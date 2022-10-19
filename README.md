@@ -1,6 +1,4 @@
-# TEQUILA-seq: Data Analysis Software
-
-This repository contains scripts for processing and analyzing TEQUILA-seq (**T**ranscript **E**nrichment and **Q**uantification **U**tilizing **I**sothermally **L**inear-**A**mplified probes in conjunction with long-read **seq**uencing) data.
+# IRIS-long: Isoform peptides from RNA splicing for Immunotherapy target Screening - based on Long-read RNA-seq data
 
 ## Table of Contents
 
