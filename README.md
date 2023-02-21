@@ -109,6 +109,7 @@ script arguments:
 ```
 
 `group_info_inf` indicates how many sample groups we have, and how many samples in each group. 
+
 An example `group_info_inf` file would be:
 ```
 Group   Number_of_samples
@@ -123,6 +124,7 @@ Note: columns are separated by `tab`. And the order is important, based on this 
 2. The canonical transcript in a gene (if it's not the interested transcript, otherwise it would be the longest annotated transcript, based on Gencode annotation)
 3. The 3rd - 5th transcripts would be the transcripts with the highest average proportion across all samples among the rest transcripts in a gene. 
 Thus, we need to input all the interested transcripts in  `required_trans_inf` so that they could be included in the genrated figures. 
+
 An example `required_trans_inf` file would be:
 ```
 Gene_ID Trans_ID  Gene_symbol
