@@ -108,7 +108,8 @@ script arguments:
 
 ```
 
-`group_info_inf` indicates how many sample groups we have, and how many samples in each group. For example:
+`group_info_inf` indicates how many sample groups we have, and how many samples in each group. 
+An example `group_info_inf` file would be:
 ```
 Group   Number_of_samples
 Tumor   16
@@ -116,11 +117,13 @@ Tissue  30
 ```
 Note: columns are separated by `tab`. And the order is important, based on this example, we know the first 16 samples in transcript expression matrix belong to Tumor group and the rest 30 samples are normal tissues.
 
+
 `required_trans_inf` indicates what transcript we want show in the figure. In default, the five transcripts we would include are: 
 1. The interested transcript
 2. The canonical transcript in a gene (if it's not the interested transcript, otherwise it would be the longest annotated transcript, based on Gencode annotation)
 3. The 3rd - 5th transcripts would be the transcripts with the highest average proportion across all samples among the rest transcripts in a gene. 
-Thus, we need to input all the interested transcripts in  `required_trans_inf` so that they could be included in the genrated figures. For example:
+Thus, we need to input all the interested transcripts in  `required_trans_inf` so that they could be included in the genrated figures. 
+An example `required_trans_inf` file would be:
 ```
 Gene_ID Trans_ID  Gene_symbol
 ENSG00000026508 ENST00000434472;ENST00000428726 CD44
