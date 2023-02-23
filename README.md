@@ -93,7 +93,7 @@ A sub-command is used to pre-process ESPRESSO results. The command can start fro
 Our script can be run as follows:
 
 ```
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Preprocess [-h] --espresso_gtf /path/to/espresso_gtf_file --espresso_abundance /path/to/espresso_abundance_matrix_file --folder_sam /path/to/folder/of/sam_files --outf_dir /path/to/folder/of/output/file
+python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Preprocess [-h] --espresso_gtf /path/to/espresso_gtf_file --espresso_abundance /path/to/espresso_abundance_matrix_file --normalized_mode /choose/from/'SAM'/or/'ESPRESSO' --folder_sam /path/to/folder/of/sam_files --outf_dir /path/to/folder/of/output/file
 
 script arguments:
     -h, --help                                          Show this message and exit
@@ -101,6 +101,8 @@ script arguments:
     --espresso_gtf                                      ESPRESSO gtf file
 
     --espresso_abundance                                ESPRESSO abundance file
+
+    --normalized_mode                                   Choose to normalize CPM based on SAM files or ESPRESSO output file
 
     --folder_sam                                        Folder of sam files
 
