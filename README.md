@@ -58,23 +58,19 @@ To run our scripts, the following dependencies will need to be installed and ava
 
 ## Usage
 
-### Data processing
+### Combine ESPRESSO result (optional)
 
 A sub-command is used to combine ESPRESSO results from different runs. The command can start from raw ESPRESSO gtf and ESPRESSO abundance matrix and it will generate combined gtf file and combined isoform abundance matrix.
 
 Our script can be run as follows:
 
 ```
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Combine [-h] --gtf_list /path/to/espresso_gtf_file/list --output_abundance /filename/of/the/combined/abundance/matrix --output_gtf /filename/of/the/combined/gtf --outf_dir /path/to/folder/of/output/file
+python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Combine [-h] --gtf_list /path/to/espresso_gtf_file/list --outf_dir /path/to/folder/of/output/file
 
 script arguments:
     -h, --help                                          Show this message and exit
 
     --gtf_list                                          Path to espresso_gtf_file list
-
-    --output_abundance                                  Filename of the combined abundance matrix
-
-    --output_gtf                                        Filename of the combined gtf
 
     --outf_dir                                          Folder of output 
 
