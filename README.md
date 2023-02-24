@@ -60,7 +60,7 @@ To run our scripts, the following dependencies will need to be installed and ava
 
 ### Combine ESPRESSO result (optional)
 
-A sub-command is used to combine ESPRESSO results from different runs. The command can start from raw ESPRESSO gtf and ESPRESSO abundance matrix and it will generate combined gtf file and combined isoform abundance matrix.
+This sub-command is used to combine ESPRESSO results from different runs. The command can start from raw ESPRESSO gtf and ESPRESSO abundance matrix and it will generate combined gtf file and combined isoform abundance matrix.
 
 Our script can be run as follows:
 
@@ -80,7 +80,7 @@ script arguments:
 
 An example `gtf_list` file would be:
 ```
-./samples_N2_R0_updated.gtf    PARCB
+./samples_N2_R0_updated.gtf    Tumor
 /mnt/isilon/xing_lab/aspera/xuy/CloneTechTissueAll_ESPRESSO_0225/samples_N2_R0_updated_hg38.gtf    Tissue
 ```
 Note: columns are separated by `tab`. 
@@ -88,7 +88,7 @@ Note: columns are separated by `tab`.
 
 ### Data processing
 
-A sub-command is used to pre-process ESPRESSO results. The command can start from raw ESPRESSO gtf and ESPRESSO abundance matrix and it will generate bed format file (derived from gtf file) as well as normalized abundance matrix using CPM as unit in both transcript level and gene level. Besides, it will also generate isoform proportion matrix, which would be used in the following steps
+This sub-command is used to pre-process ESPRESSO results. The command can start from raw ESPRESSO gtf and ESPRESSO abundance matrix and it will generate bed format file (derived from gtf file) as well as normalized abundance matrix using CPM as unit in both transcript level and gene level. Besides, it will also generate isoform proportion matrix, which would be used in the following steps
 
 Our script can be run as follows:
 
@@ -112,7 +112,7 @@ script arguments:
 
 ### Data visualization and analysis
 
-A sub-command is used to visualize process results. The command can start from results generated from previous step, and it will finally generate bar-graph figures for both isoform proportion and isoform abundance (CPM) in a gene, as well as the transcript structure figures for all involved isoforms in a gene.
+This sub-command is used to visualize process results. The command can start from results generated from previous step, and it will finally generate bar-graph figures for both isoform proportion and isoform abundance (CPM) in a gene, as well as the transcript structure figures for all involved isoforms in a gene.
 
 Our script can be run as follows:
 
@@ -162,3 +162,63 @@ ENSG00000026508 ENST00000434472;ENST00000428726 CD44
 ```
 Note: columns are separated by `tab`. Multiple required transcripts are separated by `;`.
 
+### Differential test
+
+This sub-command is used to perform differential tests between tumor samples and normal tissue samples. This step consists of two test (based on isoform level): differential expression test (two-sided wilcoxon-ranksum test) and prevalence test (fisher-exact test).
+
+Our script can be run as follows:
+
+```
+python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py DiffTest [-h] --isoform_cpm_inf /path/to/isoform_cpm_matrix --tumor_num /number/of/tumor/samples --detest_p /p-value/in/DE-test --detest_tumor_cpm /Cutoff/of/CPM/across/tumor/in/DE-test --detest_fc /Cutoff/of/fold/change/in/DE-test --pretest_p /p-value/in/prevalence-test --pretest_tumor_cpm /Cutoff/of/CPM/across/tumor/in/prevalence-test --pretest_tissue_cpm /Cutoff/of/CPM/across/tissue/in/prevalence-test --outf_dir /path/to/folder/of/output/file
+
+script arguments:
+    -h, --help                                          Show this message and exit
+
+    --isoform_cpm_inf                                   Isoform CPM infile
+
+    --tumor_num                                         Number of tumor samples
+
+    --detest_p                                          Cutoff of p-value in DE test, default is 0.05
+
+    --detest_tumor_cpm                                  Cutoff of median CPM value in tumor samples, used to decide whether an isoform is highly expressed
+
+    --detest_fc                                         Cutoff of fold change between tumor and normal, used to decide DE isoform
+
+    --pretest_p                                         Cutoff of p-value in prevalence test, default is 1e-6
+
+    --pretest_tumor_cpm                                 Cutoff of CPM value in tumor samples, used to decide whether an isoform is considered as expressed 
+
+    --pretest_tissue_cpm                                Cutoff of CPM value in tissue samples, used to decide whether an isoform is considered as expressed
+
+    --outf_dir                                          Folder of output 
+
+```
+
+
+### Translation
+
+This sub-command is used to classify transcripts into different types (protein-coding, NMD or fragment). Then translate protein-coding transcripts into proteins.
+
+Our script can be run as follows:
+
+```
+python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Translation [-h] --mode /short-read/or/long-read --trans_gtf /path/to/ESPRESSO/gtf/file --abundance_inf /path/to/abundance/file --genome_version /hg19/or/hg38 --ref_gtf /path/to/reference/gencode/gtf/file --out_file /prefix/of/name/of/output/file --outf_dir /path/to/folder/of/output/file
+
+script arguments:
+    -h, --help                                          Show this message and exit
+
+    --mode                                              Long-read or short-read RNA-seq data mode, default is long-read
+
+    --trans_gtf                                         Generated ESPRESSO gtf file
+
+    --abundance_inf                                     Generated isoform CPM abundance file
+
+    --genome_version                                    Choose from ['GRCH38','GRCH37','hg38','hg19']
+
+    --ref_gtf                                           Reference gencode annotation gtf
+
+    --out_file                                          Prefix of the name of output file
+
+    --outf_dir                                          Folder of output 
+
+```
