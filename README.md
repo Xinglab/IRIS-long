@@ -102,7 +102,7 @@ script arguments:
 
     --espresso_abundance                                ESPRESSO abundance file
 
-    --normalized_mode                                   Choose to normalize CPM based on SAM files or ESPRESSO output file
+    --normalized_mode                                   Choose to normalize CPM based on SAM files or ESPRESSO output file, choose from ['SAM','ESPRESSO']
 
     --folder_sam                                        Folder of sam files
 
@@ -178,17 +178,17 @@ script arguments:
 
     --tumor_num                                         Number of tumor samples
 
-    --detest_p                                          Cutoff of p-value in DE test, default is 0.05
+    --detest_p                                          Cutoff of p-value in DE test, default = 0.05
 
-    --detest_tumor_cpm                                  Cutoff of median CPM value in tumor samples, used to decide whether an isoform is highly expressed
+    --detest_tumor_cpm                                  Cutoff of median CPM value in tumor samples, used to decide whether an isoform is highly expressed, default = 3
 
-    --detest_fc                                         Cutoff of fold change between tumor and normal, used to decide DE isoform
+    --detest_fc                                         Cutoff of fold change between tumor and normal, used to decide DE isoform, default = 2
 
-    --pretest_p                                         Cutoff of p-value in prevalence test, default is 1e-6
+    --pretest_p                                         Cutoff of p-value in prevalence test, default = 1e-6
 
-    --pretest_tumor_cpm                                 Cutoff of CPM value in tumor samples, used to decide whether an isoform is considered as expressed 
+    --pretest_tumor_cpm                                 Cutoff of CPM value in tumor samples, used to decide whether an isoform is considered as expressed, default = 2
 
-    --pretest_tissue_cpm                                Cutoff of CPM value in tissue samples, used to decide whether an isoform is considered as expressed
+    --pretest_tissue_cpm                                Cutoff of CPM value in tissue samples, used to decide whether an isoform is considered as expressed, default = 1
 
     --outf_dir                                          Folder of output 
 
