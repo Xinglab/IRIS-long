@@ -222,3 +222,42 @@ script arguments:
     --outf_dir                                          Folder of output 
 
 ```
+
+
+### CAR-T target prediction
+
+This sub-command is used to decide protein topology and further discover potential targets for CAR-T therapy.
+
+Our script can be run as follows:
+
+```
+python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py CAR_T [-h] --tmhmm_dir /path/of/tmhmm --tumor_num /number/of/tumor/samples --protein /path/to/generated/protein/fasta --abundance_inf /path/to/abundance/file --isoform_prop_inf /path/to/isoform/proportion/file --genome_version /hg19/or/hg38 --specificity_score /cutoff/of/specificity_score --tissue_cpm /cutoff/of/transcripts/in/tissue/samples --annotated_isoform_contri_inf /path/to/file --other_isoform_contri_inf /path/to/file --out_file /prefix/of/name/of/output/file --outf_dir /path/to/folder/of/output/file
+
+script arguments:
+    -h, --help                                          Show this message and exit
+
+    --tmhmm_dir                                         File path of TMHMM tool (directory is needed)
+
+    --tumor_num                                         Number of tumor samples
+
+    --protein                                           Generated protein fasta file
+
+    --abundance_inf                                     Generated isoform CPM abundance file
+
+    --isoform_prop_inf                                  Generated isoform proportion file
+
+    --genome_version                                    Choose from ['GRCH38','GRCH37','hg38','hg19']
+
+    --specificity_score                                 Cutoff of specificity score (default = 1)
+
+    --tissue_cpm                                        Cutoff of (maximam acceptable) CPM of transcripts encode given peptide in tissue samples (default = 10)
+
+    --annotated_isoform_contri_inf                      File generated before, which ends with "_annotated_isoform_contribution.txt"
+
+    --other_isoform_contri_inf                          File generated before, which ends with "_proportion_only_focus_others.txt"
+
+    --out_file                                          Prefix of the name of output file
+
+    --outf_dir                                          Folder of output 
+
+```
