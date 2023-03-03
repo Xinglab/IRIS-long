@@ -65,7 +65,9 @@ This sub-command is used to combine ESPRESSO results from different runs. The co
 Our script can be run as follows:
 
 ```
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Combine [-h] --gtf_list /path/to/espresso_gtf_file/list --outf_dir /path/to/folder/of/output/file
+python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Combine [-h] \
+--gtf_list /path/to/espresso_gtf_file/list \
+--outf_dir /path/to/folder/of/output/file
 
 script arguments:
     -h, --help                                          Show this message and exit
@@ -93,7 +95,12 @@ This sub-command is used to pre-process ESPRESSO results. The command can start 
 Our script can be run as follows:
 
 ```
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Preprocess [-h] --espresso_gtf /path/to/espresso_gtf_file --espresso_abundance /path/to/espresso_abundance_matrix_file --normalized_mode /choose/from/'SAM'/or/'ESPRESSO' --folder_sam /path/to/folder/of/sam_files --outf_dir /path/to/folder/of/output/file
+python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Preprocess [-h] \
+--espresso_gtf /path/to/espresso_gtf_file \
+--espresso_abundance /path/to/espresso_abundance_matrix_file \
+--normalized_mode /choose/from/'SAM'/or/'ESPRESSO' \
+--folder_sam /path/to/folder/of/sam_files \
+--outf_dir /path/to/folder/of/output/file
 
 script arguments:
     -h, --help                                          Show this message and exit
@@ -117,7 +124,14 @@ This sub-command is used to visualize process results. The command can start fro
 Our script can be run as follows:
 
 ```
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Figure --isoform_porportion_inf /path/to/isoform/proportion/matrix --isoform_cpm_inf /path/to/isoform/abundance/matrix/CPM --group_info_inf /path/to/file/containing/group_info --required_trans_inf /path/to/file/containing/required_transcripts --bedgraph /path/to/processed/bed/file --outf_dir /path/to/folder/of/output/file --figures Isoform Single_isoform Structure
+python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Figure [-h] \
+--isoform_porportion_inf /path/to/isoform/proportion/matrix \
+--isoform_cpm_inf /path/to/isoform/abundance/matrix/CPM \
+--group_info_inf /path/to/file/containing/group_info \
+--required_trans_inf /path/to/file/containing/required_transcripts \
+--bedgraph /path/to/processed/bed/file \
+--outf_dir /path/to/folder/of/output/file \
+--figures Isoform Single_isoform Structure
 
 script arguments:
     -h, --help                                          Show this message and exit
@@ -169,7 +183,16 @@ This sub-command is used to perform differential tests between tumor samples and
 Our script can be run as follows:
 
 ```
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py DiffTest [-h] --isoform_cpm_inf /path/to/isoform_cpm_matrix --tumor_num /number/of/tumor/samples --detest_p /p-value/in/DE-test --detest_tumor_cpm /Cutoff/of/CPM/across/tumor/in/DE-test --detest_fc /Cutoff/of/fold/change/in/DE-test --pretest_p /p-value/in/prevalence-test --pretest_tumor_cpm /Cutoff/of/CPM/across/tumor/in/prevalence-test --pretest_tissue_cpm /Cutoff/of/CPM/across/tissue/in/prevalence-test --outf_dir /path/to/folder/of/output/file
+python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py DiffTest [-h] \
+--isoform_cpm_inf /path/to/isoform_cpm_matrix \
+--tumor_num /number/of/tumor/samples \
+--detest_p /p-value/in/DE-test \
+--detest_tumor_cpm /Cutoff/of/CPM/across/tumor/in/DE-test \
+--detest_fc /Cutoff/of/fold/change/in/DE-test \
+--pretest_p /p-value/in/prevalence-test \
+--pretest_tumor_cpm /Cutoff/of/CPM/across/tumor/in/prevalence-test \
+--pretest_tissue_cpm /Cutoff/of/CPM/across/tissue/in/prevalence-test \
+--outf_dir /path/to/folder/of/output/file
 
 script arguments:
     -h, --help                                          Show this message and exit
@@ -202,7 +225,14 @@ This sub-command is used to classify transcripts into different types (protein-c
 Our script can be run as follows:
 
 ```
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Translation [-h] --mode /short-read/or/long-read --trans_gtf /path/to/ESPRESSO/gtf/file --abundance_inf /path/to/abundance/file --genome_version /hg19/or/hg38 --ref_gtf /path/to/reference/gencode/gtf/file --out_file /prefix/of/name/of/output/file --outf_dir /path/to/folder/of/output/file
+python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Translation [-h] \
+--mode /short-read/or/long-read \
+--trans_gtf /path/to/ESPRESSO/gtf/file \
+--abundance_inf /path/to/abundance/file \
+--genome_version /hg19/or/hg38 \
+--ref_gtf /path/to/reference/gencode/gtf/file \
+--out_file /prefix/of/name/of/output/file \
+--outf_dir /path/to/folder/of/output/file
 
 script arguments:
     -h, --help                                          Show this message and exit
@@ -231,7 +261,19 @@ This sub-command is used to decide protein topology and further discover potenti
 Our script can be run as follows:
 
 ```
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py CAR_T [-h] --tmhmm_dir /path/of/tmhmm --tumor_num /number/of/tumor/samples --protein /path/to/generated/protein/fasta --abundance_inf /path/to/abundance/file --isoform_prop_inf /path/to/isoform/proportion/file --genome_version /hg19/or/hg38 --specificity_score /cutoff/of/specificity_score --tissue_cpm /cutoff/of/transcripts/in/tissue/samples --annotated_isoform_contri_inf /path/to/file --other_isoform_contri_inf /path/to/file --out_file /prefix/of/name/of/output/file --outf_dir /path/to/folder/of/output/file
+python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py CAR_T [-h] \
+--tmhmm_dir /path/of/tmhmm \
+--tumor_num /number/of/tumor/samples \
+--protein /path/to/generated/protein/fasta \
+--abundance_inf /path/to/abundance/file \
+--isoform_prop_inf /path/to/isoform/proportion/file \
+--genome_version /hg19/or/hg38 \
+--specificity_score /cutoff/of/specificity_score \
+--tissue_cpm /cutoff/of/transcripts/in/tissue/samples \
+--annotated_isoform_contri_inf /path/to/file \
+--other_isoform_contri_inf /path/to/file \
+--out_file /prefix/of/name/of/output/file \
+--outf_dir /path/to/folder/of/output/file
 
 script arguments:
     -h, --help                                          Show this message and exit
