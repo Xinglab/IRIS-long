@@ -5,7 +5,7 @@
 * [Overview](#overview)
 * [Dependencies](#dependencies)
 * [Usage](#usage)
-  + [Data combining](#data-combining)
+  + [Data combining (optional)](#data-combining)
   + [Data processing](#data-processing)
   + [Data visualization and analysis](#data-visualization-and-analysis)
   + [Differential test](#differential-test)
@@ -120,7 +120,8 @@ script arguments:
 
 ### Data visualization and analysis
 
-This sub-command is required to be run before "CAR-T target prediction" / "TCR target prediction" step.
+This sub-command is required to be run before "CAR-T target prediction" or "TCR target prediction" step.
+
 The command based on the results generated from previous step, and it will generate a bash file `Template_to_generate_figures.sh` as the output. The bar-graph figures for both isoform proportion and isoform abundance (CPM) in a gene, as well as the transcript structure figure would be generated when interested `Ensembl_Gene_ID`, `Gene_Symbol` and `Ensembl_Transcript_ID` are specified.
 
 Our script can be run as follows:
