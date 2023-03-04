@@ -5,60 +5,58 @@
 * [Overview](#overview)
 * [Dependencies](#dependencies)
 * [Usage](#usage)
+  + [Data combining](#data-combining)
   + [Data processing](#data-processing)
   + [Data visualization and analysis](#data-visualization-and-analysis)
+  + [Differential test](#differential-test)
+  + [Transcript Translation](#transcript-translation)
+  + [CAR-T target prediction](#car-t-target-prediction)
+  + [TCR target prediction](#tcr-target-prediction)
+
 
 
 ## Overview
 
-For the quantification part using ESPRESSO, please refer to [ESPRESSO GitHub page](https://github.com/Xinglab/espresso) and [TEQUILA-seq GitHub page](https://github.com/Xinglab/TEQUILA-seq).
+IRIS-long tool is designed to work with transcript-level quantification result based on long-read RNA-seq data. If you start with fast5 raw files, please refer to [ESPRESSO GitHub page](https://github.com/Xinglab/espresso) and [TEQUILA-seq GitHub page](https://github.com/Xinglab/TEQUILA-seq) for the transcript identification and quantification; during which, Guppy (Basecalling), [minimap2](https://github.com/lh3/minimap2) (Alignment) and [ESPRESSO](https://github.com/Xinglab/espresso) (Quantification) tool might be used.
 
-<img src="./files/TEQUILA-seq_Analysis_Workflow.png" width="800"/>
+<img src="./files/IRIS_long_workflow.png" width="800"/>
 
-Our data processing scripts are designed to work with raw Oxford Nanopore (ONT) signal data (FAST5 format) as input. However, these scripts can work with data from any long-read sequencing platform (e.g., PacBio) as long as the data is provided in FASTQ/SAM/BAM format. These scripts encompass the following steps:
-1. **Basecalling**: Raw ONT signal data (FAST5 format) is basecalled into nucleotide sequences (FASTQ format) using Guppy in fast mode.
-2. **Alignment**: Basecalled reads are mapped to a user-supplied reference genome using [minimap2](https://github.com/lh3/minimap2) (Li H., *Bioinformatics* 2018) together with user-supplied reference transcript annotations.
-3. **Transcript isoform discovery and quantification**: Full-length transcript isoforms are discovered and quantified from long-read RNA-seq alignment files using [ESPRESSO](https://github.com/Xinglab/espresso).
+The goal of IRIS-long tool is to discover novel tumor antigen from RNA dysregulation for immunotherapy. Here are the short descriptions for each step:
+0. **Data combining (Optional)**: If you want to compare the quantification result from multiple (ESPRESSO) runs, this step needs to be performed firstly. Since one novel transcript identified by ESPRESSO tool might be assigned for different transcript IDs in different runs, we need to collapse those IDs into a single ID, and then combine transcript abudance matrixes and gtf files from different runs into a single abundance matrix and a single gtf file.
+1. **Data processing**: Base on the transcript raw abundance matrix, we could normalize it (either by sam files or abundance matrix itself) into a abundance matrix using CPM as unit. Then this step also generates transcript proportion matrix as well as some other files that are necessary for the following steps. 
+2. **Data visualization and analysis**: This step is required to be run before "CAR-T target prediction" / "TCR target prediction" step. And most importantly, it will generate a `Template_to_generate_figures.sh` file, which could generate expected figures when interested gene and transcript are specified.
+3. **Differential test**: This step is to perform differential tests between tumor samples and normal tissue samples. This step consists of two test (based on transcript level): differential expression test (two-sided wilcoxon-ranksum test) and prevalence test (fisher-exact test). 
+4. **Transcript Translation**: This step is to translate all identified transcripts into potential protein products. During this step, all transcripts annotated as "protein-coding" and with "basic" tag (from GENCODE annotation) would be translated using their annotated Open Reading Frame (ORF); then, all the transcripts that are not considered as the target of Nonsense-Mediated Decay (NMD) would be translated using their longest ORF.
+5. **CAR-T target prediction**: During this step, we would predict the topology of proteins first to decide whether it can be presented at cell surface, by using both TMHMM tool and a customized inference medtho by borrowing information from UniProt annotation. Then we would combine predicted cell-surface proteins result with previous differential transcripts result, and adopt a tumor-specificty scanning strategy to prioritize the final targets for CAR-T therapy.
+6. **TCR target prediction**: During this step, we would perform HLA-typing based on given samples first. Then we would predict the peptides bound by sample-specific HLA complex. Finally, we adopt a tumor-specificty scanning strategy to prioritize the final targets for TCR therapy.
 
-We also have scripts designed to visualize and further characterize transcript isoforms identified from TEQUILA-seq data. These scripts can perform the following tasks:
-1. **Visualize discovered transcript isoforms**: Given a collection of samples subjected to TEQUILA-seq, we can visualize the structures and relative abundances of all transcript isoforms discovered for a given gene.
-2. **Detect group-specific and sample-specific transcript isoforms**: For a collection of samples subjected to TEQUILA-seq, if the samples can be partitioned into different groups, we can identify transcript isoforms with group-specific expression and usage. Similarly, we can also identify transcript isoforms with sample-specific expression and usage.
-3. **Characterize alternative splicing events underlying discovered transcript isoforms**: Local differences in transcript structure between a given isoform and the canonical isoform of the corresponding gene are classified into different alternative splicing patterns, including exon skipping, alternative 5' and 3' splice sites, mutually exclusive exons, retained introns, alternative first or last exons, and complex splicing. 
-4. **Predict NMD-targeted transcript isoforms**: Transcript isoforms targeted by mRNA nonsense-mediated decay (NMD) are predicted from the set of isoforms discovered from TEQUILA-seq data based on the 50 nt rule.
+
 
 ## Dependencies
 
 To run our scripts, the following dependencies will need to be installed and available on `$PATH`:
 
-* [Snakemake](https://snakemake.readthedocs.io) (v5.31.1) 
-* Guppy (must be downloaded manually from the [ONT software download page](https://community.nanoporetech.com/downloads) since a login is required
-* [minimap2](https://github.com/lh3/minimap2) (v2.17)
-* [SAMtools](http://samtools.sourceforge.net) (v1.9)
-* [BLAST](https://www.ncbi.nlm.nih.gov/blast/) (v2.10.1)
-* [HMMER](http://hmmer.org/) (v3.3.1)
-* [UCSC KentUtils](http://hgdownload.soe.ucsc.edu/admin/exe/)
-  + bedGraphToBigWig
-  + faToTwoBit
-  + twoBitInfo
-* [Python](https://www.python.org/) 3.8
-  + [NumPy](https://numpy.org/) (v1.20.1)
-  + [pandas](https://pandas.pydata.org/) (v1.1.4)
-  + [SciPy](https://scipy.org/) (v1.5.4)
-  + [statsmodels](https://www.statsmodels.org/) (v0.12.2)
-  + [NetworkX](https://networkx.org/) (v2.6.3)
-  + [BeautifulSoup4](https://pypi.org/project/beautifulsoup4/) (v4.8.2)
-  + [ConfigArgParse](https://pypi.org/project/ConfigArgParse/)
-* [R](https://www.r-project.org/) (v4.0.5)
+* [SAMtools](http://samtools.sourceforge.net) 
+* [TMHMM](https://services.healthtech.dtu.dk/services/TMHMM-2.0/)
+* [HLA-LA](https://github.com/DiltheyLab/HLA-LA) 
+* [NetMHCpan](https://services.healthtech.dtu.dk/services/NetMHCpan-4.1/) 
+* [Python](https://www.python.org/) >3.8
+  + [NumPy](https://numpy.org/) 
+  + [ConfigArgParse](https://pypi.org/project/ConfigArgParse/) 
+  + [SciPy](https://scipy.org/) 
+  + [statsmodels](https://www.statsmodels.org/) 
+  + [BioPython](https://biopython.org/) 
+  + [Matplotlib](https://matplotlib.org/)
+* [R](https://www.r-project.org/) 
   + [ggplot2](https://ggplot2.tidyverse.org/)
   + [tidyverse](https://www.tidyverse.org/)
   + [ggplotify](https://cran.r-project.org/package=ggplotify)
   + [scales](https://scales.r-lib.org/)
-  + [forcats](https://forcats.tidyverse.org/)
   + Check for thread support with `perl -e 'use threads; print("ok\n")'`
 
 ## Usage
 
-### Combine ESPRESSO result (optional)
+### Data combining
 
 This sub-command is used to combine ESPRESSO results from different runs. The command can start from raw ESPRESSO gtf and ESPRESSO abundance matrix and it will generate combined gtf file and combined isoform abundance matrix.
 
@@ -86,6 +84,7 @@ An example `gtf_list` file would be:
 /mnt/isilon/xing_lab/aspera/xuy/CloneTechTissueAll_ESPRESSO_0225/samples_N2_R0_updated_hg38.gtf    Tissue
 ```
 Note: columns are separated by `tab`. 
+
 
 
 ### Data processing
@@ -117,9 +116,12 @@ script arguments:
 
 ```
 
+
+
 ### Data visualization and analysis
 
-This sub-command is used to visualize process results. The command can start from results generated from previous step, and it will finally generate bar-graph figures for both isoform proportion and isoform abundance (CPM) in a gene, as well as the transcript structure figures for all involved isoforms in a gene.
+This sub-command is required to be run before "CAR-T target prediction" / "TCR target prediction" step.
+The command based on the results generated from previous step, and it will generate a bash file `Template_to_generate_figures.sh` as the output. The bar-graph figures for both isoform proportion and isoform abundance (CPM) in a gene, as well as the transcript structure figure would be generated when interested `Ensembl_Gene_ID`, `Gene_Symbol` and `Ensembl_Transcript_ID` are specified.
 
 Our script can be run as follows:
 
@@ -176,6 +178,8 @@ ENSG00000026508 ENST00000434472;ENST00000428726 CD44
 ```
 Note: columns are separated by `tab`. Multiple required transcripts are separated by `;`.
 
+
+
 ### Differential test
 
 This sub-command is used to perform differential tests between tumor samples and normal tissue samples. This step consists of two test (based on isoform level): differential expression test (two-sided wilcoxon-ranksum test) and prevalence test (fisher-exact test).
@@ -218,7 +222,8 @@ script arguments:
 ```
 
 
-### Translation
+
+### Transcript Translation
 
 This sub-command is used to classify transcripts into different types (protein-coding, NMD or fragment). Then translate protein-coding transcripts into proteins.
 
@@ -252,6 +257,7 @@ script arguments:
     --outf_dir                                          Folder of output 
 
 ```
+
 
 
 ### CAR-T target prediction
@@ -303,3 +309,10 @@ script arguments:
     --outf_dir                                          Folder of output 
 
 ```
+
+
+
+### TCR target prediction
+
+This sub-command is used to predict samples-specific HLA types and further discover potential targets for TCR therapy.
+
