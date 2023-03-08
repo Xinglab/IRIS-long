@@ -7,11 +7,11 @@
 * [Usage](#usage)
   + [Data combining (optional)](#data-combining)
   + [Data processing](#data-processing)
-  + [Data visualization and analysis](#data-visualization-and-analysis)
   + [Differential test](#differential-test)
   + [Transcript Translation](#transcript-translation)
   + [CAR-T target prediction](#car-t-target-prediction)
   + [TCR target prediction](#tcr-target-prediction)
+  + [Example visualization](#example-visualization)
 
 
 
@@ -25,12 +25,11 @@ The goal of IRIS-long tool is to discover novel tumor antigen from RNA dysregula
 
 1. **Data combining (Optional)**: If you want to compare the quantification result from multiple (ESPRESSO) runs, this step needs to be performed firstly. Since one novel transcript identified by ESPRESSO tool might be assigned for different transcript IDs in different runs, we need to collapse those IDs into a single ID, and then combine transcript abudance matrixes and gtf files from different runs into a single abundance matrix and a single gtf file.
 2. **Data processing**: Based on the transcript raw abundance matrix, we could normalize it (either by sam files or abundance matrix itself) into a abundance matrix with CPM (count per million) as unit. Then this step also generates transcript proportion matrix as well as some other files that are necessary for the following steps. 
-3. **Data visualization and analysis**: This step is required to be run before "CAR-T target prediction" / "TCR target prediction" step. And most importantly, it will generate a `Template_to_generate_figures.sh` file, which could generate expected figures when interested gene and transcript are specified.
-4. **Differential test**: This step is to perform differential tests between tumor samples and normal tissue samples. This step consists of two test (based on transcript level): differential expression test (two-sided wilcoxon-ranksum test) and prevalence test (fisher-exact test). 
-5. **Transcript Translation**: This step is to translate all identified transcripts into potential protein products. During this step, all transcripts annotated as "protein-coding" and with "basic" tag (from GENCODE annotation) would be translated using their annotated Open Reading Frame (ORF); then, all the transcripts that are not considered as the target of Nonsense-Mediated Decay (NMD) would be translated using their longest ORF.
-6. **CAR-T target prediction**: During this step, we would predict the topology of proteins first to decide whether it can be presented at cell surface, by using both TMHMM tool and a customized inference medthod by borrowing information from UniProt annotation. Then we would combine predicted cell-surface proteins result with previous differential transcripts result, and adopt a tumor-specificty scanning strategy to prioritize final targets for CAR-T therapy.
-7. **TCR target prediction**: During this step, we would perform HLA-typing for given samples first. Then we would predict the peptides bound by sample-specific HLA complex. Finally, we adopt a tumor-specificty scanning strategy to prioritize final targets for TCR therapy.
-
+3. **Differential test**: This step is to perform differential tests between tumor samples and normal tissue samples. This step consists of two test (based on transcript level): differential expression test (two-sided wilcoxon-ranksum test) and prevalence test (fisher-exact test). 
+4. **Transcript Translation**: This step is to translate all identified transcripts into potential protein products. During this step, all transcripts annotated as "protein-coding" and with "basic" tag (from GENCODE annotation) would be translated using their annotated Open Reading Frame (ORF); then, all the transcripts that are not considered as the target of Nonsense-Mediated Decay (NMD) would be translated using their longest ORF.
+5. **CAR-T target prediction**: During this step, we would predict the topology of proteins first to decide whether it can be presented at cell surface, by using both TMHMM tool and a customized inference medthod by borrowing information from UniProt annotation. Then we would combine predicted cell-surface proteins result with previous differential transcripts result, and adopt a tumor-specificty scanning strategy to prioritize final targets for CAR-T therapy.
+6. **TCR target prediction**: During this step, we would perform HLA-typing for given samples first. Then we would predict the peptides bound by sample-specific HLA complex. Finally, we adopt a tumor-specificty scanning strategy to prioritize final targets for TCR therapy.
+7. **Example visualization**: This step will generate a `Template_to_generate_figures.sh` file, which could generate expected figures when interested gene and transcript are specified.
 
 
 ## Dependencies
@@ -116,69 +115,6 @@ script arguments:
     --outf_dir                                          Folder of output 
 
 ```
-
-
-
-### Data visualization and analysis
-
-This sub-command is required to be run before "CAR-T target prediction" or "TCR target prediction" step.
-
-The command based on the results generated from previous step, and it will generate a bash file `Template_to_generate_figures.sh` as the output. The bar-graph figures for both isoform proportion and isoform abundance (CPM) in a gene, as well as the transcript structure figure would be generated when interested `Ensembl_Gene_ID`, `Gene_Symbol` and `Ensembl_Transcript_ID` are specified.
-
-Our script can be run as follows:
-
-```
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Figure [-h] \
---isoform_proportion_inf /path/to/isoform/proportion/matrix \
---isoform_cpm_inf /path/to/isoform/abundance/matrix/CPM \
---group_info_inf /path/to/file/containing/group_info \
---required_trans_inf /path/to/file/containing/required_transcripts \
---bedgraph /path/to/processed/bed/file \
---outf_dir /path/to/folder/of/output/file \
---figures Isoform Single_isoform Structure
-
-script arguments:
-    -h, --help                                          Show this message and exit
-
-    --isoform_proportion_inf                            Isoform proportion matrix from previous step
-
-    --isoform_cpm_inf                                   Isoform abundance matrix file (CPM) from previous step
-
-    --group_info_inf                                    Sample group information
-
-    --required_trans_inf                                Transcripts need to show in final figure
-
-    --bedgraph                                          Bed file generated from previous step
-
-    --outf_dir                                          Folder of output
-
-    --figures                                           Figures expected to generate, could be multiple choices from ['Isoform','Single_isoform','Structure'], seperated by ' ' (white space)
-
-```
-
-`group_info_inf` indicates how many sample groups we have, and how many samples in each group. 
-
-An example `group_info_inf` file would be:
-```
-Group   Number_of_samples
-Tumor   16
-Tissue  30
-```
-Note: columns are separated by `tab`. And the order is important, based on this example, we know the first 16 samples in transcript expression matrix belong to Tumor group and the rest 30 samples are normal tissues.
-
-
-`required_trans_inf` indicates what transcript we want show in the figure. In default, the five transcripts we would include are: 
-1. The interested transcript
-2. The canonical transcript in a gene (if it's not the interested transcript, otherwise it would be the longest annotated transcript, based on Gencode annotation)
-3. The 3rd - 5th transcripts would be the transcripts with the highest average proportion across all samples among the rest transcripts in a gene. 
-Thus, we need to input all the interested transcripts in  `required_trans_inf` so that they could be included in the genrated figures. 
-
-An example `required_trans_inf` file would be:
-```
-Gene_ID Trans_ID  Gene_symbol
-ENSG00000026508 ENST00000434472;ENST00000428726 CD44
-```
-Note: columns are separated by `tab`. Multiple required transcripts are separated by `;`.
 
 
 
@@ -279,7 +215,6 @@ python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_tes
 --specificity_score /cutoff/of/specificity_score \
 --tissue_cpm /cutoff/of/transcripts/in/tissue/samples \
 --annotated_isoform_contri_inf /path/to/file \
---other_isoform_contri_inf /path/to/file \
 --out_file /prefix/of/name/of/output/file \
 --outf_dir /path/to/folder/of/output/file
 
@@ -304,8 +239,6 @@ script arguments:
 
     --annotated_isoform_contri_inf                      File generated before, which ends with "_annotated_isoform_contribution.txt"
 
-    --other_isoform_contri_inf                          File generated before, which ends with "_proportion_only_focus_others.txt"
-
     --out_file                                          Prefix of the name of output file
 
     --outf_dir                                          Folder of output 
@@ -317,4 +250,65 @@ script arguments:
 ### TCR target prediction
 
 This sub-command is used to predict samples-specific HLA types and further discover potential targets for TCR therapy.
+
+
+
+### Example visualization
+
+The command based on the results generated from previous step, and it will generate a bash file `Template_to_generate_figures.sh` as the output. The bar-graph figures for both isoform proportion and isoform abundance (CPM) in a gene, as well as the transcript structure figure would be generated when interested `Ensembl_Gene_ID`, `Gene_Symbol` and `Ensembl_Transcript_ID` are specified.
+
+Our script can be run as follows:
+
+```
+python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Figure [-h] \
+--isoform_proportion_inf /path/to/isoform/proportion/matrix \
+--isoform_cpm_inf /path/to/isoform/abundance/matrix/CPM \
+--group_info_inf /path/to/file/containing/group_info \
+--required_trans_inf /path/to/file/containing/required_transcripts \
+--bedgraph /path/to/processed/bed/file \
+--outf_dir /path/to/folder/of/output/file \
+--figures Isoform Single_isoform Structure
+
+script arguments:
+    -h, --help                                          Show this message and exit
+
+    --isoform_proportion_inf                            Isoform proportion matrix from previous step
+
+    --isoform_cpm_inf                                   Isoform abundance matrix file (CPM) from previous step
+
+    --group_info_inf                                    Sample group information
+
+    --required_trans_inf                                Transcripts need to show in final figure
+
+    --bedgraph                                          Bed file generated from previous step
+
+    --outf_dir                                          Folder of output
+
+    --figures                                           Figures expected to generate, could be multiple choices from ['Isoform','Single_isoform','Structure'], seperated by ' ' (white space)
+
+```
+
+`group_info_inf` indicates how many sample groups we have, and how many samples in each group. 
+
+An example `group_info_inf` file would be:
+```
+Group   Number_of_samples
+Tumor   16
+Tissue  30
+```
+Note: columns are separated by `tab`. And the order is important, based on this example, we know the first 16 samples in transcript expression matrix belong to Tumor group and the rest 30 samples are normal tissues.
+
+
+`required_trans_inf` indicates what transcript we want show in the figure. In default, the five transcripts we would include are: 
+1. The interested transcript
+2. The canonical transcript in a gene (if it's not the interested transcript, otherwise it would be the longest annotated transcript, based on Gencode annotation)
+3. The 3rd - 5th transcripts would be the transcripts with the highest average proportion across all samples among the rest transcripts in a gene. 
+Thus, we need to input all the interested transcripts in  `required_trans_inf` so that they could be included in the genrated figures. 
+
+An example `required_trans_inf` file would be:
+```
+Gene_ID Trans_ID  Gene_symbol
+ENSG00000026508 ENST00000434472;ENST00000428726 CD44
+```
+Note: columns are separated by `tab`. Multiple required transcripts are separated by `;`.
 
