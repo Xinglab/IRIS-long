@@ -64,11 +64,14 @@ Our script can be run as follows:
 
 ```
 python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Combine [-h] \
+--allowed_dist /allowed/distance/for/each/ends/to/collapse/novel/transcripts \
 --gtf_list /path/to/espresso_gtf_file/list \
 --outf_dir /path/to/folder/of/output/file
 
 script arguments:
     -h, --help                                          Show this message and exit
+
+    --allowed_dist                                      Allowed distance for each ends to collapse novel transcripts, default = 50bp
 
     --gtf_list                                          Path to espresso_gtf_file list
 
