@@ -17,19 +17,19 @@
 
 ## Overview
 
-IRIS-long tool is designed to work with transcript-level quantification result based on long-read RNA-seq data. If you start with fast5 raw files, please refer to [ESPRESSO GitHub page](https://github.com/Xinglab/espresso) and [TEQUILA-seq GitHub page](https://github.com/Xinglab/TEQUILA-seq) for the transcript identification and quantification; during which, Guppy (Basecalling), [minimap2](https://github.com/lh3/minimap2) (Alignment) and [ESPRESSO](https://github.com/Xinglab/espresso) (Quantification) tool might be used.
+IRIS-long tool is designed to work with transcript-level quantification result based on long-read RNA-seq data. If you start with fast5 raw files, please refer to [ESPRESSO GitHub page](https://github.com/Xinglab/espresso) and [TEQUILA-seq GitHub page](https://github.com/Xinglab/TEQUILA-seq) for the transcript identification and quantification; in which, Guppy (Basecalling), [minimap2](https://github.com/lh3/minimap2) (Alignment) and [ESPRESSO](https://github.com/Xinglab/espresso) (Quantification) tool might be used.
 
 <img src="./files/IRIS_long_workflow.png" width="800"/>
 
 The goal of IRIS-long tool is to discover novel tumor antigen from RNA dysregulation for immunotherapy. Here are the short descriptions for each step:
 
 1. **Data combining (Optional)**: If you want to compare the quantification result from multiple (ESPRESSO) runs, this step needs to be performed firstly. Since one novel transcript identified by ESPRESSO tool might be assigned for different transcript IDs in different runs, we need to collapse those IDs into a single ID, and then combine transcript abudance matrixes and gtf files from different runs into a single abundance matrix and a single gtf file.
-2. **Data processing**: Base on the transcript raw abundance matrix, we could normalize it (either by sam files or abundance matrix itself) into a abundance matrix using CPM as unit. Then this step also generates transcript proportion matrix as well as some other files that are necessary for the following steps. 
+2. **Data processing**: Based on the transcript raw abundance matrix, we could normalize it (either by sam files or abundance matrix itself) into a abundance matrix with CPM (count per million) as unit. Then this step also generates transcript proportion matrix as well as some other files that are necessary for the following steps. 
 3. **Data visualization and analysis**: This step is required to be run before "CAR-T target prediction" / "TCR target prediction" step. And most importantly, it will generate a `Template_to_generate_figures.sh` file, which could generate expected figures when interested gene and transcript are specified.
 4. **Differential test**: This step is to perform differential tests between tumor samples and normal tissue samples. This step consists of two test (based on transcript level): differential expression test (two-sided wilcoxon-ranksum test) and prevalence test (fisher-exact test). 
 5. **Transcript Translation**: This step is to translate all identified transcripts into potential protein products. During this step, all transcripts annotated as "protein-coding" and with "basic" tag (from GENCODE annotation) would be translated using their annotated Open Reading Frame (ORF); then, all the transcripts that are not considered as the target of Nonsense-Mediated Decay (NMD) would be translated using their longest ORF.
-6. **CAR-T target prediction**: During this step, we would predict the topology of proteins first to decide whether it can be presented at cell surface, by using both TMHMM tool and a customized inference medtho by borrowing information from UniProt annotation. Then we would combine predicted cell-surface proteins result with previous differential transcripts result, and adopt a tumor-specificty scanning strategy to prioritize the final targets for CAR-T therapy.
-7. **TCR target prediction**: During this step, we would perform HLA-typing based on given samples first. Then we would predict the peptides bound by sample-specific HLA complex. Finally, we adopt a tumor-specificty scanning strategy to prioritize the final targets for TCR therapy.
+6. **CAR-T target prediction**: During this step, we would predict the topology of proteins first to decide whether it can be presented at cell surface, by using both TMHMM tool and a customized inference medthod by borrowing information from UniProt annotation. Then we would combine predicted cell-surface proteins result with previous differential transcripts result, and adopt a tumor-specificty scanning strategy to prioritize final targets for CAR-T therapy.
+7. **TCR target prediction**: During this step, we would perform HLA-typing for given samples first. Then we would predict the peptides bound by sample-specific HLA complex. Finally, we adopt a tumor-specificty scanning strategy to prioritize final targets for TCR therapy.
 
 
 
@@ -129,7 +129,7 @@ Our script can be run as follows:
 
 ```
 python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Figure [-h] \
---isoform_porportion_inf /path/to/isoform/proportion/matrix \
+--isoform_proportion_inf /path/to/isoform/proportion/matrix \
 --isoform_cpm_inf /path/to/isoform/abundance/matrix/CPM \
 --group_info_inf /path/to/file/containing/group_info \
 --required_trans_inf /path/to/file/containing/required_transcripts \
@@ -140,7 +140,7 @@ python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_tes
 script arguments:
     -h, --help                                          Show this message and exit
 
-    --isoform_porportion_inf                            Isoform proportion matrix from previous step
+    --isoform_proportion_inf                            Isoform proportion matrix from previous step
 
     --isoform_cpm_inf                                   Isoform abundance matrix file (CPM) from previous step
 
@@ -235,7 +235,7 @@ Our script can be run as follows:
 python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Translation [-h] \
 --mode /short-read/or/long-read \
 --trans_gtf /path/to/ESPRESSO/gtf/file \
---abundance_inf /path/to/abundance/file \
+--isoform_cpm_inf /path/to/isoform_cpm_matrix \
 --genome_version /hg19/or/hg38 \
 --ref_gtf /path/to/reference/gencode/gtf/file \
 --out_file /prefix/of/name/of/output/file \
@@ -248,7 +248,7 @@ script arguments:
 
     --trans_gtf                                         Generated ESPRESSO gtf file
 
-    --abundance_inf                                     Generated isoform CPM abundance file
+    --isoform_cpm_inf                                   Generated isoform CPM abundance file
 
     --genome_version                                    Choose from ['GRCH38','GRCH37','hg38','hg19']
 
@@ -273,8 +273,8 @@ python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_tes
 --tmhmm_dir /path/of/tmhmm \
 --tumor_num /number/of/tumor/samples \
 --protein /path/to/generated/protein/fasta \
---abundance_inf /path/to/abundance/file \
---isoform_prop_inf /path/to/isoform/proportion/file \
+--isoform_cpm_inf /path/to/isoform_cpm_matrix \
+--isoform_proportion_inf /path/to/isoform/proportion/matrix \
 --genome_version /hg19/or/hg38 \
 --specificity_score /cutoff/of/specificity_score \
 --tissue_cpm /cutoff/of/transcripts/in/tissue/samples \
@@ -292,9 +292,9 @@ script arguments:
 
     --protein                                           Generated protein fasta file
 
-    --abundance_inf                                     Generated isoform CPM abundance file
+    --isoform_cpm_inf                                   Generated isoform CPM abundance file
 
-    --isoform_prop_inf                                  Generated isoform proportion file
+    --isoform_proportion_inf                            Generated isoform proportion file
 
     --genome_version                                    Choose from ['GRCH38','GRCH37','hg38','hg19']
 
