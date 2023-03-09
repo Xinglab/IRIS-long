@@ -12,6 +12,7 @@
   + [CAR-T target prediction](#car-t-target-prediction)
   + [TCR target prediction](#tcr-target-prediction)
   + [Example visualization](#example-visualization)
+  + [Tumor specificity](#tumor-specificity)
 
 
 
@@ -52,6 +53,7 @@ To run our scripts, the following dependencies will need to be installed and ava
   + [tidyverse](https://www.tidyverse.org/)
   + [ggplotify](https://cran.r-project.org/package=ggplotify)
   + [scales](https://scales.r-lib.org/)
+  + [ComplexHeatmap](https://bioconductor.org/packages/release/bioc/html/ComplexHeatmap.html)
   + Check for thread support with `perl -e 'use threads; print("ok\n")'`
 
 ## Usage
@@ -306,7 +308,7 @@ Note: columns are separated by `tab`. And the order is important, based on this 
 1. The interested transcript
 2. The canonical transcript in a gene (if it's not the interested transcript, otherwise it would be the longest annotated transcript, based on Gencode annotation)
 3. The 3rd - 5th transcripts would be the transcripts with the highest average proportion across all samples among the rest transcripts in a gene. 
-Thus, we need to input all the interested transcripts in  `required_trans_inf` so that they could be included in the genrated figures. 
+Thus, we need to input all the interested transcripts in  `required_trans_inf` so that they could be included in the genrated figures (one gene per row).
 
 An example `required_trans_inf` file would be:
 ```
@@ -315,3 +317,49 @@ ENSG00000026508 ENST00000434472;ENST00000428726 CD44
 ```
 Note: columns are separated by `tab`. Multiple required transcripts are separated by `;`.
 
+
+
+### Tumor specificity
+
+The step is to calculate the tumor-specificity score for each 9 AAs region along the given transcript-derived protein sequence (from predicted CAR-T targets). Besides, it will also generate the figure showing the change of tumor-specificity scores along the protein sequence.
+
+Our script can be run as follows:
+
+```
+python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Specificity [-h] \
+--transcript_ID /EnsemblID/of/interested/transcript \
+--tumor_num /number/of/tumor/samples \
+--protein /path/to/generated/protein/fasta \
+--raw_protein /path/to/raw/protein/file \
+--isoform_cpm_inf /path/to/isoform/abundance/matrix/CPM \
+--cell_surface_inf /predicted/cell/surface/protein/in/given/samples \
+--window_size /size/of/sliding/window \
+--start_site /starting/position/of/visualized/region \
+--end_site /ending/position/of/visualized/region \
+--outf_dir /path/to/folder/of/output/file 
+
+
+script arguments:
+    -h, --help                                          Show this message and exit
+
+    --transcript_ID                                     Ensembl ID of interested transcript
+
+    --tumor_num                                         Number of tumor samples
+
+    --protein                                           File like '4_4_XXX_PC.fasta'
+
+    --raw_protein                                       File like '4_3_XXX_protein.txt'
+
+    --isoform_cpm_inf                                   Isoform abundance matrix file (CPM) from previous step
+
+    --cell_surface_inf                                  Predicted cell surface protein in given samples, file like '5_3_XXX_high_confidence.txt'
+
+    --window_size                                       Size of sliding window, (default = 9)
+
+    --start_site                                        Starting position of visualized protein region (default shows the 100 AAs region with the highest tumor-specificity)
+
+    --end_site                                          Ending position of visualized protein region (default shows the 100 AAs region with the highest tumor-specificity)
+
+    --outf_dir                                          Folder of output
+
+```
