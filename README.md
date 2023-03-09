@@ -54,6 +54,7 @@ To run our scripts, the following dependencies will need to be installed and ava
   + [ggplotify](https://cran.r-project.org/package=ggplotify)
   + [scales](https://scales.r-lib.org/)
   + [ComplexHeatmap](https://bioconductor.org/packages/release/bioc/html/ComplexHeatmap.html)
+  + [viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html)
   + Check for thread support with `perl -e 'use threads; print("ok\n")'`
 
 ## Usage
