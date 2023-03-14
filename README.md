@@ -213,14 +213,14 @@ Our script can be run as follows:
 ```
 python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py CAR_T [-h] \
 --tmhmm_dir /path/of/tmhmm \
---tumor_num /number/of/tumor/samples \
---protein /path/to/generated/protein/fasta \
+--protein_inf /path/to/generated/protein/fasta \
 --isoform_cpm_inf /path/to/isoform_cpm_matrix \
 --isoform_proportion_inf /path/to/isoform/proportion/matrix \
+--annotated_isoform_contri_inf /path/to/file \
 --genome_version /hg19/or/hg38 \
+--tumor_num /number/of/tumor/samples \
 --specificity_score /cutoff/of/specificity_score \
 --tissue_cpm /cutoff/of/transcripts/in/tissue/samples \
---annotated_isoform_contri_inf /path/to/file \
 --out_file /prefix/of/name/of/output/file \
 --outf_dir /path/to/folder/of/output/file
 
@@ -229,21 +229,21 @@ script arguments:
 
     --tmhmm_dir                                         File path of TMHMM tool (directory is needed)
 
-    --tumor_num                                         Number of tumor samples
-
-    --protein                                           Generated protein fasta file
+    --protein_inf                                       Generated protein fasta file
 
     --isoform_cpm_inf                                   Generated isoform CPM abundance file
 
     --isoform_proportion_inf                            Generated isoform proportion file
 
+    --annotated_isoform_contri_inf                      File generated before, which ends with "_annotated_isoform_contribution.txt"
+
     --genome_version                                    Choose from ['GRCH38','GRCH37','hg38','hg19']
+
+    --tumor_num                                         Number of tumor samples
 
     --specificity_score                                 Cutoff of specificity score (default = 1)
 
     --tissue_cpm                                        Cutoff of (maximam acceptable) CPM of transcripts encode given peptide in tissue samples (default = 10)
-
-    --annotated_isoform_contri_inf                      File generated before, which ends with "_annotated_isoform_contribution.txt"
 
     --out_file                                          Prefix of the name of output file
 
@@ -256,6 +256,55 @@ script arguments:
 ### TCR target prediction
 
 This sub-command is used to predict samples-specific HLA types and further discover potential targets for TCR therapy.
+
+Our script can be run as follows:
+
+```
+python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py TCR [-h] \
+--netMHCpan_dir /path/of/netMHCpan \
+--HLA_str /HLA/alleles \
+--protein_inf /path/to/generated/protein/fasta \
+--isoform_cpm_inf /path/to/isoform_cpm_matrix \
+--isoform_proportion_inf /path/to/isoform/proportion/matrix \
+--genome_version /hg19/or/hg38 \
+--annotated_isoform_contri_inf /path/to/file \
+--tumor_num /number/of/tumor/samples \
+--binding_affi /cutoff/of/binding/affinity \
+--specificity_score /cutoff/of/specificity_score \
+--tissue_cpm /cutoff/of/transcripts/in/tissue/samples \
+--window_size /size/of/sliding/window \
+--outf_dir /path/to/folder/of/output/file
+
+script arguments:
+    -h, --help                                          Show this message and exit
+
+    --netMHCpan_dir                                     File path of netMHCpan tool (directory is needed)
+
+    --HLA_str                                           HLA alleles, such as HLA-A01:01,HLA-A02:01
+
+    --protein_inf                                       Generated protein fasta file
+
+    --isoform_cpm_inf                                   Generated isoform CPM abundance file
+
+    --isoform_proportion_inf                            Generated isoform proportion file
+
+    --genome_version                                    Choose from ['GRCH38','GRCH37','hg38','hg19']
+
+    --annotated_isoform_contri_inf                      File generated before, which ends with "_annotated_isoform_contribution.txt"
+
+    --tumor_num                                         Number of tumor samples
+
+    --binding_affi                                      Cutoff of binding affinity between HLA complex and peptides (default = 500)
+
+    --specificity_score                                 Cutoff of specificity score (default = 3)
+
+    --tissue_cpm                                        Cutoff of (maximam acceptable) CPM of transcripts encode given peptide in tissue samples (default = 5)
+
+    --window_size                                       Size of sliding window, (default = 9)
+
+    --outf_dir                                          Folder of output 
+
+```
 
 
 
@@ -330,8 +379,7 @@ Our script can be run as follows:
 python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Specificity [-h] \
 --transcript_ID /EnsemblID/of/interested/transcript \
 --tumor_num /number/of/tumor/samples \
---protein /path/to/generated/protein/fasta \
---raw_protein /path/to/raw/protein/file \
+--protein_inf /path/to/generated/protein/fasta \
 --isoform_cpm_inf /path/to/isoform/abundance/matrix/CPM \
 --cell_surface_inf /predicted/cell/surface/protein/in/given/samples \
 --window_size /size/of/sliding/window \
@@ -347,9 +395,7 @@ script arguments:
 
     --tumor_num                                         Number of tumor samples
 
-    --protein                                           File like '4_4_XXX_PC.fasta'
-
-    --raw_protein                                       File like '4_3_XXX_protein.txt'
+    --protein_inf                                       Generated protein fasta file, such as '4_4_XXX_PC.fasta'
 
     --isoform_cpm_inf                                   Isoform abundance matrix file (CPM) from previous step
 
