@@ -31,6 +31,7 @@ The goal of IRIS-long tool is to discover novel tumor antigen from RNA dysregula
 5. **CAR-T target prediction**: During this step, we would predict the topology of proteins first to decide whether it can be presented at cell surface, by using both TMHMM tool and a customized inference medthod by borrowing information from UniProt annotation. Then we would combine predicted cell-surface proteins result with previous differential transcripts result, and adopt a tumor-specificty scanning strategy to prioritize final targets for CAR-T therapy.
 6. **TCR target prediction**: During this step, we would perform HLA-typing for given samples first. Then we would predict the peptides bound by sample-specific HLA complex. Finally, we adopt a tumor-specificty scanning strategy to prioritize final targets for TCR therapy.
 7. **Example visualization**: This step will generate a `Template_to_generate_figures.sh` file, which could generate expected figures when interested gene and transcript are specified.
+8. **Tumor specificity**: This step will calculate the tumor-specificity score for each region (e.g. 9 AAs) along the given transcript-derived protein sequence (for predicted CAR-T targets). Besides, it will also generate the figure showing the change of tumor-specificity scores along the protein sequence.
 
 
 ## Dependencies
@@ -39,7 +40,6 @@ To run our scripts, the following dependencies will need to be installed and ava
 
 * [SAMtools](http://samtools.sourceforge.net) 
 * [TMHMM](https://services.healthtech.dtu.dk/services/TMHMM-2.0/)
-* [HLA-LA](https://github.com/DiltheyLab/HLA-LA) 
 * [NetMHCpan](https://services.healthtech.dtu.dk/services/NetMHCpan-4.1/) 
 * [Python](https://www.python.org/) >3.8
   + [NumPy](https://numpy.org/) 
@@ -52,12 +52,19 @@ To run our scripts, the following dependencies will need to be installed and ava
   + [ggplot2](https://ggplot2.tidyverse.org/)
   + [tidyverse](https://www.tidyverse.org/)
   + [ggplotify](https://cran.r-project.org/package=ggplotify)
+  + [cowplot](https://github.com/wilkelab/cowplot)
   + [scales](https://scales.r-lib.org/)
   + [ComplexHeatmap](https://bioconductor.org/packages/release/bioc/html/ComplexHeatmap.html)
   + [viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html)
   + Check for thread support with `perl -e 'use threads; print("ok\n")'`
 
 ## Usage
+
+**Important Note**: 
+1. The input parameter for `--outf_dir` in all steps below should be the same folder, which should be the folder contains ESPRESSO output abundance matrix and gtf file.
+
+
+
 
 ### Data combining
 
@@ -257,6 +264,8 @@ script arguments:
 
 This sub-command is used to predict samples-specific HLA types and further discover potential targets for TCR therapy.
 
+When peforming TCR target prediction job, we need to input HLA alleles as the parameter, which could be obtained based on bam/sam files by tools such as [HLA-LA](https://github.com/DiltheyLab/HLA-LA) for given samples, or we can manually specify comman HLA alleles such as HLA-A02:01,HLA-A01:01
+
 Our script can be run as follows:
 
 ```
@@ -371,7 +380,7 @@ Note: columns are separated by `tab`. Multiple required transcripts are separate
 
 ### Tumor specificity
 
-The step is to calculate the tumor-specificity score for each 9 AAs region along the given transcript-derived protein sequence (from predicted CAR-T targets). Besides, it will also generate the figure showing the change of tumor-specificity scores along the protein sequence.
+The step is to calculate the tumor-specificity score for each region (e.g. 9 AAs) along the given transcript-derived protein sequence (from predicted CAR-T targets). Besides, it will also generate the figure showing the change of tumor-specificity scores along the protein sequence.
 
 Our script can be run as follows:
 
