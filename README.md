@@ -62,6 +62,7 @@ To run our scripts, the following dependencies will need to be installed and ava
 
 **Important Note**: 
 1. The input parameter for `--outf_dir` in all steps below should be the same folder, which should be the folder contains ESPRESSO output abundance matrix and gtf file.
+2. The columns in all files should be separated by single `tab` rather than `white space`.
 
 
 
