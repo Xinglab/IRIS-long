@@ -420,3 +420,33 @@ script arguments:
     --outf_dir                                          Folder of output
 
 ```
+
+
+
+### Topology figure
+
+The step is to generate protein topology figure using [Protter](https://wlab.ethz.ch/protter/help/) tool, and this step is only for predicted CAR-T targets, please run it after CAR-T prediction step.
+Note, this step is using API service from Protter tool, there is no need to download the tool.
+
+Our script can be run as follows:
+
+```
+python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Topology [-h] \
+--transcript_ID /EnsemblID/of/interested/transcript \
+--gene_symbol /Interested/gene/name \
+--protein_inf /path/to/generated/protein/fasta \
+--outf_dir /path/to/folder/of/output/file 
+
+
+script arguments:
+    -h, --help                                          Show this message and exit
+
+    --transcript_ID                                     Ensembl ID of interested transcript
+
+    --gene_symbol                                       Gene name of interested gene
+
+    --protein_inf                                       Generated protein fasta file, such as '4_4_XXX_PC.fasta'
+
+    --outf_dir                                          Folder of output
+
+```
