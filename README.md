@@ -229,6 +229,7 @@ python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_tes
 --tumor_num /number/of/tumor/samples \
 --specificity_score /cutoff/of/specificity_score \
 --tissue_cpm /cutoff/of/transcripts/in/tissue/samples \
+--tissue_number /cutoff/of/numbers/above/CPM/threshold/in/tissues \
 --out_file /prefix/of/name/of/output/file \
 --outf_dir /path/to/folder/of/output/file
 
@@ -251,7 +252,9 @@ script arguments:
 
     --specificity_score                                 Cutoff of specificity score (default = 1)
 
-    --tissue_cpm                                        Cutoff of (maximam acceptable) CPM of transcripts encode given peptide in tissue samples (default = 10)
+    --tissue_cpm                                        Cutoff of (maximum tolerable) CPM of transcripts encode given peptide in tissue samples (default = 5)
+
+    --tissue_number                                     Maximum tolerable number of tissues that are allowed to be higher than the given CPM expression threshold (default = 2)
 
     --out_file                                          Prefix of the name of output file
 
@@ -282,6 +285,7 @@ python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_tes
 --binding_affi /cutoff/of/binding/affinity \
 --specificity_score /cutoff/of/specificity_score \
 --tissue_cpm /cutoff/of/transcripts/in/tissue/samples \
+--tissue_number /cutoff/of/numbers/above/CPM/threshold/in/tissues \
 --window_size /size/of/sliding/window \
 --outf_dir /path/to/folder/of/output/file
 
@@ -304,11 +308,13 @@ script arguments:
 
     --tumor_num                                         Number of tumor samples
 
-    --binding_affi                                      Cutoff of binding affinity between HLA complex and peptides (default = 500)
+    --binding_affi                                      Cutoff of binding affinity between HLA complex and peptides (default = 200)
 
     --specificity_score                                 Cutoff of specificity score (default = 3)
 
-    --tissue_cpm                                        Cutoff of (maximam acceptable) CPM of transcripts encode given peptide in tissue samples (default = 5)
+    --tissue_cpm                                        Cutoff of (maximum tolerable) CPM of transcripts encode given peptide in tissue samples (default = 5)
+
+    --tissue_number                                     Maximum tolerable number of tissues that are allowed to be higher than the given CPM expression threshold (default = 2)
 
     --window_size                                       Size of sliding window, (default = 9)
 
