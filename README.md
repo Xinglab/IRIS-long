@@ -252,9 +252,9 @@ script arguments:
 
     --specificity_score                                 Cutoff of specificity score (default = 1)
 
-    --tissue_cpm                                        Cutoff of (maximum tolerable) CPM of transcripts encode given peptide in tissue samples (default = 5)
+    --tissue_cpm                                        Cutoff of (maximum tolerable) CPM of transcripts encode given peptide in tissue samples (default = 10)
 
-    --tissue_number                                     Maximum tolerable number of tissues that are allowed to be higher than the given CPM expression threshold (default = 2)
+    --tissue_number                                     Maximum tolerable number of tissues that are allowed to be higher than the given CPM expression threshold (default = 3)
 
     --out_file                                          Prefix of the name of output file
 
@@ -312,9 +312,9 @@ script arguments:
 
     --specificity_score                                 Cutoff of specificity score (default = 3)
 
-    --tissue_cpm                                        Cutoff of (maximum tolerable) CPM of transcripts encode given peptide in tissue samples (default = 5)
+    --tissue_cpm                                        Cutoff of (maximum tolerable) CPM of transcripts encode given peptide in tissue samples (default = 10)
 
-    --tissue_number                                     Maximum tolerable number of tissues that are allowed to be higher than the given CPM expression threshold (default = 2)
+    --tissue_number                                     Maximum tolerable number of tissues that are allowed to be higher than the given CPM expression threshold (default = 3)
 
     --window_size                                       Size of sliding window, (default = 9)
 
