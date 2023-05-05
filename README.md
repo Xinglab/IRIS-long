@@ -13,6 +13,7 @@
   + [TCR target prediction](#tcr-target-prediction)
   + [Example visualization](#example-visualization)
   + [Tumor specificity](#tumor-specificity)
+  + [Protein topology](#protein-topology )
 
 
 
@@ -20,7 +21,7 @@
 
 IRIS-long tool is designed to work with transcript-level quantification result based on long-read RNA-seq data. If you start with fast5 raw files, please refer to [ESPRESSO GitHub page](https://github.com/Xinglab/espresso) and [TEQUILA-seq GitHub page](https://github.com/Xinglab/TEQUILA-seq) for the transcript identification and quantification; in which, Guppy (Basecalling), [minimap2](https://github.com/lh3/minimap2) (Alignment) and [ESPRESSO](https://github.com/Xinglab/espresso) (Quantification) tool might be used.
 
-<img src="./files/IRIS_long_workflow.png" width="800"/>
+<img src="./files/IRIS_long_workflow_diagram.png" width="800"/>
 
 The goal of IRIS-long tool is to discover novel tumor antigen from RNA dysregulation for immunotherapy. Here are the short descriptions for each step:
 
@@ -32,6 +33,7 @@ The goal of IRIS-long tool is to discover novel tumor antigen from RNA dysregula
 6. **TCR target prediction**: During this step, we would perform HLA-typing for given samples first. Then we would predict the peptides bound by sample-specific HLA complex. Finally, we adopt a tumor-specificty scanning strategy to prioritize final targets for TCR therapy.
 7. **Example visualization**: This step will generate a `Template_to_generate_figures.sh` file, which could generate expected figures when interested gene and transcript are specified.
 8. **Tumor specificity**: This step will calculate the tumor-specificity score for each region (e.g. 9 AAs) along the given transcript-derived protein sequence (for predicted CAR-T targets). Besides, it will also generate the figure showing the change of tumor-specificity scores along the protein sequence.
+9. **Protein topology**: This step will generate protein topology figure through Protter API. And based on CAR-T prediction result, it will indicate which region has higher tumor specificity score, therefore could be served as potential peptide target.
 
 
 ## Dependencies
@@ -91,11 +93,12 @@ script arguments:
 ```
 
 `gtf_list` lists ESPRESSO gtf files from different runs. 
+Each row of `gtf_list` should contain `<gtf_file> <abundance_matrix> <group_name>`
 
 An example `gtf_list` file would be:
 ```
-./samples_N2_R0_updated.gtf    Tumor
-/mnt/isilon/xing_lab/aspera/xuy/CloneTechTissueAll_ESPRESSO_0225/samples_N2_R0_updated_hg38.gtf    Tissue
+./tumor.gtf    ./tumor_abundance.esp    Tumor
+./tissue_gtf   ./tissue_abundance.esp   Tissue
 ```
 Note: columns are separated by `tab`. 
 
@@ -225,6 +228,7 @@ python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_tes
 --isoform_cpm_inf /path/to/isoform_cpm_matrix \
 --isoform_proportion_inf /path/to/isoform/proportion/matrix \
 --annotated_isoform_contri_inf /path/to/file \
+--trans_CDS_inf /path/to/file \
 --genome_version /hg19/or/hg38 \
 --tumor_num /number/of/tumor/samples \
 --specificity_score /cutoff/of/specificity_score \
@@ -245,6 +249,8 @@ script arguments:
     --isoform_proportion_inf                            Generated isoform proportion file
 
     --annotated_isoform_contri_inf                      File generated before, which ends with "_annotated_isoform_contribution.txt"
+
+    --trans_CDS_inf                                     File generated before, which ends with "_detailed_match_ID.txt"
 
     --genome_version                                    Choose from ['GRCH38','GRCH37','hg38','hg19']
 
@@ -281,6 +287,7 @@ python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_tes
 --isoform_proportion_inf /path/to/isoform/proportion/matrix \
 --genome_version /hg19/or/hg38 \
 --annotated_isoform_contri_inf /path/to/file \
+--trans_CDS_inf /path/to/file \
 --tumor_num /number/of/tumor/samples \
 --binding_affi /cutoff/of/binding/affinity \
 --specificity_score /cutoff/of/specificity_score \
@@ -305,6 +312,8 @@ script arguments:
     --genome_version                                    Choose from ['GRCH38','GRCH37','hg38','hg19']
 
     --annotated_isoform_contri_inf                      File generated before, which ends with "_annotated_isoform_contribution.txt"
+
+    --trans_CDS_inf                                     File generated before, which ends with "_detailed_match_ID.txt"
 
     --tumor_num                                         Number of tumor samples
 
@@ -429,7 +438,7 @@ script arguments:
 
 
 
-### Topology figure
+### Protein topology 
 
 The step is to generate protein topology figure using [Protter](https://wlab.ethz.ch/protter/help/) tool, and this step is only for predicted CAR-T targets, please run it after CAR-T prediction step.
 Note, this step is using API service from Protter tool, there is no need to download the tool.
@@ -441,6 +450,7 @@ python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_tes
 --transcript_ID /EnsemblID/of/interested/transcript \
 --gene_symbol /Interested/gene/name \
 --protein_inf /path/to/generated/protein/fasta \
+--score_cutoff /tumor/specificity/score/cutoff \
 --outf_dir /path/to/folder/of/output/file 
 
 
@@ -453,6 +463,47 @@ script arguments:
 
     --protein_inf                                       Generated protein fasta file, such as '4_4_XXX_PC.fasta'
 
+    --score_cutoff                                      Specificity score cutoff (default = 4)
+
     --outf_dir                                          Folder of output
 
+```
+
+
+### Additionally useful scripts (Only limited to Xing lab)
+
+If interested target is due to differential gene expression between tumor and normal tissue group, we could try to query the expression profile of given gene from IRIS db in CHOP HPC. This script will generate a file containing TPM value of given gene across TCGA and GTEx samples, based on short-read RNA-seq data. Besides, it will also generate a box plot accordingly.
+
+```
+python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/scripts/Supp_2_extract_gene_expression.py [gene_symbol] [Output_dir] (Tumor_type) (Tissue_type)
+
+Such as:
+### Include all TCGA cancers and all GTEx normal tissues
+python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/scripts/Supp_2_extract_gene_expression.py HIPK2  .       
+
+### Only include TCGA-BRCA cancer and GTEx tissues that in ClonTech tissue list
+python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/scripts/Supp_2_extract_gene_expression.py HIPK2  . BRCA ClonTech         
+```
+
+
+If interested splice junction is involved in classical alternative splicing events, we could try to query this splicing junction from IRIS db in CHOP HPC. This script will generate a file containing normalized read counts mapped to given splicing junction across TCGA and GTEx samples, based on short-read RNA-seq data. Besides, it will also generate a box plot accordingly.
+
+```
+python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/scripts/Supp_4_extract_SJC.py [gene_symbol] [SJ_coordinate (hg19)] [Output_dir]
+
+Such as:
+
+python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/scripts/Supp_4_extract_SJC.py HIPK2 chr7:139299240:139305146 .
+
+```
+
+
+If we want to validate specific junction/exon of interested isoform, we could extrac the reads that only mapped to given gene from given sample, then IGV tool could be used to the following visualization.
+
+```
+python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/scripts/Supp_3_extract_sam.py [gene_symbol] [sample] [genome_version] [Sam_folder] [Output_dir]
+
+Such as:
+
+python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/scripts/Supp_3_extract_sam.py L1CAM M1_bc01 hg19 /home/xuy2/scratch/snakemake_1.2.2_Target_1104_Melanoma/alignment .
 ```
