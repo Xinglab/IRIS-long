@@ -3,6 +3,7 @@
 ## Table of Contents
 
 * [Overview](#overview)
+* [Installation](#installation)
 * [Dependencies](#dependencies)
 * [Usage](#usage)
   + [Data combining (optional)](#data-combining)
@@ -36,6 +37,22 @@ The goal of IRIS-long tool is to discover novel tumor antigen from RNA dysregula
 9. **Protein topology**: This step will generate protein topology figure through Protter API. And based on CAR-T prediction result, it will indicate which region has higher tumor specificity score, therefore could be served as potential peptide target.
 
 
+## Installation
+
+The IRIS-long program can be downloaded directly from the repository, as shown below:
+```
+git clone https://github.com/Xinglab/IRIS-long.git
+cd IRIS-long
+```
+
+IRIS-long requires some processed file, which could be downloaded from [IRIS_long_references](http://samtools.sourceforge.net)(a Google Drive link; size of file is around 7 GB). 
+
+The files need to be uncompressed and placed under `~/IRIS_long/scripts/`. e.g:
+```
+tar -zxvf IRIS_long_references.tar.gz
+mv ./references ~/IRIS_long/scripts/
+```
+
 ## Dependencies
 
 To run our scripts, the following dependencies will need to be installed and available on `$PATH`:
@@ -43,7 +60,7 @@ To run our scripts, the following dependencies will need to be installed and ava
 * [SAMtools](http://samtools.sourceforge.net) 
 * [TMHMM](https://services.healthtech.dtu.dk/services/TMHMM-2.0/)
 * [NetMHCpan](https://services.healthtech.dtu.dk/services/NetMHCpan-4.1/) 
-* [Python](https://www.python.org/) >3.8
+* [Python3](https://www.python.org/)
   + [NumPy](https://numpy.org/) 
   + [ConfigArgParse](https://pypi.org/project/ConfigArgParse/) 
   + [SciPy](https://scipy.org/) 
@@ -58,14 +75,12 @@ To run our scripts, the following dependencies will need to be installed and ava
   + [scales](https://scales.r-lib.org/)
   + [ComplexHeatmap](https://bioconductor.org/packages/release/bioc/html/ComplexHeatmap.html)
   + [viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html)
-  + Check for thread support with `perl -e 'use threads; print("ok\n")'`
 
 ## Usage
 
 **Important Note**: 
 1. The input parameter for `--outf_dir` in all steps below should be the same folder, which should be the folder contains ESPRESSO output abundance matrix and gtf file.
 2. The columns in all files should be separated by single `tab` rather than `white space`.
-
 
 
 
@@ -76,7 +91,7 @@ This sub-command is used to combine ESPRESSO results from different runs. The co
 Our script can be run as follows:
 
 ```
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Combine [-h] \
+python ~/IRIS_long/IRIS_long_main.py Combine [-h] \
 --allowed_dist /allowed/distance/for/each/ends/to/collapse/novel/transcripts \
 --gtf_list /path/to/espresso_gtf_file/list \
 --outf_dir /path/to/folder/of/output/file
@@ -111,7 +126,7 @@ This sub-command is used to pre-process ESPRESSO results. The command can start 
 Our script can be run as follows:
 
 ```
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Preprocess [-h] \
+python ~/IRIS_long/IRIS_long_main.py Preprocess [-h] \
 --espresso_gtf /path/to/espresso_gtf_file \
 --espresso_abundance /path/to/espresso_abundance_matrix_file \
 --normalized_mode /choose/from/'SAM'/or/'ESPRESSO' \
@@ -142,7 +157,7 @@ This sub-command is used to perform differential tests between tumor samples and
 Our script can be run as follows:
 
 ```
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py DiffTest [-h] \
+python ~/IRIS_long/IRIS_long_main.py DiffTest [-h] \
 --isoform_cpm_inf /path/to/isoform_cpm_matrix \
 --tumor_num /number/of/tumor/samples \
 --detest_p /p-value/in/DE-test \
@@ -185,7 +200,7 @@ This sub-command is used to classify transcripts into different types (protein-c
 Our script can be run as follows:
 
 ```
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Translation [-h] \
+python ~/IRIS_long/IRIS_long_main.py Translation [-h] \
 --mode /short-read/or/long-read \
 --trans_gtf /path/to/ESPRESSO/gtf/file \
 --isoform_cpm_inf /path/to/isoform_cpm_matrix \
@@ -222,7 +237,7 @@ This sub-command is used to decide protein topology and further discover potenti
 Our script can be run as follows:
 
 ```
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py CAR_T [-h] \
+python ~/IRIS_long/IRIS_long_main.py CAR_T [-h] \
 --tmhmm_dir /path/of/tmhmm \
 --protein_inf /path/to/generated/protein/fasta \
 --isoform_cpm_inf /path/to/isoform_cpm_matrix \
@@ -279,7 +294,7 @@ When peforming TCR target prediction job, we need to input HLA alleles as the pa
 Our script can be run as follows:
 
 ```
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py TCR [-h] \
+python ~/IRIS_long/IRIS_long_main.py TCR [-h] \
 --netMHCpan_dir /path/of/netMHCpan \
 --HLA_str /HLA/alleles \
 --protein_inf /path/to/generated/protein/fasta \
@@ -340,7 +355,7 @@ The command based on the results generated from previous step, and it will gener
 Our script can be run as follows:
 
 ```
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Figure [-h] \
+python ~/IRIS_long/IRIS_long_main.py Figure [-h] \
 --isoform_proportion_inf /path/to/isoform/proportion/matrix \
 --isoform_cpm_inf /path/to/isoform/abundance/matrix/CPM \
 --group_info_inf /path/to/file/containing/group_info \
@@ -401,7 +416,7 @@ The step is to calculate the tumor-specificity score for each region (e.g. 9 AAs
 Our script can be run as follows:
 
 ```
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Specificity [-h] \
+python ~/IRIS_long/IRIS_long_main.py Specificity [-h] \
 --transcript_ID /EnsemblID/of/interested/transcript \
 --tumor_num /number/of/tumor/samples \
 --protein_inf /path/to/generated/protein/fasta \
@@ -446,7 +461,7 @@ Note, this step is using API service from Protter tool, there is no need to down
 Our script can be run as follows:
 
 ```
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/IRIS_long_main.py Topology [-h] \
+python ~/IRIS_long/IRIS_long_main.py Topology [-h] \
 --transcript_ID /EnsemblID/of/interested/transcript \
 --gene_symbol /Interested/gene/name \
 --protein_inf /path/to/generated/protein/fasta \
@@ -475,38 +490,38 @@ script arguments:
 If interested target is due to differential gene expression between tumor and normal tissue group, we could try to query the expression profile of given gene from IRIS db in CHOP HPC. This script will generate a file containing TPM value of given gene across TCGA and GTEx samples, based on short-read RNA-seq data. Besides, it will also generate a box plot accordingly.
 
 ```
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/scripts/Supp_2_extract_gene_expression.py [gene_symbol] [Output_dir] (Tumor_type) (Tissue_type)
+python ~/IRIS_long/scripts/Supp_2_extract_gene_expression.py [gene_symbol] [Output_dir] (Tumor_type) (Tissue_type)
 
 Such as:
 ### Include all TCGA cancers and all GTEx normal tissues
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/scripts/Supp_2_extract_gene_expression.py HIPK2  .       
+python ~/IRIS_long/scripts/Supp_2_extract_gene_expression.py HIPK2  .       
 
 ### Only include TCGA-BRCA cancer and GTEx tissues that in ClonTech tissue list
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/scripts/Supp_2_extract_gene_expression.py HIPK2  . BRCA ClonTech         
+python ~/IRIS_long/scripts/Supp_2_extract_gene_expression.py HIPK2  . BRCA ClonTech         
 ```
 
 
 If interested splice junction is involved in classical alternative splicing events, we could try to query this splicing junction from IRIS db in CHOP HPC. This script will generate a file containing normalized read counts mapped to given splicing junction across TCGA and GTEx samples, based on short-read RNA-seq data. Besides, it will also generate a box plot accordingly.
 
 ```
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/scripts/Supp_4_extract_SJC.py [gene_symbol] [SJ_coordinate (hg19)] [Output_dir]
+python ~/IRIS_long/scripts/Supp_4_extract_SJC.py [gene_symbol] [SJ_coordinate (hg19)] [Output_dir]
 
 Such as:
 
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/scripts/Supp_4_extract_SJC.py HIPK2 chr7:139299240:139305146 .
+python ~/IRIS_long/scripts/Supp_4_extract_SJC.py HIPK2 chr7:139299240:139305146 .
 ```
 
 
 If we want to validate specific junction/exon of interested isoform, we could extrac the reads that only mapped to given gene from given sample, then IGV tool could be used to the following visualization.
 
 ```
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/scripts/Supp_3_extract_sam.py [gene_symbol] [sample] [genome_version] [Sam_folder] [Output_dir]
+python ~/IRIS_long/scripts/Supp_3_extract_sam.py [gene_symbol] [sample] [genome_version] [Sam_folder] [Output_dir]
 
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/scripts/Supp_3_select_reads_map_interested_junction.py [transcript_ID] [gene_symbol] [region_left_boundary] [region_right_boundary] [ESPRESSO_folder] [Output_dir]
+python ~/IRIS_long/scripts/Supp_3_select_reads_map_interested_junction.py [transcript_ID] [gene_symbol] [region_left_boundary] [region_right_boundary] [ESPRESSO_folder] [Output_dir]
 
 Such as:
 
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/scripts/Supp_3_extract_sam.py L1CAM M202 hg38 /home/xuy2/xuy2/Stored_scratch/snakemake_1.3.1_Melanoma/alignment .
+python ~/IRIS_long/scripts/Supp_3_extract_sam.py L1CAM M202 hg38 /home/xuy2/xuy2/Stored_scratch/snakemake_1.3.1_Melanoma/alignment .
 
-python /mnt/isilon/xing_lab/aspera/xuy/snakemake_ESPRESSO_reference/pipeline_test/IRIS_long/scripts/Supp_3_select_reads_map_interested_junction.py ENST00000370055 L1CAM 153872697 153875761 /home/xuy2/xuy2/Stored_scratch/snakemake_1.3.1_Melanoma/espresso_out/q_work_dir .
+python ~/IRIS_long/scripts/Supp_3_select_reads_map_interested_junction.py ENST00000370055 L1CAM 153872697 153875761 /home/xuy2/xuy2/Stored_scratch/snakemake_1.3.1_Melanoma/espresso_out/q_work_dir .
 ```

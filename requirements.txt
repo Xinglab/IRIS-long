@@ -1,0 +1,28 @@
+# Genome and annotation version
+Genome = GRCh38.primary_assembly.genome.fa
+Annotation = gencode.v39.annotation.gtf
+
+# Tools
+TMHMM = 2.0c 
+netMHCpan = 4.1
+
+# Python packages
+python = 3.9.16
+biopython = 1.81
+configargparse = 1.5.3
+matplotlib = 3.7.1
+numpy = 1.25.0
+scipy = 1.10.1
+statsmodels = 0.14.0
+
+# R packages
+r = 4.0.5
+cowplot = 1.1.1
+circlize = 0.4.15
+ComplexHeatmap = 2.4.2
+dplyr = 1.0.7
+ggplot2 = 3.3.5
+ggrepel = 0.9.1
+RColorBrewer = 1.1_3
+tidyr = 1.1.4
+viridis = 0.6.2
