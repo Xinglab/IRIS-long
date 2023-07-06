@@ -84,7 +84,7 @@ To run our scripts, the following dependencies will need to be installed and ava
 
 
 
-### Data combining
+### Data combining (Optional)
 
 This sub-command is used to combine ESPRESSO results from different runs. The command can start from raw ESPRESSO gtf and ESPRESSO abundance matrix and it will generate combined gtf file and combined isoform abundance matrix.
 
