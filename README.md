@@ -45,7 +45,7 @@ git clone https://github.com/Xinglab/IRIS-long.git
 cd IRIS-long
 ```
 
-IRIS-long requires some processed file, which could be downloaded from [IRIS_long_references](https://drive.google.com/file/d/1_C4Gvgv57lTrvridgCe75D9bDJDKiyNg/view?usp=drive_link) (a Google Drive link; size of file is around 4 GB). 
+IRIS-long requires some processed file, which could be downloaded from [IRIS_long_references](http://samtools.sourceforge.net)(a Google Drive link; size of file is around 7 GB). 
 
 The files need to be uncompressed and placed under `~/IRIS_long/scripts/`. e.g:
 ```
@@ -119,7 +119,9 @@ Note: columns are separated by `tab`.
 
 
 
-### Data processing
+### Data processing (First step)
+
+**It is important to note that when running the IRIS-long tool, the order of samples should be sorted by tumor and normal tissues. Specifically, the columns corresponding to tumor samples should be placed ahead (on the left) of the columns representing normal tissues in the expression matrix file.**
 
 This sub-command is used to pre-process ESPRESSO results. The command can start from raw ESPRESSO gtf and ESPRESSO abundance matrix and it will generate bed format file (derived from gtf file) as well as normalized abundance matrix using CPM as unit in both transcript level and gene level. Besides, it will also generate isoform proportion matrix, which would be used in the following steps
 
@@ -171,7 +173,7 @@ python ~/IRIS_long/IRIS_long_main.py DiffTest [-h] \
 script arguments:
     -h, --help                                          Show this message and exit
 
-    --isoform_cpm_inf                                   Isoform CPM infile
+    --isoform_cpm_inf                                   Isoform CPM file, e.g. samples_abundance_combined_CPM_ESPRESSO.txt
 
     --tumor_num                                         Number of tumor samples
 
@@ -214,13 +216,13 @@ script arguments:
 
     --mode                                              Long-read or short-read RNA-seq data mode, default is long-read
 
-    --trans_gtf                                         Generated ESPRESSO gtf file
+    --trans_gtf                                         Generated gtf file, e.g. samples_updated_combined.gtf
 
-    --isoform_cpm_inf                                   Generated isoform CPM abundance file
+    --isoform_cpm_inf                                   Isoform CPM file, e.g. samples_abundance_combined_CPM_ESPRESSO.txt
 
     --genome_version                                    Choose from ['GRCH38','GRCH37','hg38','hg19']
 
-    --ref_gtf                                           Reference gencode annotation gtf
+    --ref_gtf                                           Reference gencode annotation, e.g. ./references/gencode.v39.annotation.gtf
 
     --out_file                                          Prefix of the name of output file
 
@@ -259,13 +261,13 @@ script arguments:
 
     --protein_inf                                       Generated protein fasta file
 
-    --isoform_cpm_inf                                   Generated isoform CPM abundance file
+    --isoform_cpm_inf                                   Isoform CPM file, e.g. samples_abundance_combined_CPM_ESPRESSO.txt
 
-    --isoform_proportion_inf                            Generated isoform proportion file
+    --isoform_proportion_inf                            Isoform proportion file, e.g. samples_abundance_combined_CPM_ESPRESSO_proportion.txt
 
     --annotated_isoform_contri_inf                      File generated before, which ends with "_annotated_isoform_contribution.txt"
 
-    --trans_CDS_inf                                     File generated before, which ends with "_detailed_match_ID.txt"
+    --trans_CDS_inf                                     File generated before, format of which is like "4_4_*_detailed_match_ID.txt"
 
     --genome_version                                    Choose from ['GRCH38','GRCH37','hg38','hg19']
 
@@ -318,21 +320,21 @@ script arguments:
 
     --HLA_str                                           HLA alleles, such as HLA-A01:01,HLA-A02:01
 
-    --protein_inf                                       Generated protein fasta file
+    --protein_inf                                       Generated protein fasta file, such as 4_4_XXX_PC.fasta
 
-    --isoform_cpm_inf                                   Generated isoform CPM abundance file
+    --isoform_cpm_inf                                   Isoform CPM file, e.g. samples_abundance_combined_CPM_ESPRESSO.txt
 
-    --isoform_proportion_inf                            Generated isoform proportion file
+    --isoform_proportion_inf                            Isoform proportion file, e.g. samples_abundance_combined_CPM_ESPRESSO_proportion.txt
 
     --genome_version                                    Choose from ['GRCH38','GRCH37','hg38','hg19']
 
-    --annotated_isoform_contri_inf                      File generated before, which ends with "_annotated_isoform_contribution.txt"
+    --annotated_isoform_contri_inf                      File generated before, which is like "_annotated_isoform_contribution.txt"
 
-    --trans_CDS_inf                                     File generated before, which ends with "_detailed_match_ID.txt"
+    --trans_CDS_inf                                     File generated before, which is like  "4_4_*_detailed_match_ID.txt"
 
     --tumor_num                                         Number of tumor samples
 
-    --binding_affi                                      Cutoff of binding affinity between HLA complex and peptides (default = 200)
+    --binding_affi                                      Cutoff of binding affinity between HLA complex and peptides (default = 500)
 
     --specificity_score                                 Cutoff of specificity score (default = 3)
 
@@ -367,15 +369,15 @@ python ~/IRIS_long/IRIS_long_main.py Figure [-h] \
 script arguments:
     -h, --help                                          Show this message and exit
 
-    --isoform_proportion_inf                            Isoform proportion matrix from previous step
+    --isoform_proportion_inf                            Isoform proportion infile, e.g. samples_abundance_combined_CPM_ESPRESSO_proportion.txt
 
-    --isoform_cpm_inf                                   Isoform abundance matrix file (CPM) from previous step
+    --isoform_cpm_inf                                   Isoform CPM file, e.g. samples_abundance_combined_CPM_ESPRESSO.txt
 
     --group_info_inf                                    Sample group information
 
     --required_trans_inf                                Transcripts need to show in final figure
 
-    --bedgraph                                          Bed file generated from previous step
+    --bedgraph                                          Generated bedgraph file for sample, e.g. samples_BedGraph.bed
 
     --outf_dir                                          Folder of output
 
@@ -435,11 +437,11 @@ script arguments:
 
     --tumor_num                                         Number of tumor samples
 
-    --protein_inf                                       Generated protein fasta file, such as '4_4_XXX_PC.fasta'
+    --protein_inf                                       Generated protein fasta file, which is like "4_4_*_PC.fasta"
 
-    --isoform_cpm_inf                                   Isoform abundance matrix file (CPM) from previous step
+    --isoform_cpm_inf                                   Isoform CPM file, e.g. samples_abundance_combined_CPM_ESPRESSO.txt
 
-    --cell_surface_inf                                  Predicted cell surface protein in given samples, file like '5_3_XXX_high_confidence.txt'
+    --cell_surface_inf                                  Generated cell surface proteins file, which is like "5_3_*_high_confidence.txt"
 
     --window_size                                       Size of sliding window, (default = 9)
 
@@ -476,9 +478,9 @@ script arguments:
 
     --gene_symbol                                       Gene name of interested gene
 
-    --protein_inf                                       Generated protein fasta file, such as '4_4_XXX_PC.fasta'
+    --protein_inf                                       Generated protein fasta file, which is like "4_4_*_PC.fasta"
 
-    --score_cutoff                                      Specificity score cutoff (default = 4)
+    --score_cutoff                                      Specificity score cutoff (default = 3)
 
     --outf_dir                                          Folder of output
 
