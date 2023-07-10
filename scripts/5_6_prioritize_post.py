@@ -24,7 +24,7 @@ with open(cds_inf, "r") as cds_file:
 
 #### load candidate transcripts ####
 required_trans_list = []
-with open("%s/Summarized_CAR_T_prioritized_targets_temp.txt" % outf_dir, "r") as cand_trans_inf:
+with open("%s/5_5_Summarized_CAR_T_prioritized_targets_temp.txt" % outf_dir, "r") as cand_trans_inf:
 	for index,line in enumerate(cand_trans_inf):
 		arr = line.strip().split('\t')
 		if index == 0: continue
@@ -206,8 +206,8 @@ def get_geome_loc(chrom, strand, peptide_loc, cds):  ### ('chr1', '+','1-9','566
 	return genome_coords
 
 
-outf = open("%s/Summarized_CAR_T_prioritized_targets_final.txt" % outf_dir, 'w')
-with open("%s/Summarized_CAR_T_prioritized_targets_temp.txt" % outf_dir, "r") as cand_trans_inf_2:
+outf = open("%s/5_5_Summarized_CAR_T_prioritized_targets_final.txt" % outf_dir, 'w')
+with open("%s/5_5_Summarized_CAR_T_prioritized_targets_temp.txt" % outf_dir, "r") as cand_trans_inf_2:
 	for index,line in enumerate(cand_trans_inf_2):
 		line = line.strip()
 		arr = line.split('\t')

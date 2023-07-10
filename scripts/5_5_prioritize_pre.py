@@ -89,7 +89,7 @@ with open(other_isoform_contri_inf_name, 'r') as gene_inf_2:
 print ("number of black list genes:", len(black_list_gene))
 '''
 
-outf = open("%s/Summarized_CAR_T_prioritized_targets_temp.txt" % outf_dir, "w")
+outf = open("%s/5_5_Summarized_CAR_T_prioritized_targets_temp.txt" % outf_dir, "w")
 with open(tumor_vs_normal_inf_name, "r") as inf:
 	for index,line in enumerate(inf):
 		arr = line.strip().split('\t')
