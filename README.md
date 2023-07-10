@@ -15,6 +15,7 @@
   + [Example visualization](#example-visualization)
   + [Tumor specificity](#tumor-specificity)
   + [Protein topology](#protein-topology )
+* [Example](#example)
 
 
 
@@ -527,3 +528,21 @@ python ~/IRIS_long/scripts/Supp_3_extract_sam.py L1CAM M202 hg38 /home/xuy2/xuy2
 
 python ~/IRIS_long/scripts/Supp_3_select_reads_map_interested_junction.py ENST00000370055 L1CAM 153872697 153875761 /home/xuy2/xuy2/Stored_scratch/snakemake_1.3.1_Melanoma/espresso_out/q_work_dir .
 ```
+
+
+## Example
+A toy dataset (gtf and expression matrix) has been inclued in `./IRIS_long/example_dataset/`, which is about the identified transcripts from chromosome X across melanoma cell lines and normal tissues.
+
+Please follow the instruction on `run_example.sh` under `IRIS_long` folder:
+```
+bash run_example.sh
+```
+
+Predicted potential CAR-T targets could be found in `./IRIS_long/example_dataset/CAR_T/5_5_Summarized_CAR_T_prioritized_targets_final.txt`
+
+Predicted potential TCR targets could be found in `./IRIS_long/example_dataset/CAR_T/6_3_Summarized_TCR_prioritized_targets.txt`
+
+After modifying `./IRIS_long/example_dataset/emplate_to_generate_figures.sh` accordingly, the generated figures of input transcript could be found in `./IRIS_long/example_dataset/Example_res/`. 
+For example:
+<img src="./example_dataset/Example_res/Figure_L1CAM_bed_list_sorted_ENST00000370055_rank_single_color.png" width="800"/>
+<img src="./example_dataset/Example_res/Bar_sample_isoform_L1CAM_ENST00000370055_exp.png" width="800"/>

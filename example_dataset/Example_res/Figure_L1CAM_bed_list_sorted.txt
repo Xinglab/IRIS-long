@@ -1,0 +1,25 @@
+./example_dataset/Example_res/target_genes/M202_L1CAM_ENST00000455590.bed	-	protein_coding; mRNA_start_NF
+./example_dataset/Example_res/target_genes/M202_L1CAM_ENST00000474853.bed	-	retained_intron
+./example_dataset/Example_res/target_genes/M202_L1CAM_ENST00000458029.bed	-	protein_coding; mRNA_end_NF
+./example_dataset/Example_res/target_genes/M202_L1CAM_ENST00000420165.bed	-	protein_coding; mRNA_end_NF
+./example_dataset/Example_res/target_genes/M202_L1CAM_ENST00000496122.bed	-	retained_intron
+./example_dataset/Example_res/target_genes/M202_L1CAM_ENST00000484652.bed	-	retained_intron
+./example_dataset/Example_res/target_genes/M202_L1CAM_ENST00000361699.bed	-	protein_coding; basic
+./example_dataset/Example_res/target_genes/M202_L1CAM_ENST00000370058.bed	-	protein_coding; mRNA_start_NF
+./example_dataset/Example_res/target_genes/M202_L1CAM_ESPRESSO:chrX:1503:1207@Melanoma.bed	-	
+./example_dataset/Example_res/target_genes/M202_L1CAM_ENST00000407935.bed	-	protein_coding; mRNA_end_NF
+./example_dataset/Example_res/target_genes/M202_L1CAM_ESPRESSO:chrX:1503:1616@Melanoma.bed	-	
+./example_dataset/Example_res/target_genes/M202_L1CAM_ESPRESSO:chrX:1503:1295@Melanoma.bed	-	
+./example_dataset/Example_res/target_genes/M202_L1CAM_ESPRESSO:chrX:1503:1468@Melanoma.bed	-	
+./example_dataset/Example_res/target_genes/M202_L1CAM_ESPRESSO:chrX:648:4921@Tissue.bed	-	
+./example_dataset/Example_res/target_genes/M202_L1CAM_ESPRESSO:chrX:1503:1209@Melanoma.bed	-	
+./example_dataset/Example_res/target_genes/M202_L1CAM_ESPRESSO:chrX:1503:1549@Melanoma.bed	-	
+./example_dataset/Example_res/target_genes/M202_L1CAM_ESPRESSO:chrX:1503:1208@Melanoma.bed	-	
+./example_dataset/Example_res/target_genes/M202_L1CAM_ESPRESSO:chrX:648:5122@Tissue.bed	-	
+./example_dataset/Example_res/target_genes/M202_L1CAM_ENST00000439496.bed	-	protein_coding; mRNA_end_NF
+./example_dataset/Example_res/target_genes/M202_L1CAM_ENST00000460553.bed	-	retained_intron
+./example_dataset/Example_res/target_genes/M202_L1CAM_ENST00000491983.bed	-	retained_intron
+./example_dataset/Example_res/target_genes/M202_L1CAM_ENST00000616195.bed	-	processed_transcript
+./example_dataset/Example_res/target_genes/M202_L1CAM_ENST00000361981.bed	-	protein_coding; basic
+./example_dataset/Example_res/target_genes/M202_L1CAM_ENST00000370060.bed	-	protein_coding; basic
+./example_dataset/Example_res/target_genes/M202_L1CAM_ENST00000370055.bed	-	protein_coding; basic

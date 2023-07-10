@@ -1,0 +1,2 @@
+python /scr1/users/xuy2/snakemake_Melanoma_49lines_2023/IRIS_long_example_test/IRIS-long/scripts/Structure_trans_script/Generate_bedgraph_for_each_gene.py M202 L1CAM example_dataset/samples_abundance_combined_CPM_ESPRESSO.txt 0 ./example_dataset/Example_res example_dataset/samples_BedGraph.bed /scr1/users/xuy2/snakemake_Melanoma_49lines_2023/IRIS_long_example_test/IRIS-long/scripts/references/gencode.v39.annotation.gtf
+ls --color=never ./example_dataset/Example_res/target_genes/*L1CAM*.bed > ./example_dataset/Example_res/Figure_L1CAM_bed_list.txt

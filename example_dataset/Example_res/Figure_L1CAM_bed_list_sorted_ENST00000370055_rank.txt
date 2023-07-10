@@ -1,0 +1,5 @@
+6	./example_dataset/Example_res/target_genes/M202_L1CAM_ENST00000491983.bed	-	retained_intron
+4	./example_dataset/Example_res/target_genes/M202_L1CAM_ENST00000616195.bed	-	processed_transcript
+2	./example_dataset/Example_res/target_genes/M202_L1CAM_ENST00000361981.bed	-	protein_coding; basic
+3	./example_dataset/Example_res/target_genes/M202_L1CAM_ENST00000370060.bed	-	protein_coding; basic
+1	./example_dataset/Example_res/target_genes/M202_L1CAM_ENST00000370055.bed	-	protein_coding; basic

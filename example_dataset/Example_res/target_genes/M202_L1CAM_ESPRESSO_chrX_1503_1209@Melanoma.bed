@@ -1,0 +1,4 @@
+track type=bedGraph name="M202_ESPRESSO:chrX:1503:1209@Melanoma" visibility=dense color=211,37,17
+chrX	153861670	153864704	0.0
+chrX	153864820	153865210	0.0
+chrX	153865298	153866373	0.0

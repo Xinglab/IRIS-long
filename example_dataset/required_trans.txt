@@ -1,0 +1,2 @@
+Gene_ID	Trans_ID	Gene_symbol
+ENSG00000113441	ESPRESSO:chr5:1150:8937@Melanoma	LNPEP

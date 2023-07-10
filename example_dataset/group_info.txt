@@ -1,0 +1,6 @@
+Group	Number_of_samples
+Melanocytic	15
+Transitory	11
+Neural_crest_like	14
+Undifferentiated	9
+Tissue	31
