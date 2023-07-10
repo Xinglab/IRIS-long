@@ -1,345 +1,213 @@
-# TEQUILA-seq: Data Analysis Software
-
-The scripts contained in this repository were used for processing, analyzing, and visualizing TEQUILA-seq data.
+## IRIS-long: Isoform peptides from RNA splicing for Immunotherapy target Screening - based on Long-read RNA-seq data
 
 ## Table of Contents
 
-- [TEQUILA-seq: Data Analysis Software](#tequila-seq-data-analysis-software)
-  - [Table of Contents](#table-of-contents)
-  - [Overview](#overview)
-  - [Dependencies](#dependencies)
-  - [Usage](#usage)
-    - [Data processing](#data-processing)
-    - [Data visualization and analysis](#data-visualization-and-analysis)
-      - [Transcript isoform visualization](#transcript-isoform-visualization)
-      - [Identification of tumor subtype-associated transcript isoforms](#identification-of-tumor-subtype-associated-transcript-isoforms)
-      - [Identification of tumor aberrant transcript isoforms](#identification-of-tumor-aberrant-transcript-isoforms)
-      - [Classification of alternative splicing events underlying discovered transcript isoforms](#classification-of-alternative-splicing-events-underlying-discovered-transcript-isoforms)
-      - [Identification of NMD-targeted transcript isoforms](#identification-of-nmd-targeted-transcript-isoforms)
+* [Overview](#overview)
+* [Installation](#installation)
+* [Dependencies](#dependencies)
+* [Usage](#usage)
+  + [Data combining (optional)](#data-combining)
+  + [Data processing](#data-processing)
+  + [Differential test](#differential-test)
+  + [Transcript Translation](#transcript-translation)
+  + [CAR-T target prediction](#car-t-target-prediction)
+  + [TCR target prediction](#tcr-target-prediction)
+  + [Example visualization](#example-visualization)
+  + [Tumor specificity](#tumor-specificity)
+  + [Protein topology](#protein-topology )
+* [Example](#example)
+
 
 
 ## Overview
 
-<img src="./files/TEQUILA-seq_Analysis_Workflow.png" width="800"/>
+IRIS-long tool is designed to work with transcript-level quantification result based on long-read RNA-seq data. If you start with fast5 raw files, please refer to [ESPRESSO GitHub page](https://github.com/Xinglab/espresso) and [TEQUILA-seq GitHub page](https://github.com/Xinglab/TEQUILA-seq) for the transcript identification and quantification; in which, Guppy (Basecalling), [minimap2](https://github.com/lh3/minimap2) (Alignment) and [ESPRESSO](https://github.com/Xinglab/espresso) (Quantification) tool might be used.
 
-Our data processing scripts are designed to work with raw nanopore data (FAST5 format) as input. However, these scripts can work with data from any long-read sequencing platform (e.g., PacBio) as long as the data is provided in FASTQ/SAM/BAM format. These scripts encompass the following steps:
-1. **Basecalling**: Raw nanopore data (FAST5 format) is basecalled into nucleotide sequences (FASTQ format) using Guppy in fast mode.
-2. **Alignment**: Basecalled reads are mapped to a user-supplied reference genome using [minimap2](https://github.com/lh3/minimap2) (Li H., *Bioinformatics* 2018) together with user-supplied reference transcript annotations.
-3. **Transcript isoform discovery and quantification**: Full-length transcript isoforms are discovered and quantified from long-read alignment files using [ESPRESSO](https://github.com/Xinglab/espresso).
+<img src="./files/IRIS_long_workflow_diagram.png" width="800"/>
 
-We also wrote scripts for visualizing and analyzing transcript isoforms discovered from TEQUILA-seq data. These scripts were designed to perform the following tasks:
-1. **Visualize discovered transcript isoforms**: Given a collection of samples subjected to TEQUILA-seq, visualize the structures and relative abundances of all transcript isoforms discovered for a given gene.
-2. **Identify tumor subtype-associated and tumor aberrant transcript isoforms**: Using TEQUILA-seq data generated on a panel of 40 breast cancer cell lines (2 replicates for each of the 40 breast cancer cell lines), each representing 4 distinct intrinsic subtypes (luminal, HER2 enriched, basal A, basal B), identify transcript isoforms with significantly elevated proportions in cell lines belonging to a given subtype versus all other cell lines (i.e., tumor subtype-associated transcript isoforms). For the same dataset, identify transcript isoforms with significantly elevated proportions in at least one but no more than 4 breast cancer cell lines (i.e., tumor aberrant transcript isoforms).  
-3. **Classify alternative splicing events underlying discovered transcript isoforms**: Local differences in transcript structure between any two transcript isoforms are classified into different alternative splicing categories, including exon skipping, alternative 5' splice site, alternative 3' splice site, mutually exclusive exons, intron retention, alternative first exon, alternative last exon, and complex splicing. 
-4. **Identify NMD-targeted transcript isoforms**: Transcript isoforms that may be targeted by nonsense-mediated mRNA decay (NMD) are identified from the set of transcript isoforms discovered from TEQUILA-seq data based on multiple layers of criteria (e.g., transcript length, number of splice junctions, the 50 nt rule). 
+The goal of IRIS-long tool is to discover novel tumor antigen from RNA dysregulation for immunotherapy. Here are the short descriptions for each step:
 
+1. **Data combining (Optional)**: If you want to compare the quantification result from multiple (ESPRESSO) runs, this step needs to be performed firstly. Since one novel transcript identified by ESPRESSO tool might be assigned for different transcript IDs in different runs, we need to collapse those IDs into a single ID, and then combine transcript abudance matrixes and gtf files from different runs into a single abundance matrix and a single gtf file.
+2. **Data processing**: Based on the transcript raw abundance matrix, we could normalize it (either by sam files or abundance matrix itself) into a abundance matrix with CPM (count per million) as unit. Then this step also generates transcript proportion matrix as well as some other files that are necessary for the following steps. 
+3. **Differential test**: This step is to perform differential tests between tumor samples and normal tissue samples. This step consists of two test (based on transcript level): differential expression test (two-sided wilcoxon-ranksum test) and prevalence test (fisher-exact test). 
+4. **Transcript Translation**: This step is to translate all identified transcripts into potential protein products. During this step, all transcripts annotated as "protein-coding" and with "basic" tag (from GENCODE annotation) would be translated using their annotated Open Reading Frame (ORF); then, all the transcripts that are not considered as the target of Nonsense-Mediated Decay (NMD) would be translated using their longest ORF.
+5. **CAR-T target prediction**: During this step, we would predict the topology of proteins first to decide whether it can be presented at cell surface, by using both TMHMM tool and a customized inference medthod by borrowing information from UniProt annotation. Then we would combine predicted cell-surface proteins result with previous differential transcripts result, and adopt a tumor-specificty scanning strategy to prioritize final targets for CAR-T therapy.
+6. **TCR target prediction**: During this step, we would perform HLA-typing for given samples first. Then we would predict the peptides bound by sample-specific HLA complex. Finally, we adopt a tumor-specificty scanning strategy to prioritize final targets for TCR therapy.
+7. **Example visualization**: This step will generate a `Template_to_generate_figures.sh` file, which could generate expected figures when interested gene and transcript are specified.
+8. **Tumor specificity**: This step will calculate the tumor-specificity score for each region (e.g. 9 AAs) along the given transcript-derived protein sequence (for predicted CAR-T targets). Besides, it will also generate the figure showing the change of tumor-specificity scores along the protein sequence.
+9. **Protein topology**: This step will generate protein topology figure through Protter API. And based on CAR-T prediction result, it will indicate which region has higher tumor specificity score, therefore could be served as potential peptide target.
+
+
+## Installation
+
+The IRIS-long program can be downloaded directly from the repository, as shown below:
+```
+git clone https://github.com/Xinglab/IRIS-long.git
+cd IRIS-long
+```
+
+IRIS-long requires some processed file, which could be downloaded from [IRIS_long_references](https://drive.google.com/file/d/1_C4Gvgv57lTrvridgCe75D9bDJDKiyNg/view?usp=drive_link) (a Google Drive link; size of file is around 4 GB). 
+
+The files need to be uncompressed and placed under `~/IRIS_long/scripts/`. e.g:
+```
+tar -zxvf IRIS_long_references.tar.gz
+mv ./references ~/IRIS_long/scripts/
+```
 
 ## Dependencies
 
 To run our scripts, the following dependencies will need to be installed and available on `$PATH`:
 
-* [Snakemake](https://snakemake.readthedocs.io) (v5.31.1) 
-* Guppy (must be downloaded manually from the [ONT software download page](https://community.nanoporetech.com/downloads) since a login is required)
-* [minimap2](https://github.com/lh3/minimap2) (v2.17)
-* [SAMtools](http://samtools.sourceforge.net) (v1.9)
-* [BLAST](https://www.ncbi.nlm.nih.gov/blast/) (v2.10.1)
-* [HMMER](http://hmmer.org/) (v3.3.1)
-* [UCSC KentUtils](http://hgdownload.soe.ucsc.edu/admin/exe/)
-  + bedGraphToBigWig
-  + faToTwoBit
-  + twoBitInfo
-* [Python](https://www.python.org/) 3.8
-  + [NumPy](https://numpy.org/) (v1.20.1)
-  + [pandas](https://pandas.pydata.org/) (v1.1.4)
-  + [SciPy](https://scipy.org/) (v1.5.4)
-  + [statsmodels](https://www.statsmodels.org/) (v0.12.2)
-  + [NetworkX](https://networkx.org/) (v2.6.3)
-  + [BeautifulSoup4](https://pypi.org/project/beautifulsoup4/) (v4.8.2)
-  + [ConfigArgParse](https://pypi.org/project/ConfigArgParse/)
-* [R](https://www.r-project.org/) (v4.0.5)
+* [SAMtools](http://samtools.sourceforge.net) 
+* [TMHMM](https://services.healthtech.dtu.dk/services/TMHMM-2.0/)
+* [NetMHCpan](https://services.healthtech.dtu.dk/services/NetMHCpan-4.1/) 
+* [Python3](https://www.python.org/)
+  + [NumPy](https://numpy.org/) 
+  + [ConfigArgParse](https://pypi.org/project/ConfigArgParse/) 
+  + [SciPy](https://scipy.org/) 
+  + [statsmodels](https://www.statsmodels.org/) 
+  + [BioPython](https://biopython.org/) 
+  + [Matplotlib](https://matplotlib.org/)
+* [R](https://www.r-project.org/) 
   + [ggplot2](https://ggplot2.tidyverse.org/)
   + [tidyverse](https://www.tidyverse.org/)
   + [ggplotify](https://cran.r-project.org/package=ggplotify)
+  + [cowplot](https://github.com/wilkelab/cowplot)
   + [scales](https://scales.r-lib.org/)
-  + [forcats](https://forcats.tidyverse.org/)
-* [Perl](https://www.perl.org/) (v5.26.2) built with threading enabled
-  + Check for thread support with `perl -e 'use threads; print("ok\n")'`
-
-The source code for ESPRESSO (v1.2.2), which is another dependency, is available in the folder [ESPRESSO_alpha1.2.2](./ESPRESSO_alpha1.2.2/). For details on memory requirements (i.e., as a function of input data size and number of threads), please refer to the [ESPRESSO GitHub page](https://github.com/Xinglab/espresso).
-
+  + [ComplexHeatmap](https://bioconductor.org/packages/release/bioc/html/ComplexHeatmap.html)
+  + [viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html)
 
 ## Usage
 
-### Data processing
-
-A Snakemake workflow is provided for running the data processing scripts. The workflow can start from raw nanopore data (FAST5 format), sequencing reads data (FASTQ format), or long-read alignment data (SAM/BAM format). **Note:** A different configuration will be required depending on what type of data you are starting with. The workflow can also be configured to run multiple samples and each sample can have multiple inputs. Set the configuration by editing the [snakemake_config.yaml](./snakemake_config.yaml) and [snakemake_profile/config.yaml](./snakemake_profile/config.yaml) files. 
-
-Prior to running the data processing scripts, please make sure that [conda](https://conda.io/) is installed. Then, `./install` can be run to install all dependencies required for data processing (except Guppy, which requires a manual installation). Specifically, `./install` will create a conda environment with the required dependencies and set some absolute file paths in [snakemake_config.yaml](./snakemake_config.yaml)
-
-Details on configuring the [snakemake_config.yaml](./snakemake_config.yaml) file are as follows:
-
-* Set the amount of resources to allocate for each task as follows:
-  + `{job_name}_threads: {num_threads}`
-  + `{job_name}_mem_gb: {num_GBs}`
-  + `{job_name}_time_hr: {num_hours}`
-* Specify the path to the folder containing the ESPRESSO source code as follows:
-  + `espresso_path: /path/to/ESPRESSO/src`
-* If starting with raw nanopore data, specify the path to the `bin` folder containing Guppy as follows:
-  + `guppy_bin_path: /path/to/guppy/bin/`
-* Specify the reference genome sequence (FASTA format) and reference transcript annotations (GTF format) to be used:
-  + You can provide download URLs for these files as follows:
-    + `gtf_url: 'protocol://url/for/some_file.gtf.gz'`
-    + `gtf_name: 'some_file.gtf'`
-    + `fasta_url: 'protocol://url/for/some_file.fasta.gz'`
-    + `fasta_name: 'some_file.fasta'`
-  + You can also place these files in the [references](./references) folder and just set the `gtf_name` and `fasta_name` fields. (Use '' for `gtf_url` and `fasta_url`)
-* For each input sample, create a corresponding config entry as follows:
-  + For samples with raw nanopore data (FAST5 format), please provide the Guppy config file and the directory of FAST5 files as follows:
-    + `guppy_config: 'the_guppy.cfg'`
-    + `fast5_dir: '/path/to/fast5/dir'`
-  + For samples with sequencing reads data (FASTQ format), please provide the appropriate file path as follows:
-    + `fastq: '/path/to/the.fastq'`
-  + For samples with long-read alignment data (SAM/BAM format), please provide **one** of the following fields as appropriate:
-    + `sam: '/path/to/the.sam'`
-    + `bam: '/path/to/the.bam'`
-* Lastly, the following config values can be set to `true` or `false` as appropriate:
-  + `use_annotated_junctions_with_minimap2`: Uses splice junctions recorded in the user-provided GTF as input to `minimap2`
-  + `keep_espresso_c_temp`: Keep temporary files generated by the `C` step of `ESPRESSO`
-  + `output_compatible_isoforms`: Generate a file (named `samples_N2_R0_compatible_isoform.tsv`) that maps long read IDs to their compatible transcript isoforms
-  + `enable_visualization`: Generates files for visualizing transcript isoforms discovered by ESPRESSO. This requires setting other config values under "Visualization options" (**Note:** We recommend setting `enable_visualization` to false as we have separate scripts in this repository dedicated to generating visualizations for discovered transcript isoforms).
-
-Edit the files in the folder [snakemake_profile](./snakemake_profile) to configure how jobs should be run in a cluster environment as follows:
-* [config.yaml](./snakemake_profile/config.yaml): Sets various Snakemake parameters, such as whether jobs should be submitted to a cluster.
-* [cluster_submit.py](./snakemake_profile/cluster_submit.py): Script to submit jobs.
-* [cluster_status.py](./snakemake_profile/cluster_status.py): Script to check job status.
-* [cluster_commands.py](./snakemake_profile/cluster_commands.py): Script to run commands specific to the cluster management system being used. The default implementation is for Slurm, but other cluster environments can be used by changing this file. For example, [cluster_commands_sge.py](./snakemake_profile/cluster_commands_sge.py) can be used if working with an SGE cluster.
-
-For reference, examples of pre-configured `snakemake_config.yaml` files can be found in the folder [Config_for_each_system](./Config_for_each_system). Once the `snakemake_config.yaml` file has been appropriately configured, the Snakemake workflow can be run with `./run`
-
-Upon completion, the following files will be generated in the folder `espresso_out/work_dir`:
-* `samples_N2_R0_abundance.esp`: a tab-delimited file describing the expression levels of discovered transcript isoforms across input samples
-  + Each discovered transcript isoform is reported on a separate line.
-  + The first three columns are: `transcript_ID`, `transcript_name`, and `gene_ID`. Additional columns correspond to input samples and show the number of reads from a given sample that were counted towards each transcript isoform.
-  + Transcript isoform read counts are assigned by expectation maximization, such that each read contributes at most 1 count, either to a single transcript isoform or distributed as fractional counts to multiple transcript isoforms.
-* `samples_N2_R0_updated.gtf`: a transcript annotation file (GTF format) describing the coordinates of all discovered transcript isoforms
-  + The `source` column indicates whether each transcript isoform is a `novel_isoform` or an `annotated_isoform`
-* `samples_N2_R0_compatible_isoform.tsv`: an optional tab-delimited file that describes compatible transcript isoforms for each read in a given sample
-  + The columns are `read_id`, `sample_name`, `read_classification`, and `compatible_isoforms`. Possible classifications for each read under the column `read_classification` include:
-    + **Full Splice Match (FSM)**: indicates that the read carries a combination of splice junctions that is consistent with that of a known transcript isoform
-    + **Incomplete Splice Match (ISM)**: indicates that the read carries a combination of splice junctions that is part of a known transcript isoform
-    + **Novel In Catalog/Novel Not in Catalog (NIC/NNC)**: indicates that the read carries at least one splice junction involving a novel combination of known splice sites or novel splice sites, respectively.
-    + **Not Completely Determined (NCD)**: indicates that the read carries at least one splice junction that could not be corrected by ESPRESSO
-    + **Single-exon**: indicates that the read does not carry any splice junctions
-
-The Snakemake workflow will also produce log files that are named after the rules contained in the [Snakefile](./Snakefile). Specifically, there will be `{rule_name}_log.out` and `{rule_name}_log.err` files containing the stdout and stderr, respectively, of the command run for that rule. There will also be `.cluster.out`, `.cluster.err`, and `.cluster.usage` files if a rule was submitted to the cluster using [cluster_submit.py](./snakemake_profile/cluster_submit.py).
+**Important Note**: 
+1. The input parameter for `--outf_dir` in all steps below should be the same folder, which should be the folder contains ESPRESSO output abundance matrix and gtf file.
+2. The columns in all files should be separated by single `tab` rather than `white space`.
 
 
-### Data visualization and analysis
 
-After data processing, we used the following scripts to visualize and analyze the transcript isoforms discovered from our samples. 
+### Data combining (Optional)
 
+This sub-command is used to combine ESPRESSO results from different runs. The command can start from raw ESPRESSO gtf and ESPRESSO abundance matrix and it will generate combined gtf file and combined isoform abundance matrix.
 
-#### Transcript isoform visualization
-
-We wrote scripts, [1_Data_process.sh](./scripts/1_Data_process.sh) and [2_Figure_generation.sh](./scripts/2_Figure_generation.sh), that can generate the following types of plots:
-1. Stacked barplots showing (a) estimated abundances and (b) isoform proportions of transcript isoforms discovered for a user-specified gene from a collection of samples subjected to TEQUILA-seq
-2. Diagrams showing the structures of transcript isoforms discovered for a user-specified gene from a collection of samples subjected to TEQUILA-seq
-
-Our visualization script requires a file containing reference transcript annotations (GTF format), and this file should be placed in the [files](./scripts/scripts/files/) folder. If you are using the GRCh37/hg19 reference genome build, we recommend downloading and using this [transcript annotation file](https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_34/GRCh37_mapping/gencode.v34lift37.annotation.gtf.gz). Alternatively, if you are using the GRCh38/hg38 reference genome build, we recommend downloading and using this [transcript annotation file](https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_39/gencode.v39.annotation.gtf.gz).
-
-To demonstrate how to run our visualization script, we have provided a test dataset in the folder [Example_res](./scripts/BRCA_Example/). The files that will be generated after running [1_Data_process.sh](./scripts/1_Data_process.sh) include:
-* **samples_BedGraph.bed**: A BED file that was directly converted from `samples_N2_R0_updated.gtf`, the transcript annotation file generated by ESPRESSO (GTF format). 
-  * This BED file contains exon-level coordinates for each transcript isoform discovered from input samples.
-* **samples_N2_R0_abundance_CPM_ESPRESSO_gene.txt**: a tab-delimited file describing the expression levels (in counts per million, CPM) for discovered transcript isoforms of target genes across input samples. 
-  * This file was directly generated from `samples_N2_R0_abundance.esp` (an output file generated by ESPRESSO) by normalizing transcript isoform read counts for each input sample to CPM. 
-  * The first three columns are: `transcript_ID`, `transcript_name`, and `gene_ID`. Additional columns correspond to input samples and show the CPM values of transcript isoforms discovered in a given sample.
-* **samples_N2_R0_abundance_CPM_ESPRESSO_proportion_reshaped_merge_others.txt**: a tab-delimited file with six columns where each row corresponds to an individual transcript isoform of a target gene that was discovered in a given input sample. 
-  * Each row has the following pieces of information:
-    * Gene ID
-    * Transcript ID
-    * Input sample ID
-    * Transcript isoform proportion in the given input sample
-    * Tumor subtype associated with the given input sample
-    * Hexadecimal color code associated with the tumor subtype
-  * The top five transcript isoforms of a given target gene with the highest average transcript isoform proportion across all samples are represented individually, while remaining transcript isoforms are grouped together into an "Others" category.  
-* **samples_N2_R0_abundance_CPM_ESPRESSO_reshaped_merge_others.txt**: a tab-delimited file with six columns where each row corresponds to an individual transcript isoform of a target gene that was discovered in a given input sample. 
-  * Each row has the following pieces of information:
-    * Gene ID
-    * Transcript ID
-    * Input sample ID
-    * CPM of the transcript isoform in the given input sample
-    * Tumor subtype associated with the given input sample
-    * Hexadecimal color code associated with the tumor subtype
-  * The top five transcript isoforms of a given target gene with the highest average transcript isoform proportion across all samples are represented individually, while remaining transcript isoforms are grouped together into an "Others" category (to match the isoforms shown in the **samples_N2_R0_abundance_CPM_ESPRESSO_proportion_reshaped_merge_others.txt** file).  
-
-Given a target gene of interest, as well as a transcript isoform of interest, we can run our script `Template_to_generate_figures.sh` (which will be generated by [2_Figure_generation.sh](./scripts/2_Figure_generation.sh)).
-
-For example, we can use [Template_to_generate_figures.sh](./scripts/Template_to_generate_figures.sh) to visualize (a) transcript isoforms of *TP53* and (b) transcript isoforms of *DNMT3B* that were discovered from TEQUILA-seq data generated on our panel of 40 breast cancer cell lines (2 replicates for each of the 40 breast cancer cell lines):
-
-Plots generated by our script (in both PNG and PDF format) can be found in the folder [Example_res](./scripts/BRCA_Example/Example_res/).
-
-
-#### Identification of tumor subtype-associated transcript isoforms
-
-We wrote a script, [SubtypeSpecificIsoforms.py](./scripts/SubtypeSpecificIsoforms.py), to identify tumor subtype-associated transcript isoforms from TEQUILA-seq data generated on our panel of 40 breast cancer cell lines (2 replicates for each of the 40 breast cancer cell lines), each representing 4 distinct intrinsic subtypes (luminal, HER2 enriched, basal A, basal B). Tumor subtype-associated transcript isoforms have significantly elevated proportions in cell lines belonging to a given subtype versus all other cell lines. Our script uses the following approach to identify tumor subtype-associated transcript isoforms:
-* For each subtype, run a two-sided Student's *t*-test to compare the proportion of a transcript isoform between cell lines belonging to the given subtype and all other cell lines.
-* Filter for transcript isoforms meeting the following criteria:
-  * FDR-adjusted *p*-value from two-sided Student's *t*-test is $\leq$ a user-defined threshold
-  * The difference between the mean transcript isoform proportion across cell lines of the given subtype and the mean transcript isoform proportion over all other cell lines is $\geq$ a user-defined threshold
-
-The following input files are required for running our script:
-* A tab-delimited file containing isoform proportions for discovered transcript isoforms across input samples. 
-  * This file can be directly generated from `samples_N2_R0_abundance.esp` (an output file generated by ESPRESSO) by dividing the read count of a transcript isoform by the total read count for the corresponding gene (i.e., sum of read counts over all transcript isoforms discovered for the gene) for each input sample. 
-  * The first three columns are: `transcript_ID`, `transcript_name`, and `gene_ID`. 
-  * Additional columns correspond to input samples and show the proportion of the transcript isoform in a given sample. 
-  * Please refer to the file [samples_N2_R0_abundance_proportion_target_genes.txt](./scripts/Example_res/samples_N2_R0_abundance_proportion_target_genes.txt) as an example. 
-* A tab-delimited file mapping each input sample ID to a tumor subtype. 
-  * Each row represents an input sample and has three columns: (i) a sample ID, (ii) a cell line ID, and (iii) a tumor subtype. 
-  * Please refer to the file [BRCA_cell_lines.txt](./files/BRCA_cell_lines.txt) as an example.
-
-Detailed usage information for our script is shown below:
+Our script can be run as follows:
 
 ```
-python SubtypeSpecificIsoforms.py [-h] -i /path/to/isoform/proportion/matrix -a /path/to/sample-subtype_match_table -t <number of worker threads> \
-    -c <FDR threshold> -d <delta_proportion threshold> -o /path/to/output/file
+python ~/IRIS_long/IRIS_long_main.py Combine [-h] \
+--allowed_dist /allowed/distance/for/each/ends/to/collapse/novel/transcripts \
+--gtf_list /path/to/espresso_gtf_file/list \
+--outf_dir /path/to/folder/of/output/file
 
 script arguments:
-    -h, --help                                          show this message and exit
+    -h, --help                                          Show this message and exit
 
-    -i /path/to/isoform_proportion_matrix               tab-delimited file containing isoform proportions for discovered transcript isoforms
-                                                        across input samples
+    --allowed_dist                                      Allowed distance for each ends to collapse novel transcripts, default = 50bp
 
-    -a /path/to/sample-subtype_match_table              tab-delimited file containing mapping information between indiviudal samples and
-                                                        their respective tumor subtypes
+    --gtf_list                                          Path to espresso_gtf_file list
 
-    -t <number of worker threads>                       number of worker threads (integer)
-
-    -c <FDR threshold>                                  FDR threshold for calling transcript isoforms as tumor subtype-associated
-                                                        (float between 0 and 1)
-
-    -d <delta_proportion threshold>                     threshold on the difference (in %) between the mean transcript isoform proportion across cell lines 
-                                                        of a given subtype and the mean transcript isoform proportion over all other cell lines 
-                                                        (float between 0 and 100)
-
-    -o /path/to/output/file                             path to output tsv file summarizing all transcript
-                                                        isoforms prioritized as being tumor subtype-associated
-```
-
-Our script will generate a tsv file summarizing all transcript isoforms prioritized as being tumor subtype-associated based on user-specified thresholds. Each line of the tsv file has the following output fields:
-
-* **Field 1**: Gene symbol corresponding to the gene of a tumor subtype-associated transcript isoform
-* **Field 2**: Transcript ID of the tumor subtype-associated transcript isoform
-* **Field 3**: Gene ID corresponding to the gene of a tumor subtype-associated transcript isoform
-* **Field 4**: Corresponding tumor subtype
-* **Field 5**: Average transcript isoform proportion across cell lines of the specified tumor subtype
-* **Field 6**: Raw *p*-value for tumor subtype-association
-* **Field 7**: FDR-adjusted *p*-value for tumor subtype-association
-* **Field 8**: Indicator for whether the transcript isoform is tumor subtype-associated
-
-
-#### Identification of tumor aberrant transcript isoforms
-
-We wrote a script, [SampleSpecificIsoforms.py](./scripts/SampleSpecificIsoforms.py), to identify transcript isoforms that are present at significantly elevated proportions in a single cell line replicate based on TEQUILA-seq data generated on our panel of 40 breast cancer cell lines (2 replicates for each of the 40 breast cancer cell lines) (hereafter referred to as "sample-specific" transcript isoforms). Briefly, our script uses the following approach to identify sample-specific transcript isoforms:
-1. For each gene, generate an *m*-by-80 matrix comprised of read counts (rounded to the nearest integer) for *m* discovered transcript isoforms across 80 TEQUILA-seq samples (2 replicates for each of the 40 breast cancer cell lines).
-2. Run a chi-square test of homogeneity (FDR $\lt$ user-specified threshold) on the matrix to assess whether transcript isoform proportions for the given gene are homogenous across all samples.
-3. Focusing on genes identified by the chi-square test as having an FDR-adjusted *p*-value $\lt$ user-specified threshold, run a post-hoc one-tailed binomial test (FDR $\lt$ user-specified threshold) to identify sample-isoform pairs in which the transcript isoform proportion in the given sample is significantly higher than the overall transcript isoform proportion over all samples (i.e., sum of read counts of the transcript isoform over all samples divided by the sum of read counts of the gene over all samples)
-  
-Detailed usage information for our script is shown below:
+    --outf_dir                                          Folder of output 
 
 ```
-python SampleSpecificIsoforms.py [-h] -i /path/to/ESPRESSO/isoform/abundance/matrix -t <number of worker threads> \
-    -c <FDR threshold> -o /path/to/output/file
+
+`gtf_list` lists ESPRESSO gtf files from different runs. 
+Each row of `gtf_list` should contain `<gtf_file> <abundance_matrix> <group_name>`
+
+An example `gtf_list` file would be:
+```
+./tumor.gtf    ./tumor_abundance.esp    Tumor
+./tissue_gtf   ./tissue_abundance.esp   Tissue
+```
+Note: columns are separated by `tab`. 
+
+
+
+### Data processing (First step)
+
+**It is important to note that when running the IRIS-long tool, the order of samples should be sorted by tumor and normal tissues. Specifically, the columns corresponding to tumor samples should be placed ahead (on the left) of the columns representing normal tissues in the expression matrix file.**
+
+This sub-command is used to pre-process ESPRESSO results. The command can start from raw ESPRESSO gtf and ESPRESSO abundance matrix and it will generate bed format file (derived from gtf file) as well as normalized abundance matrix using CPM as unit in both transcript level and gene level. Besides, it will also generate isoform proportion matrix, which would be used in the following steps
+
+Our script can be run as follows:
+
+```
+python ~/IRIS_long/IRIS_long_main.py Preprocess [-h] \
+--espresso_gtf /path/to/espresso_gtf_file \
+--espresso_abundance /path/to/espresso_abundance_matrix_file \
+--normalized_mode /choose/from/'SAM'/or/'ESPRESSO' \
+--folder_sam /path/to/folder/of/sam_files \
+--outf_dir /path/to/folder/of/output/file
 
 script arguments:
-    -h, --help                                          show this message and exit
+    -h, --help                                          Show this message and exit
 
-    -i /path/to/ESPRESSO/isoform/abundance/matrix       path to tsv file generated by ESPRESSO summarizing all discovered transcript 
-                                                        isoforms across samples and their assigned read counts
+    --espresso_gtf                                      ESPRESSO gtf file
 
-    -t <number of worker threads>                       number of worker threads (integer)
+    --espresso_abundance                                ESPRESSO abundance file
 
-    -c <FDR threshold>                                  FDR threshold for calling transcript isoforms as sample-specific 
-                                                        (float between 0 and 1)
+    --normalized_mode                                   Choose to normalize CPM based on SAM files or ESPRESSO output file, choose from ['SAM','ESPRESSO']
 
-    -o /path/to/output/file                             path to output tsv file summarizing all transcript isoforms 
-                                                        prioritized as being sample-specific
-```
+    --folder_sam                                        Folder of sam files
 
-Our script will generate a tsv file summarizing all transcript isoforms prioritized as being sample-specific at the specified FDR threshold. Each line of the tsv file has the following output fields:
-
-* **Field 1**: Gene ID corresponding to the gene of a sample-specific transcript isoform
-* **Field 2**: Transcript ID of the sample-specific transcript isoform
-* **Field 3**: Name of the corresponding sample
-* **Field 4**: Read counts assigned by ESPRESSO to the sample-specific transcript isoform in the given sample
-* **Field 5**: Overall transcript isoform proportion
-* **Field 6**: Transcript isoform proportion in the given sample
-* **Field 7**: Raw *p*-value for sample-specificity
-* **Field 8**: FDR-adjusted *p*-value for sample-specificity
-
-To identify tumor aberrant transcript isoforms, we took the set of sample-specific transcript isoforms reported by our script and first identified cell line-isoform pairs for which the transcript isoform showed significantly elevated usage in a given cell line. Specifically, these pairs were required to meet the following criteria:
-* The transcript isoform has an FDR-adjusted *p*-value $\lt$ 1% (post-hoc test) for both replicates of the given cell line
-* The transcript isoform proportions in both replicates are $\geq$ 10% higher than the overall transcript isoform proportion over all samples. 
-
-Finally, tumor aberrant transcript isoforms are identified based on the following criteria:
-1. The transcript isoform shows significantly elevated usage in at least 1 but no more than 4 cell lines (i.e., $\leq$ 10% of our breast cancer cell line panel)
-2. The transcript isoform is not the canonical transcript isoform of the corresponding gene, as defined by the [Ensembl database (Release 100, April 2020)](http://apr2020.archive.ensembl.org/index.html). 
-
-
-#### Classification of alternative splicing events underlying discovered transcript isoforms
-
-We wrote a script, [FindAltTSEvents.py](./scripts/FindAltTSEvents.py), that compares the structures of any two transcript isoforms. Local differences in transcript structure are then classified into 7 basic alternative splicing categories:
-
-<img src="./files/AS_Patterns_Basic_2018_AJHG.jpg" width="800"/>
-
-* Exon skipping (SE)
-* Alternative 5'-splice site (A5SS)
-* Alternative 3'-splice site (A3SS)
-* Mutually exclusive exons (MXE)
-* Intron retention (RI)
-* Alternative first exon (AFE)
-* Alternative last exon (ALE)
-
-Any local differences in transcript structure that could not be classified as one of the 7 basic alternative splicing categories were classified as "complex" (COMPLEX). **Note:** It is possible to have combinations of alternative splicing events for any given pair of transcript isoforms.
-
-Detailed usage information for our script is shown below:
+    --outf_dir                                          Folder of output 
 
 ```
-python FindAltTSEvents.py [-h] -i /path/to/input/GTF -o /path/to/output/file
+
+
+
+### Differential test
+
+This sub-command is used to perform differential tests between tumor samples and normal tissue samples. This step consists of two test (based on isoform level): differential expression test (two-sided wilcoxon-ranksum test) and prevalence test (fisher-exact test).
+
+Our script can be run as follows:
+
+```
+python ~/IRIS_long/IRIS_long_main.py DiffTest [-h] \
+--isoform_cpm_inf /path/to/isoform_cpm_matrix \
+--tumor_num /number/of/tumor/samples \
+--detest_p /p-value/in/DE-test \
+--detest_tumor_cpm /Cutoff/of/CPM/across/tumor/in/DE-test \
+--detest_fc /Cutoff/of/fold/change/in/DE-test \
+--pretest_p /p-value/in/prevalence-test \
+--pretest_tumor_cpm /Cutoff/of/CPM/across/tumor/in/prevalence-test \
+--pretest_tissue_cpm /Cutoff/of/CPM/across/tissue/in/prevalence-test \
+--outf_dir /path/to/folder/of/output/file
 
 script arguments:
-    -h, --help                                          show this message and exit
+    -h, --help                                          Show this message and exit
 
-    -i /path/to/input/GTF                               path to GTF file containing annotations for two transcript isoforms
+    --isoform_cpm_inf                                   Isoform CPM file, e.g. samples_abundance_combined_CPM_ESPRESSO.txt
 
-    -o /path/to/output/file                             path to output file
-```
+    --tumor_num                                         Number of tumor samples
 
-Our script will subsequently generate a tab-delimited file consisting of four fields:
-* **Field 1**: ID for transcript isoform 1
-* **Field 2**: ID for transcript isoform 2
-* **Field 3**: Discovered alternative splicing events
-* **Field 4**: Genomic coordinates for alternative splicing events
+    --detest_p                                          Cutoff of p-value in DE test, default = 0.05
 
-**Note:** Designation of transcript isoforms 1 and 2 is completely arbitrary. Moreover, if the two transcript isoforms contained in the input GTF file exhibit a combination of multiple alternative splicing events, each event will be reported as its own line in the output file.
+    --detest_tumor_cpm                                  Cutoff of median CPM value in tumor samples, used to decide whether an isoform is highly expressed, default = 3
 
+    --detest_fc                                         Cutoff of fold change between tumor and normal, used to decide DE isoform, default = 2
 
-#### Identification of NMD-targeted transcript isoforms
+    --pretest_p                                         Cutoff of p-value in prevalence test, default = 1e-6
 
-To identify NMD-targeted transcript isoforms, we first retrieved the sequences of discovered transcript isoforms (from a user-supplied reference genome) and searched for open reading frames (ORFs). For discovered transcript isoforms that are annotated as `'basic' protein-coding` in reference transcript annotations, we used the annotated ORF. Alternatively, for other transcript isoforms, we used the longest ORF and required it to encode at least 20 amino acids. Among transcripts with predicted ORFs, we identified those that may be NMD-targeted using the following criteria (adapted from [Lindeboom et al., *Nat. Genet* (2016)](https://www.nature.com/articles/ng.3664)):
-1. The transcript is $\geq$ 200 nt long
-2. The transcript contains at least one splice junction
-3. **The 50 nt rule:** The predicted stop codon is $\geq$ 50 nt upstream of the last splice junction (i.e., the transcript harbors a premature termination codon).
+    --pretest_tumor_cpm                                 Cutoff of CPM value in tumor samples, used to decide whether an isoform is considered as expressed, default = 2
 
-We wrote a script, [Translation.sh](./scripts/Translation.sh), that searches for ORFs from transcripts contained in an input file of transcript annotations (GTF format). Our script requires (i) a user-supplied reference genome (FASTA format) and (ii) user-supplied reference transcript annotations (GTF format). Prior to running our script, these files should be placed in the [files](./scripts/scripts/files/) folder. If you are using the GRCh37/hg19 reference genome build, we recommend using [this reference genome file](https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_34/GRCh37_mapping/GRCh37.primary_assembly.genome.fa.gz) and [this transcript annotation file](https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_34/GRCh37_mapping/gencode.v34lift37.annotation.gtf.gz). Alternatively, if you are using the GRCh38/hg38 reference genome build, we recommend using [this reference genome file](https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_39/GRCh38.p13.genome.fa.gz) and [this transcript annotation file](https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_39/gencode.v39.annotation.gtf.gz). 
+    --pretest_tissue_cpm                                Cutoff of CPM value in tissue samples, used to decide whether an isoform is considered as expressed, default = 1
 
-Detailed usage information for our script is shown below:
+    --outf_dir                                          Folder of output 
 
 ```
-python scripts/Translation.py \
---mode long-read \
+
+
+
+### Transcript Translation
+
+This sub-command is used to classify transcripts into different types (protein-coding, NMD or fragment). Then translate protein-coding transcripts into proteins.
+
+Our script can be run as follows:
+
+```
+python ~/IRIS_long/IRIS_long_main.py Translation [-h] \
+--mode /short-read/or/long-read \
 --trans_gtf /path/to/ESPRESSO/gtf/file \
 --isoform_cpm_inf /path/to/isoform_cpm_matrix \
---genome_version hg19 \
+--genome_version /hg19/or/hg38 \
 --ref_gtf /path/to/reference/gencode/gtf/file \
 --out_file /prefix/of/name/of/output/file \
 --outf_dir /path/to/folder/of/output/file
@@ -349,13 +217,13 @@ script arguments:
 
     --mode                                              Long-read or short-read RNA-seq data mode, default is long-read
 
-    --trans_gtf                                         Generated ESPRESSO gtf file
+    --trans_gtf                                         Generated gtf file, e.g. samples_updated_combined.gtf
 
-    --isoform_cpm_inf                                   Generated isoform CPM abundance file
+    --isoform_cpm_inf                                   Isoform CPM file, e.g. samples_abundance_combined_CPM_ESPRESSO.txt
 
     --genome_version                                    Choose from ['GRCH38','GRCH37','hg38','hg19']
 
-    --ref_gtf                                           Reference gencode annotation gtf
+    --ref_gtf                                           Reference gencode annotation, e.g. ./references/gencode.v39.annotation.gtf
 
     --out_file                                          Prefix of the name of output file
 
@@ -363,5 +231,319 @@ script arguments:
 
 ```
 
-Our script will generate protein FASTA files for both protein-coding transcript isoforms and NMD-targeted transcript isoforms in the user-specified output directory.
 
+
+### CAR-T target prediction
+
+This sub-command is used to decide protein topology and further discover potential targets for CAR-T therapy.
+
+Our script can be run as follows:
+
+```
+python ~/IRIS_long/IRIS_long_main.py CAR_T [-h] \
+--tmhmm_dir /path/of/tmhmm \
+--protein_inf /path/to/generated/protein/fasta \
+--isoform_cpm_inf /path/to/isoform_cpm_matrix \
+--isoform_proportion_inf /path/to/isoform/proportion/matrix \
+--annotated_isoform_contri_inf /path/to/file \
+--trans_CDS_inf /path/to/file \
+--genome_version /hg19/or/hg38 \
+--tumor_num /number/of/tumor/samples \
+--specificity_score /cutoff/of/specificity_score \
+--tissue_cpm /cutoff/of/transcripts/in/tissue/samples \
+--tissue_number /cutoff/of/numbers/above/CPM/threshold/in/tissues \
+--out_file /prefix/of/name/of/output/file \
+--outf_dir /path/to/folder/of/output/file
+
+script arguments:
+    -h, --help                                          Show this message and exit
+
+    --tmhmm_dir                                         File path of TMHMM tool (directory is needed)
+
+    --protein_inf                                       Generated protein fasta file
+
+    --isoform_cpm_inf                                   Isoform CPM file, e.g. samples_abundance_combined_CPM_ESPRESSO.txt
+
+    --isoform_proportion_inf                            Isoform proportion file, e.g. samples_abundance_combined_CPM_ESPRESSO_proportion.txt
+
+    --annotated_isoform_contri_inf                      File generated before, which ends with "_annotated_isoform_contribution.txt"
+
+    --trans_CDS_inf                                     File generated before, format of which is like "4_4_*_detailed_match_ID.txt"
+
+    --genome_version                                    Choose from ['GRCH38','GRCH37','hg38','hg19']
+
+    --tumor_num                                         Number of tumor samples
+
+    --specificity_score                                 Cutoff of specificity score (default = 1)
+
+    --tissue_cpm                                        Cutoff of (maximum tolerable) CPM of transcripts encode given peptide in tissue samples (default = 10)
+
+    --tissue_number                                     Maximum tolerable number of tissues that are allowed to be higher than the given CPM expression threshold (default = 3)
+
+    --out_file                                          Prefix of the name of output file
+
+    --outf_dir                                          Folder of output 
+
+```
+
+
+
+### TCR target prediction
+
+This sub-command is used to predict samples-specific HLA types and further discover potential targets for TCR therapy.
+
+When peforming TCR target prediction job, we need to input HLA alleles as the parameter, which could be obtained based on bam/sam files by tools such as [HLA-LA](https://github.com/DiltheyLab/HLA-LA) for given samples, or we can manually specify comman HLA alleles such as HLA-A02:01,HLA-A01:01
+
+Our script can be run as follows:
+
+```
+python ~/IRIS_long/IRIS_long_main.py TCR [-h] \
+--netMHCpan_dir /path/of/netMHCpan \
+--HLA_str /HLA/alleles \
+--protein_inf /path/to/generated/protein/fasta \
+--isoform_cpm_inf /path/to/isoform_cpm_matrix \
+--isoform_proportion_inf /path/to/isoform/proportion/matrix \
+--genome_version /hg19/or/hg38 \
+--annotated_isoform_contri_inf /path/to/file \
+--trans_CDS_inf /path/to/file \
+--tumor_num /number/of/tumor/samples \
+--binding_affi /cutoff/of/binding/affinity \
+--specificity_score /cutoff/of/specificity_score \
+--tissue_cpm /cutoff/of/transcripts/in/tissue/samples \
+--tissue_number /cutoff/of/numbers/above/CPM/threshold/in/tissues \
+--window_size /size/of/sliding/window \
+--outf_dir /path/to/folder/of/output/file
+
+script arguments:
+    -h, --help                                          Show this message and exit
+
+    --netMHCpan_dir                                     File path of netMHCpan tool (directory is needed)
+
+    --HLA_str                                           HLA alleles, such as HLA-A01:01,HLA-A02:01
+
+    --protein_inf                                       Generated protein fasta file, such as 4_4_XXX_PC.fasta
+
+    --isoform_cpm_inf                                   Isoform CPM file, e.g. samples_abundance_combined_CPM_ESPRESSO.txt
+
+    --isoform_proportion_inf                            Isoform proportion file, e.g. samples_abundance_combined_CPM_ESPRESSO_proportion.txt
+
+    --genome_version                                    Choose from ['GRCH38','GRCH37','hg38','hg19']
+
+    --annotated_isoform_contri_inf                      File generated before, which is like "_annotated_isoform_contribution.txt"
+
+    --trans_CDS_inf                                     File generated before, which is like  "4_4_*_detailed_match_ID.txt"
+
+    --tumor_num                                         Number of tumor samples
+
+    --binding_affi                                      Cutoff of binding affinity between HLA complex and peptides (default = 500)
+
+    --specificity_score                                 Cutoff of specificity score (default = 3)
+
+    --tissue_cpm                                        Cutoff of (maximum tolerable) CPM of transcripts encode given peptide in tissue samples (default = 10)
+
+    --tissue_number                                     Maximum tolerable number of tissues that are allowed to be higher than the given CPM expression threshold (default = 3)
+
+    --window_size                                       Size of sliding window, (default = 9)
+
+    --outf_dir                                          Folder of output 
+
+```
+
+
+
+### Example visualization
+
+The command based on the results generated from previous step, and it will generate a bash file `Template_to_generate_figures.sh` as the output. The bar-graph figures for both isoform proportion and isoform abundance (CPM) in a gene, as well as the transcript structure figure would be generated when interested `Ensembl_Gene_ID`, `Gene_Symbol` and `Ensembl_Transcript_ID` are specified.
+
+Our script can be run as follows:
+
+```
+python ~/IRIS_long/IRIS_long_main.py Figure [-h] \
+--isoform_proportion_inf /path/to/isoform/proportion/matrix \
+--isoform_cpm_inf /path/to/isoform/abundance/matrix/CPM \
+--group_info_inf /path/to/file/containing/group_info \
+--required_trans_inf /path/to/file/containing/required_transcripts \
+--bedgraph /path/to/processed/bed/file \
+--outf_dir /path/to/folder/of/output/file \
+--figures Isoform Single_isoform Structure
+
+script arguments:
+    -h, --help                                          Show this message and exit
+
+    --isoform_proportion_inf                            Isoform proportion infile, e.g. samples_abundance_combined_CPM_ESPRESSO_proportion.txt
+
+    --isoform_cpm_inf                                   Isoform CPM file, e.g. samples_abundance_combined_CPM_ESPRESSO.txt
+
+    --group_info_inf                                    Sample group information
+
+    --required_trans_inf                                Transcripts need to show in final figure
+
+    --bedgraph                                          Generated bedgraph file for sample, e.g. samples_BedGraph.bed
+
+    --outf_dir                                          Folder of output
+
+    --figures                                           Figures expected to generate, could be multiple choices from ['Isoform','Single_isoform','Structure'], seperated by ' ' (white space)
+
+```
+
+`group_info_inf` indicates how many sample groups we have, and how many samples in each group. 
+
+An example `group_info_inf` file would be:
+```
+Group   Number_of_samples
+Tumor   16
+Tissue  30
+```
+Note: columns are separated by `tab`. And the order is important, based on this example, we know the first 16 samples in transcript expression matrix belong to Tumor group and the rest 30 samples are normal tissues.
+
+
+`required_trans_inf` indicates what transcript we want show in the figure. In default, the five transcripts we would include are: 
+1. The interested transcript
+2. The canonical transcript in a gene (if it's not the interested transcript, otherwise it would be the longest annotated transcript, based on Gencode annotation)
+3. The 3rd - 5th transcripts would be the transcripts with the highest average proportion across all samples among the rest transcripts in a gene. 
+Thus, we need to input all the interested transcripts in  `required_trans_inf` so that they could be included in the genrated figures (one gene per row).
+
+An example `required_trans_inf` file would be:
+```
+Gene_ID Trans_ID  Gene_symbol
+ENSG00000026508 ENST00000434472;ENST00000428726 CD44
+```
+Note: columns are separated by `tab`. Multiple required transcripts are separated by `;`.
+
+
+
+### Tumor specificity
+
+The step is to calculate the tumor-specificity score for each region (e.g. 9 AAs) along the given transcript-derived protein sequence (from predicted CAR-T targets). Besides, it will also generate the figure showing the change of tumor-specificity scores along the protein sequence.
+
+Our script can be run as follows:
+
+```
+python ~/IRIS_long/IRIS_long_main.py Specificity [-h] \
+--transcript_ID /EnsemblID/of/interested/transcript \
+--tumor_num /number/of/tumor/samples \
+--protein_inf /path/to/generated/protein/fasta \
+--isoform_cpm_inf /path/to/isoform/abundance/matrix/CPM \
+--cell_surface_inf /predicted/cell/surface/protein/in/given/samples \
+--window_size /size/of/sliding/window \
+--start_site /starting/position/of/visualized/region \
+--end_site /ending/position/of/visualized/region \
+--outf_dir /path/to/folder/of/output/file 
+
+
+script arguments:
+    -h, --help                                          Show this message and exit
+
+    --transcript_ID                                     Ensembl ID of interested transcript
+
+    --tumor_num                                         Number of tumor samples
+
+    --protein_inf                                       Generated protein fasta file, which is like "4_4_*_PC.fasta"
+
+    --isoform_cpm_inf                                   Isoform CPM file, e.g. samples_abundance_combined_CPM_ESPRESSO.txt
+
+    --cell_surface_inf                                  Generated cell surface proteins file, which is like "5_3_*_high_confidence.txt"
+
+    --window_size                                       Size of sliding window, (default = 9)
+
+    --start_site                                        Starting position of visualized protein region (default shows the 100 AAs region with the highest tumor-specificity)
+
+    --end_site                                          Ending position of visualized protein region (default shows the 100 AAs region with the highest tumor-specificity)
+
+    --outf_dir                                          Folder of output
+
+```
+
+
+
+### Protein topology 
+
+The step is to generate protein topology figure using [Protter](https://wlab.ethz.ch/protter/help/) tool, and this step is only for predicted CAR-T targets, please run it after CAR-T prediction step.
+Note, this step is using API service from Protter tool, there is no need to download the tool.
+
+Our script can be run as follows:
+
+```
+python ~/IRIS_long/IRIS_long_main.py Topology [-h] \
+--transcript_ID /EnsemblID/of/interested/transcript \
+--gene_symbol /Interested/gene/name \
+--protein_inf /path/to/generated/protein/fasta \
+--score_cutoff /tumor/specificity/score/cutoff \
+--outf_dir /path/to/folder/of/output/file 
+
+
+script arguments:
+    -h, --help                                          Show this message and exit
+
+    --transcript_ID                                     Ensembl ID of interested transcript
+
+    --gene_symbol                                       Gene name of interested gene
+
+    --protein_inf                                       Generated protein fasta file, which is like "4_4_*_PC.fasta"
+
+    --score_cutoff                                      Specificity score cutoff (default = 3)
+
+    --outf_dir                                          Folder of output
+
+```
+
+
+### Additionally useful scripts (Only limited to Xing lab)
+
+If interested target is due to differential gene expression between tumor and normal tissue group, we could try to query the expression profile of given gene from IRIS db in CHOP HPC. This script will generate a file containing TPM value of given gene across TCGA and GTEx samples, based on short-read RNA-seq data. Besides, it will also generate a box plot accordingly.
+
+```
+python ~/IRIS_long/scripts/Supp_2_extract_gene_expression.py [gene_symbol] [Output_dir] (Tumor_type) (Tissue_type)
+
+Such as:
+### Include all TCGA cancers and all GTEx normal tissues
+python ~/IRIS_long/scripts/Supp_2_extract_gene_expression.py HIPK2  .       
+
+### Only include TCGA-BRCA cancer and GTEx tissues that in ClonTech tissue list
+python ~/IRIS_long/scripts/Supp_2_extract_gene_expression.py HIPK2  . BRCA ClonTech         
+```
+
+
+If interested splice junction is involved in classical alternative splicing events, we could try to query this splicing junction from IRIS db in CHOP HPC. This script will generate a file containing normalized read counts mapped to given splicing junction across TCGA and GTEx samples, based on short-read RNA-seq data. Besides, it will also generate a box plot accordingly.
+
+```
+python ~/IRIS_long/scripts/Supp_4_extract_SJC.py [gene_symbol] [SJ_coordinate (hg19)] [Output_dir]
+
+Such as:
+
+python ~/IRIS_long/scripts/Supp_4_extract_SJC.py HIPK2 chr7:139299240:139305146 .
+```
+
+
+If we want to validate specific junction/exon of interested isoform, we could extrac the reads that only mapped to given gene from given sample, then IGV tool could be used to the following visualization.
+
+```
+python ~/IRIS_long/scripts/Supp_3_extract_sam.py [gene_symbol] [sample] [genome_version] [Sam_folder] [Output_dir]
+
+python ~/IRIS_long/scripts/Supp_3_select_reads_map_interested_junction.py [transcript_ID] [gene_symbol] [region_left_boundary] [region_right_boundary] [ESPRESSO_folder] [Output_dir]
+
+Such as:
+
+python ~/IRIS_long/scripts/Supp_3_extract_sam.py L1CAM M202 hg38 /home/xuy2/xuy2/Stored_scratch/snakemake_1.3.1_Melanoma/alignment .
+
+python ~/IRIS_long/scripts/Supp_3_select_reads_map_interested_junction.py ENST00000370055 L1CAM 153872697 153875761 /home/xuy2/xuy2/Stored_scratch/snakemake_1.3.1_Melanoma/espresso_out/q_work_dir .
+```
+
+
+## Example
+A toy dataset (gtf and expression matrix) has been inclued in `./example_dataset/`, which is about the identified transcripts from chromosome X across melanoma cell lines and normal tissues.
+
+Please follow the instruction on `run_example.sh` under `IRIS_long` folder:
+```
+bash run_example.sh
+```
+
+Predicted potential CAR-T targets could be found in `./example_dataset/CAR_T/5_5_Summarized_CAR_T_prioritized_targets_final.txt`
+
+Predicted potential TCR targets could be found in `./example_dataset/TCR/6_3_Summarized_TCR_prioritized_targets.txt`
+
+After modifying [./example_dataset/emplate_to_generate_figures.sh](./example_dataset/emplate_to_generate_figures.sh) accordingly, the generated figures of input transcript could be found in [./example_dataset/Example_res/](./example_dataset/Example_res/). 
+
+For example:
+<img src="./example_dataset/Example_res/Figure_L1CAM_bed_list_sorted_ENST00000370055_rank_single_color.png" width="800"/>
+<img src="./example_dataset/Example_res/Bar_sample_isoform_L1CAM_ENST00000370055_exp.png" width="800"/>
