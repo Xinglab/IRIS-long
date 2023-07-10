@@ -6,7 +6,7 @@
 * [Installation](#installation)
 * [Dependencies](#dependencies)
 * [Usage](#usage)
-  + [Data combining (optional)](#data-combining)
+  + [Data integration (optional)](#data-integration)
   + [Data processing](#data-processing)
   + [Differential test](#differential-test)
   + [Transcript Translation](#transcript-translation)
@@ -85,7 +85,7 @@ To run our scripts, the following dependencies will need to be installed and ava
 
 
 
-### Data combining (Optional)
+### Data integration
 
 This sub-command is used to combine ESPRESSO results from different runs. The command can start from raw ESPRESSO gtf and ESPRESSO abundance matrix and it will generate combined gtf file and combined isoform abundance matrix.
 
@@ -120,7 +120,7 @@ Note: columns are separated by `tab`.
 
 
 
-### Data processing (First step)
+### Data processing
 
 **It is important to note that when running the IRIS-long tool, the order of samples should be sorted by tumor and normal tissues. Specifically, the columns corresponding to tumor samples should be placed ahead (on the left) of the columns representing normal tissues in the expression matrix file.**
 
@@ -547,3 +547,4 @@ After modifying [./example_dataset/Template_to_generate_figures.sh](./example_da
 For example:
 <img src="./example_dataset/Example_res/Figure_L1CAM_bed_list_sorted_ENST00000370055_rank_single_color.png" width="800"/>
 <img src="./example_dataset/Example_res/Bar_sample_isoform_L1CAM_ENST00000370055_exp.png" width="800"/>
+
