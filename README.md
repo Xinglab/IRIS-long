@@ -45,7 +45,7 @@ git clone https://github.com/Xinglab/IRIS-long.git
 cd IRIS-long
 ```
 
-IRIS-long requires some processed file, which could be downloaded from [IRIS_long_references]([http://samtools.sourceforge.net](https://drive.google.com/file/d/1_C4Gvgv57lTrvridgCe75D9bDJDKiyNg/view?usp=drive_link) (a Google Drive link; size of file is around 4 GB). 
+IRIS-long requires some processed file, which could be downloaded from [IRIS_long_references](https://drive.google.com/file/d/1_C4Gvgv57lTrvridgCe75D9bDJDKiyNg/view?usp=drive_link) (a Google Drive link; size of file is around 4 GB). 
 
 The files need to be uncompressed and placed under `~/IRIS_long/scripts/`. e.g:
 ```
