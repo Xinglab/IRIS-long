@@ -542,7 +542,7 @@ Predicted potential CAR-T targets could be found in `./example_dataset/CAR_T/5_5
 
 Predicted potential TCR targets could be found in `./example_dataset/TCR/6_3_Summarized_TCR_prioritized_targets.txt`
 
-After modifying [./example_dataset/emplate_to_generate_figures.sh](./example_dataset/emplate_to_generate_figures.sh) accordingly, the generated figures of input transcript could be found in [./example_dataset/Example_res/](./example_dataset/Example_res/). 
+After modifying [./example_dataset/Template_to_generate_figures.sh](./example_dataset/Template_to_generate_figures.sh) accordingly, the generated figures of input transcript could be found in [./example_dataset/Example_res/](./example_dataset/Example_res/). 
 
 For example:
 <img src="./example_dataset/Example_res/Figure_L1CAM_bed_list_sorted_ENST00000370055_rank_single_color.png" width="800"/>
