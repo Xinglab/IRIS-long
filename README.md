@@ -382,7 +382,7 @@ script arguments:
 
     --outf_dir                                          Folder of output
 
-    --figures                                           Figures expected to generate, could be multiple choices from ['Isoform','Single_isoform','Structure'], seperated by ' ' (white space)
+    --figures                                           Figures expected to generate, could be multiple choices from ['Isoform','Single_isoform','Structure'], seperated by ' ' (white space, no quotation mark)
 
 ```
 
