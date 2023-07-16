@@ -446,9 +446,9 @@ script arguments:
 
     --window_size                                       Size of sliding window, (default = 9)
 
-    --start_site                                        Starting position of visualized protein region (default shows the 100 AAs region with the highest tumor-specificity)
+    --start_site                                        Starting position of visualized protein region (default shows the 50 AAs region with the highest tumor-specificity)
 
-    --end_site                                          Ending position of visualized protein region (default shows the 100 AAs region with the highest tumor-specificity)
+    --end_site                                          Ending position of visualized protein region (default shows the 50 AAs region with the highest tumor-specificity)
 
     --outf_dir                                          Folder of output
 
