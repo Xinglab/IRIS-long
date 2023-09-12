@@ -44,7 +44,7 @@ for index,line in enumerate(exp_inf_0):
 		if ENSG_ID == 'NA':
 			continue
 		if (query_gene_name != 'NA') and (query_gene_ID == 'NA') :
-			if re.findall(query_gene_name+'-\d+',arr[1]):
+			if re.findall('^'+query_gene_name+'-\d+',arr[1]):
 				query_gene_ID = ENSG_ID
 				break
 		elif (query_gene_ID != 'NA') and (query_gene_name == 'NA'):
