@@ -1,5 +1,3 @@
 #!/bin/bash
 
-#./conda_wrapper snakemake --profile ./snakemake_profile 
-#./conda_wrapper snakemake --profile ./snakemake_profile --dag | dot -Tsvg > dag.svg
 ./conda_wrapper snakemake --profile ./snakemake_profile --keep-incomplete --rerun-incomplete
