@@ -1,0 +1,3 @@
+Group	Number_of_samples
+SCLC	11
+Tissue	17

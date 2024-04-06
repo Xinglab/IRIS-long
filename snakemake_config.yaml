@@ -1,0 +1,58 @@
+# Resource allocation
+general_mem_gb: 40
+general_threads: 4
+general_time_hr: 24
+
+# Input samples
+input_transcript_abundance_matrix: "samples_abundance_combined.txt"
+input_transcript_gtf: "samples_updated_combined.gtf"
+tumor_key_word: "SCLC"
+outf_dir: "/mnt/isilon/xing_lab/aspera/xuy/Test/SCLC"
+
+# Genome fasta and gtf will be downloaded automatically if missing
+genome_version: "hg38"
+genome_fasta_path:
+genome_fasta_url: "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_39/GRCh38.primary_assembly.genome.fa.gz"
+genome_gtf_path:
+genome_gtf_url: "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_39/gencode.v39.annotation.gtf.gz"
+
+# Parameters in pre-processing:
+normalized_mode: 'ESPRESSO'
+
+# Parameters in differential transcript identification
+num_tumor_sample: 11
+enriched_test_p_value: 0.05
+enriched_test_cpm_in_tumor: 5
+enriched_test_fc: 2
+specificity_test_cpm_in_tumor: 5
+specificity_test_cpm_in_tissue: 1
+specificity_test_minimum_percentage_in_tumor: 0.5
+specificity_test_maximal_percentage_in_tissue: 0.1
+specificity_test_exclude_tissue: "Testis"
+
+# Parameters in transcript translation:
+mode: "long-read"
+
+# Parameters in TCR prediction:
+HLA_str: "HLA-A02:01"
+AA_window_size: 9
+binding_affi: 500
+minimum_specificity_score_TCR: 3
+maximal_peptide_cpm_in_tissue_TCR: 10
+maximal_tissue_percentage_TCR: 0.2
+
+# Parameters in CAR-T prediction:
+minimum_specificity_score_CAR_T: 2
+maximal_peptide_cpm_in_tissue_CAR_T: 20
+maximal_tissue_percentage_CAR_T: 0.2
+
+# Parameters in figure generation:
+group_info_inf: "group_info.txt"
+required_trans_inf: "required_trans.txt"
+
+# Additional configuration
+IRIS_long_path: "/mnt/isilon/xing_lab/aspera/xuy/Test/IRIS_long/"
+tmhmm_dir: "/mnt/isilon/xing_lab/aspera/xuy/tmhmm-2.0c/bin/"
+netMHCpan_dir: "/home/xuy2/xuy2/program/netMHCpan-4.1/"
+conda_wrapper: '/mnt/isilon/xing_lab/aspera/xuy/Test/conda_wrapper'
+
