@@ -5,7 +5,7 @@
 * [Overview](#overview)
 * [Installation](#installation)
 * [Dependencies](#dependencies)
-* [Usage (Snakemake)](#usage-in-snakemake)
+* [Usage (Snakemake)](#usage-in-snakemake-recommended)
 * [Usage (Command)](#usage-in-command)
   + [Data integration (optional)](#data-integration)
   + [Data processing](#data-processing)
