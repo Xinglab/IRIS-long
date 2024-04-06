@@ -64,7 +64,7 @@ To run our scripts, the following dependencies will need to be installed and ava
   + [viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html)
 
 
-## Usage in Snakemake
+## Usage in Snakemake (Recommended)
 
 The most straightforward method to execute the IRIS-long tool is by utilizing the built-in Snakemake workflow. Please modify the corresponding parameters in the [snakemake_config.yaml](./snakemake_config.yaml) file.
 
