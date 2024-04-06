@@ -45,12 +45,12 @@ The IRIS-long program can be downloaded directly from the repository, and when `
 
 ```
 git clone https://github.com/Xinglab/IRIS-long.git
-cd IRIS-long
+cd ~/IRIS-long
 chmod +x install
 ./install
 ```
 
-IRIS-long requires annotated genome fasta and gtf files, user-specified files should be downloaded firstly and moved into `~/IRIS_long/IRIS_long/scripts/references/`, otherwise genome fasta (hg38) and corresponding genocode gtf (genome.v39.annotation.gtf) will be downloaded automatically and used. 
+IRIS-long requires annotated genome fasta and gtf files, user-specified files should be downloaded firstly and moved into `~/IRIS_long/IRIS_long/scripts/references/`, otherwise genome fasta (hg38) and corresponding genocode gtf (genome.v39.annotation.gtf) will be downloaded and used automatically. 
 
 
 ## Dependencies
@@ -76,21 +76,21 @@ To run our scripts, the following dependencies will need to be installed and ava
   + [ComplexHeatmap](https://bioconductor.org/packages/release/bioc/html/ComplexHeatmap.html)
   + [viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html)
 
+
 ## Usage in Snakemake
 
-**Through Snakemake**
-The easiest way to run IRIS-long tool would be through built-in snakemake workflow.
-Please modify corresponding parameters in `snakemake_config.yaml` file.
+The most straightforward method to execute the IRIS-long tool is by utilizing the built-in Snakemake workflow. Please modify the corresponding parameters in the [snakemake_config.yaml](./snakemake_config.yaml) file.
 
-To generate ad irected acyclic graph (DAG) plot of whole IRIS-long pipeline, we could run
-```
-./conda_wrapper snakemake --profile ./snakemake_profile --dag | dot -Tsvg > dag.svg
-```
-
-Our IRIS-long could be run as follows:
+To run IRIS-long, simply submit this command:
 ```
 sbatch ./run
 ```
+
+To generate the directed acyclic graph (DAG) plot of whole IRIS-long workflow, we could run
+```
+./conda_wrapper snakemake --profile ./snakemake_profile --dag | dot -Tsvg > IRIS_long_dag.svg
+```
+
 
 
 ## Usage in Command
