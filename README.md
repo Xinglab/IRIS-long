@@ -7,18 +7,7 @@
 * [Dependencies](#dependencies)
 * [Usage (Snakemake)](#usage-in-snakemake-recommended)
 * [Usage (Command)](#usage-in-command)
-  + [Data integration (optional)](#data-integration)
-  + [Data processing](#data-processing)
-  + [Differential test](#differential-test)
-  + [Transcript Translation](#transcript-translation)
-  + [CAR-T target prediction](#car-t-target-prediction)
-  + [TCR target prediction](#tcr-target-prediction)
-  + [Example visualization](#example-visualization)
-  + [Tumor specificity](#tumor-specificity)
-  + [Protein topology](#protein-topology )
 * [Example](#example)
-
-
 
 ## Overview
 
@@ -86,9 +75,7 @@ To generate the directed acyclic graph (DAG) plot of whole IRIS-long workflow, w
 1. The input parameter for `--outf_dir` in all steps below should be the same folder, which should be the folder contains ESPRESSO output abundance matrix and gtf file.
 2. The columns in all files should be separated by single `tab` rather than `white space`.
 
-
-
-### Data integration
+### Data integration (Optional, not included in Snakemake)
 
 This sub-command is used to combine ESPRESSO results from different runs. The command can start from raw ESPRESSO gtf and ESPRESSO abundance matrix and it will generate combined gtf file and combined isoform abundance matrix.
 
