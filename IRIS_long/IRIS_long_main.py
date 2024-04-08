@@ -41,6 +41,7 @@ def parse_args():
 	parser_figure.add_argument('-is', '--intron_shrinkage', dest='intron_shrinkage', type=int, help="Intron shrinkage fold in isoform structure figure", default=10)
 	parser_figure.add_argument('-of', '--order', dest='order', type=str, help='order samples by isoform proportion', default='no')
 	parser_figure.add_argument('-rg', '--ref_gtf', dest='ref_gtf', type=str, help='Reference Gencode gtf', default = './')
+	parser_figure.add_argument('-eg', '--espresso_gtf', dest='espresso_gtf', type=str, help='ESPRESSO gtf file', required=True)
 	parser_figure.add_argument('-od', '--outf_dir', dest='outf_dir', type=str, help='output directory', required=True)
 
 	# create the parser for the 'DiffTest' command
@@ -218,6 +219,7 @@ def Sub_figure(dir_path, args):
 	intron_shrinkage = args.intron_shrinkage
 	order = args.order
 	ref_gtf = args.ref_gtf
+	espresso_gtf = args.espresso_gtf
 	# 2.1 only show top 5 isoform's proportion and reshape the file format
 	cmd_figure_1 = f"python {dir_path}/scripts/2_1_merge_isoforms_and_reshape_format.py {isoform_proportion_inf} {isoform_cpm_inf} {group_info_inf} {required_trans_inf} {outf_dir}"
 	print(cmd_figure_1)
@@ -236,9 +238,9 @@ def Sub_figure(dir_path, args):
 	if not os.path.exists(f"{outf_dir}/Example_res"):
 		os.system(f"mkdir {outf_dir}/Example_res")
 	if genome_version in ['hg19','GRCh37']:
-		cmd_figure_2 = f"python {dir_path}/scripts/2_2_Generate_bar_structure_figure_example.py --gene [Ensembl_Gene_ID] --gene_name [Gene_Symbol] --transcript [Interested_Transcript_ID] --abundance_CPM_original {isoform_cpm_inf} --abundance_proportion {prop_reshaped_inf_name} --abundance_CPM {exp_reshaped_inf_name} --bedgraph {bedgraph} --sorted_group {sorted_group_info} --out_dir {outf_dir}/Example_res --figures {' '.join(figures)} --canonical_transcript {dir_path}/scripts/references/Gencode_v39_canonical_isoform.txt --basic_transcript {dir_path}/scripts/references/gencode.v34lift37.annotation_basic_trans.txt --anno_gtf {ref_gtf} --CDS_inf {CDS_inf} --genome_version {genome_version} --intron_shrinkage {intron_shrinkage} --order {order}"
+		cmd_figure_2 = f"python {dir_path}/scripts/2_2_Generate_bar_structure_figure_example.py --gene [Ensembl_Gene_ID] --gene_name [Gene_Symbol] --transcript [Interested_Transcript_ID] --abundance_CPM_original {isoform_cpm_inf} --abundance_proportion {prop_reshaped_inf_name} --abundance_CPM {exp_reshaped_inf_name} --bedgraph {bedgraph} --sorted_group {sorted_group_info} --out_dir {outf_dir}/Example_res --figures {' '.join(figures)} --canonical_transcript {dir_path}/scripts/references/Gencode_v39_canonical_isoform.txt --basic_transcript {dir_path}/scripts/references/gencode.v34lift37.annotation_basic_trans.txt --anno_gtf {ref_gtf} --novel_gtf {espresso_gtf} --CDS_inf {CDS_inf} --genome_version {genome_version} --intron_shrinkage {intron_shrinkage} --order {order}"
 	elif genome_version in ['hg38', 'GRCh38']:
-		cmd_figure_2 = f"python {dir_path}/scripts/2_2_Generate_bar_structure_figure_example.py --gene [Ensembl_Gene_ID] --gene_name [Gene_Symbol] --transcript [Interested_Transcript_ID] --abundance_CPM_original {isoform_cpm_inf} --abundance_proportion {prop_reshaped_inf_name} --abundance_CPM {exp_reshaped_inf_name} --bedgraph {bedgraph} --sorted_group {sorted_group_info} --out_dir {outf_dir}/Example_res --figures {' '.join(figures)} --canonical_transcript {dir_path}/scripts/references/Gencode_v39_canonical_isoform.txt --basic_transcript {dir_path}/scripts/references/gencode.v39.annotation_basic_trans.txt --anno_gtf {ref_gtf} --CDS_inf {CDS_inf} --genome_version {genome_version} --intron_shrinkage {intron_shrinkage} --order {order}"
+		cmd_figure_2 = f"python {dir_path}/scripts/2_2_Generate_bar_structure_figure_example.py --gene [Ensembl_Gene_ID] --gene_name [Gene_Symbol] --transcript [Interested_Transcript_ID] --abundance_CPM_original {isoform_cpm_inf} --abundance_proportion {prop_reshaped_inf_name} --abundance_CPM {exp_reshaped_inf_name} --bedgraph {bedgraph} --sorted_group {sorted_group_info} --out_dir {outf_dir}/Example_res --figures {' '.join(figures)} --canonical_transcript {dir_path}/scripts/references/Gencode_v39_canonical_isoform.txt --basic_transcript {dir_path}/scripts/references/gencode.v39.annotation_basic_trans.txt --anno_gtf {ref_gtf} --novel_gtf {espresso_gtf} --CDS_inf {CDS_inf} --genome_version {genome_version} --intron_shrinkage {intron_shrinkage} --order {order}"
 	with open(f"{outf_dir}/Template_to_generate_figures.sh", "w") as outf_figure_2:
 		outf_figure_2.write(cmd_figure_2+'\n')
 
