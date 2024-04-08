@@ -351,6 +351,7 @@ rule figure:
 		conda_wrapper = config['conda_wrapper'],
 		IRIS_long = os.path.join(config['IRIS_long_path'], 'IRIS_long_main.py'),
 		ref_gtf = get_genome_gtf,
+		transcript_gtf = config['input_transcript_gtf'],
 		outf_dir = config['outf_dir'],
 		genome_version = config['genome_version'],
 	log:
@@ -371,5 +372,6 @@ rule figure:
 		' --figures Isoform Single_isoform Structure'
 		' --genome_version {params.genome_version}'
 		' --ref_gtf {params.ref_gtf}'
+		' --espresso_gtf {params.transcript_gtf}'
 		' 1> {log.out}'
 		' 2> {log.err}'

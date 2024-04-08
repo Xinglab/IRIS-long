@@ -12,8 +12,9 @@ bioconductor-complexheatmap
 r-cowplot
 r-circlize
 r-dbplyr
-r-ggplot2>=3.3.5
+r-ggplot2=3.4.0
 r-ggrepel
 r-rcolorbrewer
 r-tidyr
 r-viridis
+

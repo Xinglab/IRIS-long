@@ -4,8 +4,8 @@ general_threads: 4
 general_time_hr: 24
 
 # Input samples
-input_transcript_abundance_matrix: "samples_abundance_combined.txt"
-input_transcript_gtf: "samples_updated_combined.gtf"
+input_transcript_abundance_matrix: "/mnt/isilon/xing_lab/aspera/xuy/Test/samples_abundance_combined.txt"
+input_transcript_gtf: "/mnt/isilon/xing_lab/aspera/xuy/Test/samples_updated_combined.gtf"
 tumor_key_word: "SCLC"
 outf_dir: "/mnt/isilon/xing_lab/aspera/xuy/Test/SCLC"
 
