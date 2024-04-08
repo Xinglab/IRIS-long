@@ -55,7 +55,7 @@ To run our scripts, the following dependencies will need to be installed and ava
 
 ## Usage in Snakemake (Recommended)
 
-The most straightforward method to execute the IRIS-long tool is by utilizing the built-in Snakemake workflow. Please modify the corresponding parameters in the [snakemake_config.yaml](./snakemake_config.yaml) file.
+The most straightforward method to execute the IRIS-long tool is by utilizing the built-in Snakemake workflow. Please modify the corresponding parameters in the [snakemake_config.yaml](./snakemake_config.yaml) file, as well as [group_info.txt](./group_info.txt) and [required_trans.txt](./required_trans.txt) files for figure generation step.
 
 To run IRIS-long, simply submit this command:
 ```
@@ -67,6 +67,7 @@ To generate the directed acyclic graph (DAG) plot of whole IRIS-long workflow, w
 ./conda_wrapper snakemake --profile ./snakemake_profile --dag | dot -Tsvg > IRIS_long_dag.svg
 ```
 
+For detailed explanation for other parameters, please refer to cooresponding section in [Usage in Command](#usage-in-command).
 
 
 ## Usage in Command
