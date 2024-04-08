@@ -67,7 +67,8 @@ To generate the directed acyclic graph (DAG) plot of whole IRIS-long workflow, w
 ./conda_wrapper snakemake --profile ./snakemake_profile --dag | dot -Tsvg > IRIS_long_dag.svg
 ```
 
-For detailed explanation for other parameters, please refer to cooresponding section in [Usage in Command](#usage-in-command).
+For detailed explanation of other parameters, please refer to corresponding section in [Usage in Command](#usage-in-command).
+
 
 
 ## Usage in Command
