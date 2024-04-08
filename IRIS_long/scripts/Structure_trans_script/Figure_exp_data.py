@@ -9,6 +9,7 @@ gene_name = sys.argv[2]
 name_col = sys.argv[3] # 2
 genome_version = sys.argv[6]
 gtf_file_name = sys.argv[7]
+novel_gtf_file_name = sys.argv[8]
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -26,19 +27,6 @@ sample_list = []
 CPM_group_dict = defaultdict()
 CPM_total_dict = defaultdict()
 abundance_inf_name = sys.argv[4]
-#gtf_inf_name = '/'.join(abundance_inf_name.split('/')[0:-1])+'/samples_N2_R0_updated_combined_with_tissue.gtf'
-gtf_inf_name_1 = '/'.join(os.path.abspath(abundance_inf_name).split('/')[0:-1])+'/samples_N2_R0_updated_combined_with_tissue.gtf'
-gtf_inf_name_2 = '/'.join(os.path.abspath(abundance_inf_name).split('/')[0:-1])+'/samples_updated_combined.gtf'
-gtf_inf_name_3 = '/'.join(os.path.abspath(abundance_inf_name).split('/')[0:-1])+'/samples_N2_R0_updated.gtf'
-if os.path.exists(gtf_inf_name_1):
-	gtf_inf_name = gtf_inf_name_1
-elif os.path.exists(gtf_inf_name_2):
-	gtf_inf_name = gtf_inf_name_2
-elif os.path.exists(gtf_inf_name_3):
-	gtf_inf_name = gtf_inf_name_3
-else:
-	sys.stderr.write('No corresponding gtf file')
-	sys.exit(0)
 
 with open(abundance_inf_name, 'r') as inf:
 	for index,line in enumerate(inf):
@@ -59,7 +47,7 @@ with open(abundance_inf_name, 'r') as inf:
 #### detect isoforms (anno+novel) ####
 common_strand = ''
 strand_dict = defaultdict()
-with open(gtf_inf_name, 'r') as gtf_inf:
+with open(novel_gtf_file_name, 'r') as gtf_inf:
 	for line in gtf_inf:
 		if line.startswith('#'): continue
 		arr = line.strip().split('\t')
