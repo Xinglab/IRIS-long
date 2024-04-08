@@ -26,6 +26,7 @@ def parse_args():
 	parser.add('-is', '--intron_shrinkage', dest='intron_shrinkage', type=int, help='intron_shrinkage')
 	parser.add('-bt', '--basic_transcript', dest='basic_transcript', type=str, help='basic transcript')
 	parser.add('-ag', '--anno_gtf', dest='anno_gtf', type=str, help='annotated gencode gtf')
+	parser.add('-ng', '--novel_gtf', dest='novel_gtf', type=str, help='novel gencode gtf')
 	parser.add('-fi', '--figures', dest='figures', nargs='+', help='Choose from [Isoform, Single_isoform, Structure]', default = 'Isoform Single_isoform Structure')
 	args = parser.parse_args()
 	return parser, args
@@ -49,6 +50,7 @@ canonical_transcript = args.canonical_transcript
 basic_transcript = args.basic_transcript
 intron_shrinkage = args.intron_shrinkage
 anno_gtf = args.anno_gtf
+novel_gtf = args.novel_gtf
 figures = args.figures
 print (figures)
 
@@ -81,7 +83,7 @@ if 'Single_isoform' in figures:
 
 #### 2. Generate transcript structure plot ####
 if 'Structure' in figures:
-	command_2 = "python %s/2_2_3_Isoform_structure_generate_single_color.py %s %s %s %s %s %s %s %s %s %s" % (file_dir, gene_name, transcript, out_dir, name_col, abundance_CPM_original, bedgraph, genome_version, anno_gtf, CDS_inf, intron_shrinkage)
+	command_2 = "python %s/2_2_3_Isoform_structure_generate_single_color.py %s %s %s %s %s %s %s %s %s %s %s" % (file_dir, gene_name, transcript, out_dir, name_col, abundance_CPM_original, bedgraph, genome_version, anno_gtf, novel_gtf, CDS_inf, intron_shrinkage)
 	print (command_2)
 	os.system(command_2)
 	print ('Step 2 completed: Generate transcript structure plot.\n')

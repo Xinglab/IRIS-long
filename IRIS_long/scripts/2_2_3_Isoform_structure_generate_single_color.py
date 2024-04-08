@@ -8,8 +8,9 @@ abun_CPM_original = sys.argv[5]
 sample_bedgraph = sys.argv[6]
 genome_version = sys.argv[7]
 anno_gtf = sys.argv[8]
-CDS_inf = sys.argv[9]
-intron_shrinkage = sys.argv[10]
+novel_gtf = sys.argv[9]
+CDS_inf = sys.argv[10]
+intron_shrinkage = sys.argv[11]
 
 ## attention: need to change the column index
 ## normal format is Group_GeneSymbol_TransID.bed
@@ -21,7 +22,7 @@ command_1 = "python %s/Structure_trans_script/Create_target_gene_bedgraph_sh.py 
 print (command_1)
 os.system(command_1)
 
-command_2 = "python %s/Structure_trans_script/Figure_exp_data.py %s/Figure_%s_bed_list.txt %s %s %s %s %s" % (file_dir, object_dir, gene_name, gene_name, name_col, abun_CPM_original, target_trans_ID, genome_version, anno_gtf)
+command_2 = "python %s/Structure_trans_script/Figure_exp_data.py %s/Figure_%s_bed_list.txt %s %s %s %s %s %s %s" % (file_dir, object_dir, gene_name, gene_name, name_col, abun_CPM_original, target_trans_ID, genome_version, anno_gtf, novel_gtf)
 print (command_2)
 os.system(command_2)
 

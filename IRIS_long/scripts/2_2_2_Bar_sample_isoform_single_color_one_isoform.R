@@ -143,9 +143,9 @@ if (identical(as.character(unique(gene_data$Subtype)), reference_list)) {
 } else {
 	f_fig <- f_fig + scale_colour_manual(name="Group",values = group_color_list)
 }
-f_fig <- f_fig + geom_bar(stat="identity", position = position_stack(vjust = 1, reverse = FALSE), width=0.9, color="black", size=0.4)
+f_fig <- f_fig + geom_bar(stat="identity", position = position_stack(vjust = 1, reverse = FALSE), width=0.9, color="black", linewidth=0.4)
 f_fig <- f_fig + scale_fill_manual(values = trans_color_list)
-f_fig <- f_fig + theme(panel.grid.major = element_line(color = "white",size=0.01),panel.grid.minor = element_line(color = "white",size=0.01), axis.title.y=element_text(size = font_size), axis.text.y=element_text(size = font_size+2), axis.title.x=element_text(size = font_size), axis.text.x=element_text(size = font_size+1, colour = sub_color, angle=90, vjust=0.5, hjust=1), plot.title = element_blank(), legend.position = 'none', legend.title = element_text(size = font_size-1, hjust=0.5), legend.text = element_text(size = font_size-1.5), panel.border = element_rect(fill=NA, size=0.3, colour = "black"), panel.background = element_blank(), legend.box="horizontal", legend.direction="vertical", plot.margin = unit(c(0.5,5,0.5,5), "pt"))
+f_fig <- f_fig + theme(panel.grid.major = element_line(color = "white", linewidth=0.01),panel.grid.minor = element_line(color = "white", linewidth=0.01), axis.title.y=element_text(size = font_size), axis.text.y=element_text(size = font_size+2), axis.title.x=element_text(size = font_size), axis.text.x=element_text(size = font_size+1, colour = sub_color, angle=90, vjust=0.5, hjust=1), plot.title = element_blank(), legend.position = 'none', legend.title = element_text(size = font_size-1, hjust=0.5), legend.text = element_text(size = font_size-1.5), panel.border = element_rect(fill=NA, linewidth=0.3, colour = "black"), panel.background = element_blank(), legend.box="horizontal", legend.direction="vertical", plot.margin = unit(c(0.5,5,0.5,5), "pt"))
 f_fig <- f_fig + labs(x="", y="Isoform proportion (%)", title="")
 #f_fig <- f_fig + scale_y_continuous(label = unit_format(unit = "K",sep="",accuracy=0.1))
 #f_fig <- f_fig + guides(fill = guide_legend(reverse = FALSE, ncol=1, label.theme = element_text(size = font_size-1),keywidth=1, keyheight=1, order=1)) + guides(color = guide_legend(reverse = FALSE, ncol=1, label.theme = element_text(size = font_size-1), keywidth=1, keyheight=1, order=2))
@@ -173,9 +173,9 @@ if (identical(as.character(unique(gene_data$Subtype)), reference_list)) {
 } else {
 	f_fig_exp <- f_fig_exp + scale_colour_manual(name="Group",values = group_color_list)
 }
-f_fig_exp <- f_fig_exp + geom_bar(stat="identity", position = position_stack(vjust = 1, reverse = FALSE), width=0.9, color="black", size=0.4)
+f_fig_exp <- f_fig_exp + geom_bar(stat="identity", position = position_stack(vjust = 1, reverse = FALSE), width=0.9, color="black", linewidth=0.4)
 f_fig_exp <- f_fig_exp + scale_fill_manual(values = trans_color_list)
-f_fig_exp <- f_fig_exp + theme(panel.grid.major = element_line(color = "white",size=0.01),panel.grid.minor = element_line(color = "white",size=0.01), axis.title.y=element_text(size = font_size), axis.text.y=element_text(size = font_size+2), axis.title.x=element_blank(), axis.ticks.x=element_blank(), axis.text.x=element_blank(), plot.title = element_blank(), legend.position ='none', legend.title = element_text(size = font_size-1), legend.text = element_text(size = font_size-1), panel.border = element_rect(fill=NA, size=0.3, colour ="black"), panel.background = element_blank(), legend.box="horizontal", legend.direction="horizontal", plot.margin = unit(c(5,5,0.5,5), "pt"))
+f_fig_exp <- f_fig_exp + theme(panel.grid.major = element_line(color = "white", linewidth=0.01),panel.grid.minor = element_line(color = "white", linewidth=0.01), axis.title.y=element_text(size = font_size), axis.text.y=element_text(size = font_size+2), axis.title.x=element_blank(), axis.ticks.x=element_blank(), axis.text.x=element_blank(), plot.title = element_blank(), legend.position ='none', legend.title = element_text(size = font_size-1), legend.text = element_text(size = font_size-1), panel.border = element_rect(fill=NA, linewidth=0.3, colour ="black"), panel.background = element_blank(), legend.box="horizontal", legend.direction="horizontal", plot.margin = unit(c(5,5,0.5,5), "pt"))
 f_fig_exp <- f_fig_exp + labs(x="", y="Abundance (CPM)", title="")
 #f_fig_exp <- f_fig_exp + guides(fill = guide_legend(reverse = FALSE, nrow=2, label.theme = element_text(size = 5),keywidth=1, keyheight=1, order=1)) + guides(color = guide_legend(reverse = FALSE, nrow=2, label.theme = element_text(size = 5), keywidth=1, keyheight=1, order=2))
 
