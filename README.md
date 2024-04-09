@@ -92,8 +92,6 @@ python ~/IRIS_long/IRIS_long_main.py Combine [-h] \
 script arguments:
     -h, --help                                          Show this message and exit
 
-    --allowed_dist                                      Allowed distance for each ends to collapse novel transcripts, default = 50bp
-
     --gtf_list                                          Path to espresso_gtf_file list
 
     --outf_dir                                          Folder of output 
@@ -125,6 +123,7 @@ python ~/IRIS_long/IRIS_long_main.py Preprocess [-h] \
 --espresso_gtf /path/to/espresso_gtf_file \
 --espresso_abundance /path/to/espresso_abundance_matrix_file \
 --normalized_mode /choose/from/'SAM'/or/'ESPRESSO' \
+--ref_gtf /gencode/gtf/file \
 --folder_sam /path/to/folder/of/sam_files \
 --outf_dir /path/to/folder/of/output/file
 
@@ -134,6 +133,8 @@ script arguments:
     --espresso_gtf                                      ESPRESSO gtf file
 
     --espresso_abundance                                ESPRESSO abundance file
+
+    --ref_gtf                                           Reference Gencode gtf
 
     --normalized_mode                                   Choose to normalize CPM based on SAM files or ESPRESSO output file, choose from ['SAM','ESPRESSO']
 
@@ -155,12 +156,14 @@ Our script can be run as follows:
 python ~/IRIS_long/IRIS_long_main.py DiffTest [-h] \
 --isoform_cpm_inf /path/to/isoform_cpm_matrix \
 --tumor_num /number/of/tumor/samples \
---detest_p /p-value/in/DE-test \
---detest_tumor_cpm /Cutoff/of/CPM/across/tumor/in/DE-test \
---detest_fc /Cutoff/of/fold/change/in/DE-test \
---pretest_p /p-value/in/prevalence-test \
---pretest_tumor_cpm /Cutoff/of/CPM/across/tumor/in/prevalence-test \
---pretest_tissue_cpm /Cutoff/of/CPM/across/tissue/in/prevalence-test \
+--enriched_test_p /p-value/in/tumor-enriched test \
+--enriched_test_tumor_cpm /Cutoff/of/CPM/across/tumor/in/tumor-enriched test \
+--enriched_test_fc /Cutoff/of/fold/change/in/tumor-enriched test \
+--specificity_test_tumor_cpm /Cutoff/of/CPM/across/tumor/in/tumor-specificity test \
+--specificity_test_tumor_percentage /Minimum/precentage/of/tumor/samples/that/express/given/transcript \
+--specificity_test_tissue_cpm /Cutoff/of/CPM/across/tissue/in/tumor-specificity test \
+--specificity_test_tissue_percentage /Maximum/precentage/of/tissue/samples/that/express/given/transcript \
+--specificity_test_exclude_tissue /Excluded/tissues/in/tumor-specificity/transcript/identification \
 --outf_dir /path/to/folder/of/output/file
 
 script arguments:
@@ -170,17 +173,21 @@ script arguments:
 
     --tumor_num                                         Number of tumor samples
 
-    --detest_p                                          Cutoff of p-value in DE test, default = 0.05
+    --enriched_test_p                                   Cutoff of p-value in tumor-enriched test, default = 0.05
 
-    --detest_tumor_cpm                                  Cutoff of median CPM value in tumor samples, used to decide whether an isoform is highly expressed, default = 3
+    --enriched_test_tumor_cpm                           Cutoff of median CPM value in tumor samples, used to decide whether an isoform is highly expressed, default = 5
 
-    --detest_fc                                         Cutoff of fold change between tumor and normal, used to decide DE isoform, default = 2
+    --enriched_test_fc                                  Cutoff of fold change between tumor and normal, used to decide DE isoform, default = 2
 
-    --pretest_p                                         Cutoff of p-value in prevalence test, default = 1e-6
+    --specificity_test_tumor_cpm                        Cutoff of CPM value in tumor samples, used to decide whether an isoform is considered as expressed (default = 5)
 
-    --pretest_tumor_cpm                                 Cutoff of CPM value in tumor samples, used to decide whether an isoform is considered as expressed, default = 2
+    --specificity_test_tumor_percentage                 Minimum precentage of tumor samples that express given transcript (default = 50%, which is 0.5)
 
-    --pretest_tissue_cpm                                Cutoff of CPM value in tissue samples, used to decide whether an isoform is considered as expressed, default = 1
+    --specificity_test_tissue_cpm                       Cutoff of CPM value in tissue samples, used to decide whether an isoform is considered as expressed (default = 1)
+
+    --specificity_test_tissue_percentage                Maximum precentage of tissue samples that express given transcript (default = 10%, which is 0.1)
+
+    --specificity_test_exclude_tissue                   Excluded tissues in tumor-specificity transcript identification, separated by comma. (default = "Testis")
 
     --outf_dir                                          Folder of output 
 
@@ -243,7 +250,12 @@ python ~/IRIS_long/IRIS_long_main.py CAR_T [-h] \
 --tumor_num /number/of/tumor/samples \
 --specificity_score /cutoff/of/specificity_score \
 --tissue_cpm /cutoff/of/transcripts/in/tissue/samples \
---tissue_number /cutoff/of/numbers/above/CPM/threshold/in/tissues \
+--tissue_percentage /maximum/tolerable/percentage/of/tissues/that/are/allowed/to/have/transcript/higher/than/the/given/CPM/expression/threshold \
+--ref_gtf /gencode/gtf/file \
+--gencode_fasta /reference/gencode/translation/fasta \
+--de_trans_inf /Tumor-enriched/transcripts \
+--spe_trans_inf /Tumor-specific/transcripts \
+--window_size /Window/size \
 --out_file /prefix/of/name/of/output/file \
 --outf_dir /path/to/folder/of/output/file
 
@@ -270,7 +282,17 @@ script arguments:
 
     --tissue_cpm                                        Cutoff of (maximum tolerable) CPM of transcripts encode given peptide in tissue samples (default = 10)
 
-    --tissue_number                                     Maximum tolerable number of tissues that are allowed to be higher than the given CPM expression threshold (default = 3)
+    --tissue_percentage                                 Maximum tolerable percentage of tissues that are allowed to have transcript higher than the given CPM expression threshold (default = 20%, which is 0.2)
+
+    --ref_gtf                                           Reference gencode annotation, e.g. gencode.v39.annotation.gtf
+
+    --gencode_fasta                                     Reference gencode translation.fasta, e.g. gencode.v39.pc_translations.fa
+
+    --de_trans_inf                                      Tumor-enriched transcripts, e.g. 3_1_Tumor_vs_normal_DE_test.txt
+
+    --spe_trans_inf                                     Tumor-specific transcripts, e.g. 3_2_Tumor_vs_normal_prevalence.txt
+
+    --window_size                                       Window size (default = 9 AAs)
 
     --out_file                                          Prefix of the name of output file
 
@@ -299,11 +321,15 @@ python ~/IRIS_long/IRIS_long_main.py TCR [-h] \
 --annotated_isoform_contri_inf /path/to/file \
 --trans_CDS_inf /path/to/file \
 --tumor_num /number/of/tumor/samples \
---binding_affi /cutoff/of/binding/affinity \
 --specificity_score /cutoff/of/specificity_score \
 --tissue_cpm /cutoff/of/transcripts/in/tissue/samples \
---tissue_number /cutoff/of/numbers/above/CPM/threshold/in/tissues \
+--tissue_percentage /maximum/tolerable/percentage/of/tissues/that/are/allowed/to/have peptide/higher/than/the/given/CPM/expression/threshold \
+--binding_affi /cutoff/of/binding/affinity/between/HLA/complex/and/peptide \
 --window_size /size/of/sliding/window \
+--ref_gtf /gencode/gtf/file \
+--de_trans_inf /Tumor-enriched/transcripts \
+--spe_trans_inf /Tumor-specific/transcripts \
+--out_file /prefix/of/name/of/output/file \
 --outf_dir /path/to/folder/of/output/file
 
 script arguments:
@@ -333,9 +359,17 @@ script arguments:
 
     --tissue_cpm                                        Cutoff of (maximum tolerable) CPM of transcripts encode given peptide in tissue samples (default = 10)
 
-    --tissue_number                                     Maximum tolerable number of tissues that are allowed to be higher than the given CPM expression threshold (default = 3)
+    --tissue_percentage                                 Maximum tolerable percentage of tissues that are allowed to have transcript higher than the given CPM expression threshold (default = 20%, which is 0.2)
 
-    --window_size                                       Size of sliding window, (default = 9)
+    --ref_gtf                                           Reference gencode annotation, e.g. gencode.v39.annotation.gtf
+
+    --de_trans_inf                                      Tumor-enriched transcripts, e.g. 3_1_Tumor_vs_normal_DE_test.txt
+
+    --spe_trans_inf                                     Tumor-specific transcripts, e.g. 3_2_Tumor_vs_normal_prevalence.txt
+
+    --window_size                                       Window size (default = 9 AAs)
+
+    --out_file                                          Prefix of the name of output file
 
     --outf_dir                                          Folder of output 
 
@@ -356,6 +390,11 @@ python ~/IRIS_long/IRIS_long_main.py Figure [-h] \
 --group_info_inf /path/to/file/containing/group_info \
 --required_trans_inf /path/to/file/containing/required_transcripts \
 --bedgraph /path/to/processed/bed/file \
+--genome_version /hg19/or/hg38 \
+--CDS_inf /generated/CDS/file \
+--intron_shrinkage /Intron/shrinkage/fold/in/isoform/structure/figure \
+--ref_gtf /gencode/gtf/file \
+--espresso_gtf /novel/gtf/file \
 --outf_dir /path/to/folder/of/output/file \
 --figures Isoform Single_isoform Structure
 
@@ -371,6 +410,16 @@ script arguments:
     --required_trans_inf                                Transcripts need to show in final figure
 
     --bedgraph                                          Generated bedgraph file for sample, e.g. samples_BedGraph.bed
+
+    --genome_version                                    Choose from ['GRCH38','GRCH37','hg38','hg19']
+
+    --CDS_inf                                           Generated CDS file, e.g. 4_4_*_detailed_match_ID.txt
+
+    --intron_shrinkage                                  Intron shrinkage fold in isoform structure figure
+
+    --ref_gtf                                           Reference Gencode gtf
+
+    --espresso_gtf                                      ESPRESSO gtf file
 
     --outf_dir                                          Folder of output
 
