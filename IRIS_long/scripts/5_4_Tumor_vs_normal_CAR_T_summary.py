@@ -60,17 +60,28 @@ with open(Spe_inf, 'r') as inf_1:
 		iso_prevalence_list.append(arr[0])
 		gene_ID = get_right_ID(arr[2])
 		trans2gene_dict[arr[0]] = gene_ID
+		if gene_ID not in union_gene_list:
+			union_gene_list.append(gene_ID)
 		CPM_info_dict[arr[0]] = '\t'.join([arr[0]]+[gene_ID]+arr[-6:len(arr)]+[arr[-7]]+[str(-np.log10(float(arr[-7])))])
 		significant_dict[arr[0]] = 'Tumor-specific'
 
-
 ########################
+Union_list = list(set(iso_prevalence_list + iso_DE_list))
+Intersection_list = set(iso_prevalence_list).intersection(iso_DE_list)
+only_iso_prevalence = set(iso_prevalence_list).difference(iso_DE_list)
+only_iso_DE = set(iso_DE_list).difference(iso_prevalence_list)
 print ('Tumor-enriched transcripts', len(iso_DE_list))
 print ('Tumor-specific transcripts', len(iso_prevalence_list))
+print ('Union_list', len(Union_list),'Gene_ID',len(union_gene_list))
+print ('Intersection_list', len(Intersection_list))
+print ('Only_pass_prevalence', len(only_iso_prevalence))
+print ('Only_pass_DE', len(only_iso_DE))
 
 union_out = open("%s/../3_3_Tumor_vs_normal_DE_and_prevalence_test.txt" % outf_dir, 'w')
-union_out.write("Tumor-enriched transcripts\t"+str(len(iso_DE_list))+'\t'+','.join(iso_DE_list)+'\n')
-union_out.write("Tumor-specific transcripts\t"+str(len(iso_prevalence_list))+'\t'+','.join(iso_prevalence_list)+'\n')
+union_out.write("Union_list\t"+str(len(Union_list))+'\t'+','.join(Union_list)+'\n')
+union_out.write("Intersection_list\t"+str(len(Intersection_list))+'\t'+','.join(Intersection_list)+'\n')
+union_out.write("Only_pass_prevalence\t"+str(len(only_iso_prevalence))+'\t'+','.join(only_iso_prevalence)+'\n')
+union_out.write("Only_pass_DE\t"+str(len(only_iso_DE))+'\t'+','.join(only_iso_DE)+'\n')
 union_out.close()
 ############################
 
@@ -81,7 +92,7 @@ with open(protein_inf, 'r') as pro_inf:
 		if line.startswith('>'):
 			trans_ID = line.split(' ')[0].split('|')[-1].split('_')[0]
 			gene_ID = line.split(' ')[1]
-			if trans_ID in iso_DE_list:
+			if (trans_ID in iso_DE_list) or (trans_ID in iso_prevalence_list):
 				pro_list.append(trans_ID)
 				if gene_ID not in pro_gene_list:
 					pro_gene_list.append(gene_ID)
