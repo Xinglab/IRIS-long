@@ -69,7 +69,7 @@ To generate the directed acyclic graph (DAG) plot of whole IRIS-long workflow, w
 
 For detailed explanation of other parameters, please refer to corresponding section in [Usage in Command](#usage-in-command).
 
-1. `HLA.txt` indicates HLA alleles for input samples. 
+* `HLA.txt` indicates HLA alleles for input samples. 
 
 An example `HLA.txt` file would be:
 ```
@@ -80,7 +80,7 @@ NCI-H1105  HLA-A02:01,HLA-A68:01
 Note: columns are separated by `tab`, and different HLA allels are separated by comma.
 
 
-2. `group_info_inf` indicates how many sample groups we have, and how many samples in each group. 
+* `group_info_inf` indicates how many sample groups we have, and how many samples in each group. 
 
 An example `group_info_inf` file would be:
 ```
@@ -91,7 +91,7 @@ Tissue  30
 Note: columns are separated by `tab`. And the order is important, based on this example, we know the first 16 samples in transcript expression matrix belong to Tumor group and the rest 30 samples are normal tissues.
 
 
-3. `required_trans_inf` indicates what transcript we want show in the figure. In default, the five transcripts we would include are: 
+* `required_trans_inf` indicates what transcript we want show in the figure. In default, the five transcripts we would include are: 
 1. The interested transcript
 2. The canonical transcript in a gene (if it's not the interested transcript, otherwise it would be the longest annotated transcript, based on Gencode annotation)
 3. The 3rd - 5th transcripts would be the transcripts with the highest average proportion across all samples among the rest transcripts in a gene. 
