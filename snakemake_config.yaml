@@ -4,10 +4,10 @@ general_threads: 4
 general_time_hr: 24
 
 # Input samples
-input_transcript_abundance_matrix: "/mnt/isilon/xing_lab/aspera/xuy/Test/samples_abundance_combined.txt"
-input_transcript_gtf: "/mnt/isilon/xing_lab/aspera/xuy/Test/samples_updated_combined.gtf"
+input_transcript_abundance_matrix: "/mnt/isilon/xing_lab/aspera/xuy/IRIS-long_SCLC/samples_abundance_combined.txt"
+input_transcript_gtf: "/mnt/isilon/xing_lab/aspera/xuy/IRIS-long_SCLC/samples_updated_combined.gtf"
 tumor_key_word: "SCLC"
-outf_dir: "/mnt/isilon/xing_lab/aspera/xuy/Test/SCLC"
+outf_dir: "/mnt/isilon/xing_lab/aspera/xuy/IRIS-long_SCLC/SCLC"
 
 # Genome fasta and gtf will be downloaded automatically if missing
 genome_version: "hg38"
@@ -34,17 +34,17 @@ specificity_test_exclude_tissue: "Testis"
 mode: "long-read"
 
 # Parameters in TCR prediction:
-HLA_str: "HLA-A02:01"
-AA_window_size: 9
+HLA_str_inf: "/mnt/isilon/xing_lab/aspera/xuy/IRIS-long_SCLC/SCLC_HLA.txt"
+AA_window_size: 10
 binding_affi: 500
 minimum_specificity_score_TCR: 3
 maximal_peptide_cpm_in_tissue_TCR: 10
-maximal_tissue_percentage_TCR: 0.2
+maximal_tissue_percentage_TCR: 0.1
 
 # Parameters in CAR-T prediction:
-minimum_specificity_score_CAR_T: 2
-maximal_peptide_cpm_in_tissue_CAR_T: 20
-maximal_tissue_percentage_CAR_T: 0.2
+minimum_specificity_score_CAR_T: 3
+maximal_peptide_cpm_in_tissue_CAR_T: 10
+maximal_tissue_percentage_CAR_T: 0.1
 
 # Parameters in figure generation:
 group_info_inf: "group_info.txt"
