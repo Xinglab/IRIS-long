@@ -34,7 +34,7 @@ specificity_test_exclude_tissue: "Testis"
 mode: "long-read"
 
 # Parameters in TCR prediction:
-HLA_str_inf: "/mnt/isilon/xing_lab/aspera/xuy/IRIS-long_SCLC/SCLC_HLA.txt"
+HLA_str_inf: "SCLC_HLA.txt"
 AA_window_size: 10
 binding_affi: 500
 minimum_specificity_score_TCR: 3
