@@ -1,4 +1,5 @@
 import os,re,sys
+import time
 from collections import defaultdict
 
 netMHCpan_dir = sys.argv[1].rstrip('/')
@@ -41,14 +42,29 @@ with open(protein_inf_name, "r") as pro_inf:
 outf_pro.close()
 
 ############## generate netMHCpan bash file ##########
+HLA_list = HLA_str.split(",")
 outf_sh = open("%s/6_1_perform_netMHCpan.sh" % outf_dir, "w")
-outf_sh.write("#!/bin/bash\n#SBATCH -J netMHCpan\n#SBATCH -o netMHCpan.out\n#SBATCH -e netMHCpan.err\n#SBATCH -t 120:00:00\n#SBATCH -n 8\n#SBATCH --mem=40G\n#SBATCH --export=ALL\n")
-outf_sh.write("%s/netMHCpan -inptype 0 -f %s/6_1_Tumor_vs_normal_DE_prevalence_protein.fasta -BA -t 2 -s -l %s -a %s > %s/6_1_TCR_temp_out.txt\n" % (netMHCpan_dir, outf_dir, window_size, HLA_str, outf_dir))
-outf_sh.close()	
-command_1 = f"bash {outf_dir}/6_1_perform_netMHCpan.sh"
+outf_sh.write(f"#!/bin/bash\n#SBATCH -J netMHCpan\n#SBATCH -t 120:00:00\n#SBATCH -n 4\n#SBATCH --mem=120G\n#SBATCH --export=ALL\n#SBATCH --array=1-{len(HLA_list)}\n")
+outf_sh.write("s=$(sed -n \"${SLURM_ARRAY_TASK_ID}p\" %s/6_1_perform_netMHCpan_cmd)\neval \"$s\"\n" % outf_dir)
+#outf_sh.write("export s=`sed -n ${SLURM_ARRAY_TASK_ID}p %s/6_1_perform_netMHCpan_cmd`\necho $s\n$s\n" % outf_dir)
+outf_sh.close()
+
+outf_sh_array = open("%s/6_1_perform_netMHCpan_cmd" % outf_dir, "w")
+for each_HLA_str in HLA_list:
+	outf_sh_array.write("%s/netMHCpan -inptype 0 -f %s/6_1_Tumor_vs_normal_DE_prevalence_protein.fasta -BA -t 2 -s -l %s -a %s > %s/6_1_TCR_temp_out_%s.txt\n" % (netMHCpan_dir, outf_dir, window_size, each_HLA_str, outf_dir, each_HLA_str))
+outf_sh_array.close()	
+
+command_1 = f"sbatch {outf_dir}/6_1_perform_netMHCpan.sh"
 print(command_1)
 os.system(command_1)
 
+if int(window_size) == 9:
+	# Wait for 3 hours (10,800 seconds)
+	time.sleep(10800)
+else:
+	time.sleep(21600)
+
+os.system("cat %s/6_1_TCR_temp_out_*.txt > %s/6_1_TCR_temp_out.txt" % (outf_dir, outf_dir))
 
 ############## process netMHCpan result #############
 peptide_info_dict = defaultdict(lambda: [])
