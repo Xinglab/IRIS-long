@@ -94,7 +94,7 @@ def parse_args():
 	# create the parser for the 'TCR prediction' command
 	parser_tcr = subparsers.add_parser('TCR', help='TCR target prediction')
 	parser_tcr.add_argument('-nd', '--netMHCpan_dir', dest='netMHCpan_dir', type=str, help='file path of netMHCpan_dir tool (directory is needed)', required=True)
-	parser_tcr.add_argument('-hs', '--HLA_str', dest='HLA_str', type=str, help='HLA alleles, such as HLA-A01:01,HLA-A02:01', required=True)
+	parser_tcr.add_argument('-hs', '--HLA_str_inf', dest='HLA_str_inf', type=str, help='File containing HLA alleles information, first column is sample, and second column is interesed HLA allele that separated by comma', required=True)
 	parser_tcr.add_argument('-tn', '--tumor_num', dest='tumor_num', type=int, help='Number of tumor samples', required=True)
 	parser_tcr.add_argument('-pi', '--protein_inf', dest='protein_inf', type=str, help='Generated protein fasta file, such as 4_4_XXX_PC.fasta', required=True)
 	parser_tcr.add_argument('-ic', '--isoform_cpm_inf', dest='isoform_cpm_inf', type=str, help='Isoform CPM file, e.g. samples_abundance_combined_CPM_ESPRESSO.txt', required=True)
@@ -371,7 +371,7 @@ def Sub_CAR_T(dir_path, args):
 def Sub_TCR(dir_path, args):
 	genome = args.genome_version
 	netMHCpan_dir = args.netMHCpan_dir.rstrip('/')
-	HLA_str = args.HLA_str
+	HLA_str_inf = args.HLA_str_inf
 	protein_inf = args.protein_inf
 	isoform_cpm_inf = args.isoform_cpm_inf
 	isoform_proportion_inf = args.isoform_proportion_inf
@@ -391,6 +391,15 @@ def Sub_TCR(dir_path, args):
 	if not os.path.exists(outf_dir):
 		os.system(f"mkdir {outf_dir}")
 
+	HLA_list = []
+	with open(HLA_str_inf,"r") as HLA_inf:
+		for index,line in enumerate(HLA_inf):
+			if index == 0: continue
+			arr = line.strip().split("\t")
+			for each_arr in arr[1].split(","):
+				if each_arr not in HLA_list:
+					HLA_list.append(each_arr)
+	HLA_str = ",".join(HLA_list)
 	command_6_1 = f"python {dir_path}/scripts/6_1_perform_netMHCpan.py {netMHCpan_dir} {protein_inf} {HLA_str} {window_size} {outf_dir} {de_trans_inf} {spe_trans_inf}"
 	print (command_6_1)
 	if not os.path.exists(f"{outf_dir}/6_1_TCR_temp_out.txt"):
