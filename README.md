@@ -313,7 +313,7 @@ Our script can be run as follows:
 ```
 python ~/IRIS_long/IRIS_long_main.py TCR [-h] \
 --netMHCpan_dir /path/of/netMHCpan \
---HLA_str /HLA/alleles \
+--HLA_str_inf /HLA/alleles/inf \
 --protein_inf /path/to/generated/protein/fasta \
 --isoform_cpm_inf /path/to/isoform_cpm_matrix \
 --isoform_proportion_inf /path/to/isoform/proportion/matrix \
@@ -337,7 +337,7 @@ script arguments:
 
     --netMHCpan_dir                                     File path of netMHCpan tool (directory is needed)
 
-    --HLA_str                                           HLA alleles, such as HLA-A01:01,HLA-A02:01
+    --HLA_str_inf                                       File containing HLA alleles information, first column is sample, and second column is interesed HLA allele that separated by comma
 
     --protein_inf                                       Generated protein fasta file, such as 4_4_XXX_PC.fasta
 
