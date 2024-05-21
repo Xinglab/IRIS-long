@@ -304,7 +304,7 @@ rule TCR_prediction:
 		minimum_specificity_score_TCR = config['minimum_specificity_score_TCR'],
 		maximal_peptide_cpm_in_tissue_TCR = config['maximal_peptide_cpm_in_tissue_TCR'],
 		maximal_tissue_percentage_TCR = config['maximal_tissue_percentage_TCR'],
-		HLA_str = config['HLA_str'],
+		HLA_str_inf = config['HLA_str_inf'],
 		AA_window_size = config['AA_window_size'],
 		binding_affi = config['binding_affi'],
 	log:
@@ -316,7 +316,7 @@ rule TCR_prediction:
 	shell:
 		'python {params.IRIS_long} TCR' 
 		' --netMHCpan_dir {params.netMHCpan_dir}'
-		' --HLA_str {params.HLA_str}'
+		' --HLA_str_inf {params.HLA_str_inf}'
 		' --isoform_cpm_inf {input.trans_CPM}'
 		' --tumor_num {params.num_tumor_sample}'
 		' --protein_inf {input.PC_NMD_fasta}'
