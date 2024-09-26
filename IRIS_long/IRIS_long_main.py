@@ -14,24 +14,24 @@ def parse_args():
 	# create the parser for the 'Combine' command
 	parser_combine = subparsers.add_parser('Combine', help='combine ESPRESSO outputs from different batch')
 	parser_combine.add_argument('-l', '--gtf_list', dest='gtf_list', type=str, help='list of GTF files that needs to be combined', required=True)
-	parser_combine.add_argument('-ad', '--allowed_dist', dest='allowed_dist', type=int, help='allowed distance (bp) for each end to determine two novel transcripts is the same one (default = 50)', default = 50)
+	parser_combine.add_argument('-ad', '--allowed_dist', dest='allowed_dist', type=int, help='allowed distance (bp) for each end to determine two novel transcripts is the same one', default = 50)
 	#parser_combine.add_argument('-oe', '--output_abundance', dest='output_abundance', type=str, help='filename of the output combined abundance matrix', required=True)
 	#parser_combine.add_argument('-og', '--output_gtf', dest='output_gtf', type=str, help='filename of the output combined gtf file', required=True)
 	parser_combine.add_argument('-od', '--outf_dir', dest='outf_dir', type=str, help='output directory', required=True)
 
 	# create the parser for the 'Preprocess' command
 	parser_preprocess = subparsers.add_parser('Preprocess', help='generate CPM file as well as isoform proportion matrix')    
-	parser_preprocess.add_argument('-eg', '--espresso_gtf', dest='espresso_gtf', type=str, help='ESPRESSO gtf file', required=True)
-	parser_preprocess.add_argument('-ea', '--espresso_abundance', dest='espresso_abundance', type=str, help='ESPRESSO abundance file', required=True)
+	parser_preprocess.add_argument('-ig', '--input_gtf', dest='input_gtf', type=str, help='Input gtf file', required=True)
+	parser_preprocess.add_argument('-ia', '--input_abundance', dest='input_abundance', type=str, help='Input abundance file', required=True)
 	parser_preprocess.add_argument('-rg', '--ref_gtf', dest='ref_gtf', type=str, help='Reference Gencode gtf', default = './')
-	parser_preprocess.add_argument('-nm', '--normalized_mode', dest='normalized_mode', type=str, choices=['SAM','ESPRESSO'], help="Choose normalization mode from ['SAM','ESPRESSO']", required=True)
+	parser_preprocess.add_argument('-nm', '--normalized_mode', dest='normalized_mode', type=str, choices=['SAM','SELF'], help="Choose normalization mode from ['SAM','SELF']", required=True)
 	parser_preprocess.add_argument('-fs', '--folder_sam', dest='folder_sam', type=str, help='directory of corresponding sam files, sample names need to match abundance matrix', default = './')
 	parser_preprocess.add_argument('-od', '--outf_dir', dest='outf_dir', type=str, help='output directory', required=True)
 
 	# create the parser for the 'Figure' command
 	parser_figure = subparsers.add_parser('Figure', help='generate barplot and isoform structure plot')
-	parser_figure.add_argument('-ip', '--isoform_proportion_inf', dest='isoform_proportion_inf', type=str, help='Isoform proportion infile, e.g. samples_abundance_combined_CPM_ESPRESSO_proportion.txt', required=True)
-	parser_figure.add_argument('-ic', '--isoform_cpm_inf', dest='isoform_cpm_inf', type=str, help='Isoform CPM file, e.g. samples_abundance_combined_CPM_ESPRESSO.txt', required=True)
+	parser_figure.add_argument('-ip', '--isoform_proportion_inf', dest='isoform_proportion_inf', type=str, help='Isoform proportion infile, e.g. samples_abundance_combined_CPM_proportion.txt', required=True)
+	parser_figure.add_argument('-ic', '--isoform_cpm_inf', dest='isoform_cpm_inf', type=str, help='Isoform CPM file, e.g. samples_abundance_combined_CPM.txt', required=True)
 	parser_figure.add_argument('-gi', '--group_info_inf', dest='group_info_inf', type=str, help='Group information file', required=True)
 	parser_figure.add_argument('-rt', '--required_trans_inf', dest='required_trans_inf', type=str, help='Required transcripts information file', required=True)
 	parser_figure.add_argument('-be', '--bedgraph', dest='bedgraph', type=str, help='Generated bedgraph file for sample, e.g. samples_BedGraph.bed', required=True)
@@ -41,12 +41,12 @@ def parse_args():
 	parser_figure.add_argument('-is', '--intron_shrinkage', dest='intron_shrinkage', type=int, help="Intron shrinkage fold in isoform structure figure", default=10)
 	parser_figure.add_argument('-of', '--order', dest='order', type=str, help='order samples by isoform proportion', default='no')
 	parser_figure.add_argument('-rg', '--ref_gtf', dest='ref_gtf', type=str, help='Reference Gencode gtf', default = './')
-	parser_figure.add_argument('-eg', '--espresso_gtf', dest='espresso_gtf', type=str, help='ESPRESSO gtf file', required=True)
+	parser_figure.add_argument('-ig', '--input_gtf', dest='input_gtf', type=str, help='Input gtf file', required=True)
 	parser_figure.add_argument('-od', '--outf_dir', dest='outf_dir', type=str, help='output directory', required=True)
 
 	# create the parser for the 'DiffTest' command
 	parser_difftest = subparsers.add_parser('DiffTest', help='Differential tests between tumor and normal tissues')
-	parser_difftest.add_argument('-ic', '--isoform_cpm_inf', dest='isoform_cpm_inf', type=str, help='Isoform CPM file, e.g. samples_abundance_combined_CPM_ESPRESSO.txt', required=True)
+	parser_difftest.add_argument('-ic', '--isoform_cpm_inf', dest='isoform_cpm_inf', type=str, help='Isoform CPM file, e.g. samples_abundance_combined_CPM.txt', required=True)
 	parser_difftest.add_argument('-tn', '--tumor_num', dest='tumor_num', type=int, help='Number of tumor samples', required=True)
 	parser_difftest.add_argument('-ep', '--enriched_test_p', dest='enriched_test_p', type=float, default=0.05, help='Cutoff of p-value in DE test (default = 0.05)')
 	parser_difftest.add_argument('-etc', '--enriched_test_tumor_cpm', dest='enriched_test_tumor_cpm', type=float, help='Cutoff of median CPM value in tumor samples, used to filter out lowly-expressed isoform (default = 5)', default = 5)
@@ -63,7 +63,7 @@ def parse_args():
 	parser_translate = subparsers.add_parser('Translation', help='translate transcripts into protein sequence')
 	parser_translate.add_argument('-mo', '--mode', dest='mode', type=str, default = 'long-read', help='Long-read RNA-seq data mode')
 	parser_translate.add_argument('-tg', '--trans_gtf', dest='trans_gtf', type=str, help='generated gtf file, e.g. samples_updated_combined.gtf', required=True)
-	parser_translate.add_argument('-ic', '--isoform_cpm_inf', dest='isoform_cpm_inf', type=str, help='Isoform CPM file, e.g. samples_abundance_combined_CPM_ESPRESSO.txt', required=True)
+	parser_translate.add_argument('-ic', '--isoform_cpm_inf', dest='isoform_cpm_inf', type=str, help='Isoform CPM file, e.g. samples_abundance_combined_CPM.txt', required=True)
 	parser_translate.add_argument('-gv', '--genome_version', dest='genome_version', type=str, choices=['GRCh38','GRCh37','hg38','hg19'], help="choose from ['GRCh38','GRCh37','hg38','hg19']", required=True)
 	parser_translate.add_argument('-rg', '--ref_gtf', dest='ref_gtf', type=str, help='reference gencode annotation, e.g. gencode.v39.annotation.gtf', default = './')
 	parser_translate.add_argument('-of', '--out_file', dest='out_file', type=str, help='prefix of the name of output file', required=True)
@@ -74,8 +74,8 @@ def parse_args():
 	parser_car_t.add_argument('-td', '--tmhmm_dir', dest='tmhmm_dir', type=str, help='file path of TMHMM tool (directory is needed)', required=True)
 	parser_car_t.add_argument('-tn', '--tumor_num', dest='tumor_num', type=int, help='Number of tumor samples', required=True)
 	parser_car_t.add_argument('-pi', '--protein_inf', dest='protein_inf', type=str, help='Generated protein fasta file', required=True)
-	parser_car_t.add_argument('-ic', '--isoform_cpm_inf', dest='isoform_cpm_inf', type=str, help='Isoform CPM file, e.g. samples_abundance_combined_CPM_ESPRESSO.txt', required=True)
-	parser_car_t.add_argument('-ip', '--isoform_proportion_inf', dest='isoform_proportion_inf', type=str, help='Isoform proportion file, e.g. samples_abundance_combined_CPM_ESPRESSO_proportion.txt', required=True)
+	parser_car_t.add_argument('-ic', '--isoform_cpm_inf', dest='isoform_cpm_inf', type=str, help='Isoform CPM file, e.g. samples_abundance_combined_CPM.txt', required=True)
+	parser_car_t.add_argument('-ip', '--isoform_proportion_inf', dest='isoform_proportion_inf', type=str, help='Isoform proportion file, e.g. samples_abundance_combined_CPM_proportion.txt', required=True)
 	parser_car_t.add_argument('-gv', '--genome_version', dest='genome_version', type=str, choices=['GRCh38','GRCh37','hg38','hg19'], help="choose from ['GRCh38','GRCh37','hg38','hg19']", required=True)
 	parser_car_t.add_argument('-ss', '--specificity_score', dest='specificity_score', type=float, help='cutoff of specificity_score (default = 1)', default = 1)
 	parser_car_t.add_argument('-tc', '--tissue_cpm', dest='tissue_cpm', type=float, help='cutoff of (maximum tolerable) CPM of transcripts encode given peptide in tissue samples (default = 10)', default = 10)
@@ -94,11 +94,11 @@ def parse_args():
 	# create the parser for the 'TCR prediction' command
 	parser_tcr = subparsers.add_parser('TCR', help='TCR target prediction')
 	parser_tcr.add_argument('-nd', '--netMHCpan_dir', dest='netMHCpan_dir', type=str, help='file path of netMHCpan_dir tool (directory is needed)', required=True)
-	parser_tcr.add_argument('-hs', '--HLA_str_inf', dest='HLA_str_inf', type=str, help='File containing HLA alleles information, first column is sample, and second column is interesed HLA allele that separated by comma', required=True)
+	parser_tcr.add_argument('-hs', '--HLA_str_inf', dest='HLA_str_inf', type=str, help='File containing HLA alleles information, first column is sample, and second column is interesed HLA allele that separated by comma, e.g. HLA-A02:01,HLA-A01:01', required=True)
 	parser_tcr.add_argument('-tn', '--tumor_num', dest='tumor_num', type=int, help='Number of tumor samples', required=True)
 	parser_tcr.add_argument('-pi', '--protein_inf', dest='protein_inf', type=str, help='Generated protein fasta file, such as 4_4_XXX_PC.fasta', required=True)
-	parser_tcr.add_argument('-ic', '--isoform_cpm_inf', dest='isoform_cpm_inf', type=str, help='Isoform CPM file, e.g. samples_abundance_combined_CPM_ESPRESSO.txt', required=True)
-	parser_tcr.add_argument('-ip', '--isoform_proportion_inf', dest='isoform_proportion_inf', type=str, help='Isoform proportion file, e.g. samples_abundance_combined_CPM_ESPRESSO_proportion.txt', required=True)
+	parser_tcr.add_argument('-ic', '--isoform_cpm_inf', dest='isoform_cpm_inf', type=str, help='Isoform CPM file, e.g. samples_abundance_combined_CPM.txt', required=True)
+	parser_tcr.add_argument('-ip', '--isoform_proportion_inf', dest='isoform_proportion_inf', type=str, help='Isoform proportion file, e.g. samples_abundance_combined_CPM_proportion.txt', required=True)
 	parser_tcr.add_argument('-gv', '--genome_version', dest='genome_version', type=str, choices=['GRCh38','GRCh37','hg38','hg19'], help="choose from ['GRCh38','GRCh37','hg38','hg19']", required=True)
 	parser_tcr.add_argument('-ss', '--specificity_score', dest='specificity_score', type=float, help='cutoff of specificity_score (default = 3)', default = 3)
 	parser_tcr.add_argument('-tc', '--tissue_cpm', dest='tissue_cpm', type=float, help='cutoff of (maximum tolerable) CPM of transcripts encode given peptide in tissue samples (default = 10)', default = 10)
@@ -118,7 +118,7 @@ def parse_args():
 	parser_specificity.add_argument('-ti', '--transcript_ID', dest='transcript_ID', type=str, help='Interested transcript ID', required=True)
 	parser_specificity.add_argument('-tn', '--tumor_num', dest='tumor_num', type=int, help='Number of tumor samples', required=True)
 	parser_specificity.add_argument('-pi', '--protein_inf', dest='protein_inf', type=str, help='Generated protein fasta file, which is like \"4_4_*_PC.fasta\"', required=True)
-	parser_specificity.add_argument('-ic', '--isoform_cpm_inf', dest='isoform_cpm_inf', type=str, help='Isoform CPM file, e.g. samples_abundance_combined_CPM_ESPRESSO.txt', required=True)
+	parser_specificity.add_argument('-ic', '--isoform_cpm_inf', dest='isoform_cpm_inf', type=str, help='Isoform CPM file, e.g. samples_abundance_combined_CPM.txt', required=True)
 	parser_specificity.add_argument('-cs', '--cell_surface_inf', dest='cell_surface_inf', type=str, help='Generated cell surface proteins file, which is like \"5_3_*_high_confidence.txt\"', required=True)
 	parser_specificity.add_argument('-ws', '--window_size', dest='window_size', type=int, help='Window size (default = 9 AAs)', default = 9)
 	parser_specificity.add_argument('-ss', '--start_site', dest='start_site', type=int, help='Starting position of visualized protein region (default shows the 100 AAs region with the highest tumor-specificity)', default = 0)
@@ -181,22 +181,22 @@ def Sub_combine(dir_path, args):
 
 
 def Sub_process(dir_path, args):
-	espresso_gtf = args.espresso_gtf
-	espresso_abundance = args.espresso_abundance
+	input_gtf = args.input_gtf
+	input_abundance = args.input_abundance
 	ref_gtf = args.ref_gtf
 	folder_sam = args.folder_sam
 	normalized_mode = args.normalized_mode
 	outf_dir = args.outf_dir.rstrip('/')
 	# 1.1 convert gtf to bed file
-	cmd_process_1 = f"python {dir_path}/scripts/1_1_gtf2bed_1_to_1_based.py {espresso_gtf} {espresso_abundance} {ref_gtf} {outf_dir}"
+	cmd_process_1 = f"python {dir_path}/scripts/1_1_gtf2bed_1_to_1_based.py {input_gtf} {input_abundance} {ref_gtf} {outf_dir}"
 	print (cmd_process_1)
 	os.system(cmd_process_1)
 	# 1.2 calculate CPM based on sam/ban files
-	cmd_process_2 = f"python {dir_path}/scripts/1_2_calculate_CPM_based_on_bam.py {espresso_abundance} {folder_sam} {outf_dir} {normalized_mode}"
+	cmd_process_2 = f"python {dir_path}/scripts/1_2_calculate_CPM_based_on_bam.py {input_abundance} {folder_sam} {outf_dir} {normalized_mode}"
 	print (cmd_process_2)
 	os.system(cmd_process_2)
 	# 1.3 merge to gene level, and generate files to filter out bad-quality genes
-	out_file_name = re.sub(".txt|.esp", f"_CPM_{normalized_mode}.txt", espresso_abundance.split('/')[-1])
+	out_file_name = re.sub(".txt|.esp", f"_CPM.txt", input_abundance.split('/')[-1])
 	cmd_process_3 = f"python {dir_path}/scripts/1_3_merge_to_gene_CPM.py {outf_dir}/{out_file_name}"
 	print (cmd_process_3)
 	os.system(cmd_process_3)
@@ -219,7 +219,7 @@ def Sub_figure(dir_path, args):
 	intron_shrinkage = args.intron_shrinkage
 	order = args.order
 	ref_gtf = args.ref_gtf
-	espresso_gtf = args.espresso_gtf
+	input_gtf = args.input_gtf
 	# 2.1 only show top 5 isoform's proportion and reshape the file format
 	cmd_figure_1 = f"python {dir_path}/scripts/2_1_merge_isoforms_and_reshape_format.py {isoform_proportion_inf} {isoform_cpm_inf} {group_info_inf} {required_trans_inf} {outf_dir}"
 	print(cmd_figure_1)
@@ -238,9 +238,9 @@ def Sub_figure(dir_path, args):
 	if not os.path.exists(f"{outf_dir}/Example_res"):
 		os.system(f"mkdir {outf_dir}/Example_res")
 	if genome_version in ['hg19','GRCh37']:
-		cmd_figure_2 = f"python {dir_path}/scripts/2_2_Generate_bar_structure_figure_example.py --gene [Ensembl_Gene_ID] --gene_name [Gene_Symbol] --transcript [Interested_Transcript_ID] --abundance_CPM_original {isoform_cpm_inf} --abundance_proportion {prop_reshaped_inf_name} --abundance_CPM {exp_reshaped_inf_name} --bedgraph {bedgraph} --sorted_group {sorted_group_info} --out_dir {outf_dir}/Example_res --figures {' '.join(figures)} --canonical_transcript {dir_path}/scripts/references/Gencode_v39_canonical_isoform.txt --basic_transcript {dir_path}/scripts/references/gencode.v34lift37.annotation_basic_trans.txt --anno_gtf {ref_gtf} --novel_gtf {espresso_gtf} --CDS_inf {CDS_inf} --genome_version {genome_version} --intron_shrinkage {intron_shrinkage} --order {order}"
+		cmd_figure_2 = f"python {dir_path}/scripts/2_2_Generate_bar_structure_figure_example.py --gene [Ensembl_Gene_ID] --gene_name [Gene_Symbol] --transcript [Interested_Transcript_ID] --abundance_CPM_original {isoform_cpm_inf} --abundance_proportion {prop_reshaped_inf_name} --abundance_CPM {exp_reshaped_inf_name} --bedgraph {bedgraph} --sorted_group {sorted_group_info} --out_dir {outf_dir}/Example_res --figures {' '.join(figures)} --canonical_transcript {dir_path}/scripts/references/Gencode_v39_canonical_isoform.txt --basic_transcript {dir_path}/scripts/references/gencode.v34lift37.annotation_basic_trans.txt --anno_gtf {ref_gtf} --novel_gtf {input_gtf} --CDS_inf {CDS_inf} --genome_version {genome_version} --intron_shrinkage {intron_shrinkage} --order {order}"
 	elif genome_version in ['hg38', 'GRCh38']:
-		cmd_figure_2 = f"python {dir_path}/scripts/2_2_Generate_bar_structure_figure_example.py --gene [Ensembl_Gene_ID] --gene_name [Gene_Symbol] --transcript [Interested_Transcript_ID] --abundance_CPM_original {isoform_cpm_inf} --abundance_proportion {prop_reshaped_inf_name} --abundance_CPM {exp_reshaped_inf_name} --bedgraph {bedgraph} --sorted_group {sorted_group_info} --out_dir {outf_dir}/Example_res --figures {' '.join(figures)} --canonical_transcript {dir_path}/scripts/references/Gencode_v39_canonical_isoform.txt --basic_transcript {dir_path}/scripts/references/gencode.v39.annotation_basic_trans.txt --anno_gtf {ref_gtf} --novel_gtf {espresso_gtf} --CDS_inf {CDS_inf} --genome_version {genome_version} --intron_shrinkage {intron_shrinkage} --order {order}"
+		cmd_figure_2 = f"python {dir_path}/scripts/2_2_Generate_bar_structure_figure_example.py --gene [Ensembl_Gene_ID] --gene_name [Gene_Symbol] --transcript [Interested_Transcript_ID] --abundance_CPM_original {isoform_cpm_inf} --abundance_proportion {prop_reshaped_inf_name} --abundance_CPM {exp_reshaped_inf_name} --bedgraph {bedgraph} --sorted_group {sorted_group_info} --out_dir {outf_dir}/Example_res --figures {' '.join(figures)} --canonical_transcript {dir_path}/scripts/references/Gencode_v39_canonical_isoform.txt --basic_transcript {dir_path}/scripts/references/gencode.v39.annotation_basic_trans.txt --anno_gtf {ref_gtf} --novel_gtf {input_gtf} --CDS_inf {CDS_inf} --genome_version {genome_version} --intron_shrinkage {intron_shrinkage} --order {order}"
 	with open(f"{outf_dir}/Template_to_generate_figures.sh", "w") as outf_figure_2:
 		outf_figure_2.write(cmd_figure_2+'\n')
 
