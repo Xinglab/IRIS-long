@@ -1,10 +1,10 @@
 python=3.11
 snakemake=7.32
-biopython
+biopython=1.83
 configargparse
 matplotlib
 numpy
-percolator=3.05.0
+percolator=3.5
 scipy
 statsmodels
 r>=4.0.5
@@ -12,9 +12,8 @@ bioconductor-complexheatmap
 r-cowplot
 r-circlize
 r-dbplyr
-r-ggplot2=3.4.0
+r-ggplot2=3.5.1
 r-ggrepel
 r-rcolorbrewer
 r-tidyr
 r-viridis
-

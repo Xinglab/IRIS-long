@@ -4,23 +4,24 @@ general_threads: 4
 general_time_hr: 24
 
 # Input samples
-input_transcript_abundance_matrix: "/mnt/isilon/xing_lab/aspera/xuy/IRIS-long_SCLC/samples_abundance_combined.txt"
-input_transcript_gtf: "/mnt/isilon/xing_lab/aspera/xuy/IRIS-long_SCLC/samples_updated_combined.gtf"
+input_transcript_abundance_matrix: "/mnt/isilon/xing_lab/aspera/xuy/Test/samples_abundance_combined.txt"
+input_transcript_gtf: "/mnt/isilon/xing_lab/aspera/xuy/Test/samples_updated_combined.gtf"
 tumor_key_word: "SCLC"
-outf_dir: "/mnt/isilon/xing_lab/aspera/xuy/IRIS-long_SCLC/SCLC"
+outf_dir: "/mnt/isilon/xing_lab/aspera/xuy/Test/SCLC"
 
 # Genome fasta and gtf will be downloaded automatically if missing
 genome_version: "hg38"
+gencode_release_version: "39"
 genome_fasta_path:
 genome_fasta_url: "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_39/GRCh38.primary_assembly.genome.fa.gz"
 genome_gtf_path:
 genome_gtf_url: "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_39/gencode.v39.annotation.gtf.gz"
 
 # Parameters in pre-processing:
-normalized_mode: 'ESPRESSO'
+normalized_mode: 'SELF'
 
 # Parameters in differential transcript identification
-num_tumor_sample: 11
+num_tumor_sample: 10
 enriched_test_p_value: 0.05
 enriched_test_cpm_in_tumor: 5
 enriched_test_fc: 2
@@ -34,8 +35,8 @@ specificity_test_exclude_tissue: "Testis"
 mode: "long-read"
 
 # Parameters in TCR prediction:
-HLA_str_inf: "SCLC_HLA.txt"
-AA_window_size: 10
+HLA_str_inf: "/mnt/isilon/xing_lab/aspera/xuy/Test/SCLC_HLA.txt"
+AA_window_size: 9
 binding_affi: 500
 minimum_specificity_score_TCR: 3
 maximal_peptide_cpm_in_tissue_TCR: 10

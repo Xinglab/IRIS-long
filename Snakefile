@@ -42,22 +42,22 @@ def get_genome_fasta(wildcards):
 		if config['genome_version'] in ['hg38','GRCh38']:
 			return os.path.join(config['IRIS_long_path'], 'scripts', 'references', 'GRCh38.primary_assembly.genome.fa')
 		elif config['genome_version'] in ['hg19','GRCh37']:
-			return os.path.join(config['IRIS_long_path'], 'scripts', 'references', 'hg19.fa'),
+			return os.path.join(config['IRIS_long_path'], 'scripts', 'references', 'hg19.fa')
 
 def get_genome_gtf(wildcards):
 	if (config['genome_gtf_path']) and (config['genome_gtf_path'] != ''):
 		return config['genome_gtf_path']
 	else:
 		if config['genome_version'] in ['hg38','GRCh38']:
-			return os.path.join(config['IRIS_long_path'], 'scripts', 'references', 'genome.v39.annotation.gtf')
+			return os.path.join(config['IRIS_long_path'], 'scripts', 'references', f"genome.v{config['gencode_release_version']}.annotation.gtf")
 		elif config['genome_version'] in ['hg19','GRCh37']:
-			return os.path.join(config['IRIS_long_path'], 'scripts', 'references', 'genome.v34lift37.annotation.gtf'),
+			return os.path.join(config['IRIS_long_path'], 'scripts', 'references', 'genome.v34lift37.annotation.gtf')
 
 def get_gencode_fasta(wildcards):
 	if config['genome_version'] in ['hg38','GRCh38']:
-		return os.path.join(config['IRIS_long_path'], 'scripts', 'references', 'gencode.v39.pc_translations.fa')
+		return os.path.join(config['IRIS_long_path'], 'scripts', 'references', f"gencode.v{config['gencode_release_version']}.pc_translations.fa")
 	elif config['genome_version'] in ['hg19','GRCh37']:
-		return os.path.join(config['IRIS_long_path'], 'scripts', 'references', 'gencode.v34lift37.pc_translations.fa'),
+		return os.path.join(config['IRIS_long_path'], 'scripts', 'references', 'gencode.v34lift37.pc_translations.fa')
 
 
 rule download_genome_fasta:
@@ -82,7 +82,7 @@ rule download_genome_fasta:
 
 rule download_genome_gtf:
 	output:
-		genome_gtf=os.path.join(config['IRIS_long_path'], 'scripts', 'references', 'genome.v39.annotation.gtf') if config['genome_version'] in ['hg38','GRCh38'] else os.path.join(config['IRIS_long_path'], 'scripts', 'references', 'genome.v34lift37.annotation.gtf'),
+		genome_gtf=os.path.join(config['IRIS_long_path'], 'scripts', 'references', f"genome.v{config['gencode_release_version']}.annotation.gtf") if config['genome_version'] in ['hg38','GRCh38'] else os.path.join(config['IRIS_long_path'], 'scripts', 'references', 'genome.v34lift37.annotation.gtf'),
 	log:
 		out=os.path.join(config['outf_dir'], 'log_dir', 'download_genome_gtf.out'),
 		err=os.path.join(config['outf_dir'], 'log_dir', 'download_genome_gtf.err'),
@@ -102,12 +102,12 @@ rule download_genome_gtf:
 
 rule download_additional_file:
 	output:
-		gencode_fasta=os.path.join(config['IRIS_long_path'], 'scripts', 'references', 'gencode.v39.pc_translations.fa') if config['genome_version'] in ['hg38','GRCh38'] else os.path.join(config['IRIS_long_path'], 'scripts', 'references', 'gencode.v34lift37.pc_translations.fa'),
+		gencode_fasta=os.path.join(config['IRIS_long_path'],'scripts','references',f"gencode.v{config['gencode_release_version']}.pc_translations.fa") if config['genome_version'] in ['hg38','GRCh38'] else os.path.join(config['IRIS_long_path'], 'scripts', 'references', 'gencode.v34lift37.pc_translations.fa'),
 	log:
 		out=os.path.join(config['outf_dir'], 'log_dir', 'download_additional_file.out'),
 		err=os.path.join(config['outf_dir'], 'log_dir', 'download_additional_file.err'),
 	params:
-		gencode_fasta_url="https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_39/gencode.v39.pc_translations.fa.gz",
+		gencode_fasta_url=f"https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_{config['gencode_release_version']}/gencode.v{config['gencode_release_version']}.pc_translations.fa.gz",
 	resources:
 		mem_mb=config['general_mem_gb'] * 1024,
 		time_hours=config['general_time_hr'],
@@ -128,9 +128,9 @@ rule pre_processing:
 		download_genome_gtf = get_genome_gtf,
 		download_genome_fasta = get_genome_fasta,
 	output:
-		trans_CPM = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_ESPRESSO.txt"),
-		trans_proportion = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_ESPRESSO_proportion.txt"),
-		anno_trans_contribution = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_ESPRESSO_gene_annotated_isoform_contribution.txt"),
+		trans_CPM = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM.txt"),
+		trans_proportion = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_proportion.txt"),
+		anno_trans_contribution = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_gene_annotated_isoform_contribution.txt"),
 		bed_file = os.path.join(config['outf_dir'], "samples_BedGraph.bed"),
 	params:
 		conda_wrapper = config['conda_wrapper'],
@@ -146,8 +146,8 @@ rule pre_processing:
 		time_hours=config['general_time_hr'],
 	shell:
 		'python {params.IRIS_long} Preprocess' 
-		' --espresso_gtf {input.transcript_gtf}'
-		' --espresso_abundance {input.transcript_abundance}'
+		' --input_gtf {input.transcript_gtf}'
+		' --input_abundance {input.transcript_abundance}'
 		' --normalized_mode {params.normalized_mode}'
 		' --ref_gtf {params.ref_gtf}'
 		' --outf_dir {params.outf_dir}'
@@ -156,7 +156,7 @@ rule pre_processing:
 
 rule DE_transcripts:
 	input:
-		trans_CPM = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_ESPRESSO.txt"),
+		trans_CPM = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM.txt"),
 	output:
 		TE_trans = os.path.join(config['outf_dir'], "3_1_Tumor_vs_normal_DE_test.txt"),
 		TS_trans = os.path.join(config['outf_dir'], "3_2_Tumor_vs_normal_prevalence.txt"),
@@ -198,7 +198,7 @@ rule DE_transcripts:
 rule translation:
 	input:
 		transcript_gtf = config['input_transcript_gtf'],
-		trans_CPM = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_ESPRESSO.txt"),
+		trans_CPM = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM.txt"),
 	output:
 		PC_fasta = os.path.join(config['outf_dir'], f"4_4_{config['tumor_key_word']}_PC.fasta"),
 		PC_NMD_fasta = os.path.join(config['outf_dir'], f"4_4_{config['tumor_key_word']}_PC_and_NMD.fasta"),
@@ -232,9 +232,9 @@ rule translation:
 rule CAR_T_prediction:
 	input:
 		PC_fasta = os.path.join(config['outf_dir'], f"4_4_{config['tumor_key_word']}_PC.fasta"),
-		trans_CPM = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_ESPRESSO.txt"),
-		trans_proportion = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_ESPRESSO_proportion.txt"),
-		anno_trans_contribution = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_ESPRESSO_gene_annotated_isoform_contribution.txt"),
+		trans_CPM = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM.txt"),
+		trans_proportion = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_proportion.txt"),
+		anno_trans_contribution = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_gene_annotated_isoform_contribution.txt"),
 		CDS_info_table = os.path.join(config['outf_dir'], f"4_4_{config['tumor_key_word']}_detailed_match_ID.txt"),
 		TE_trans = os.path.join(config['outf_dir'], "3_1_Tumor_vs_normal_DE_test.txt"),
 		TS_trans = os.path.join(config['outf_dir'], "3_2_Tumor_vs_normal_prevalence.txt"),
@@ -284,9 +284,9 @@ rule CAR_T_prediction:
 rule TCR_prediction:
 	input:
 		PC_NMD_fasta = os.path.join(config['outf_dir'], f"4_4_{config['tumor_key_word']}_PC_and_NMD.fasta"),
-		trans_CPM = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_ESPRESSO.txt"),
-		trans_proportion = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_ESPRESSO_proportion.txt"),
-		anno_trans_contribution = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_ESPRESSO_gene_annotated_isoform_contribution.txt"),
+		trans_CPM = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM.txt"),
+		trans_proportion = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_proportion.txt"),
+		anno_trans_contribution = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_gene_annotated_isoform_contribution.txt"),
 		CDS_info_table = os.path.join(config['outf_dir'], f"4_4_{config['tumor_key_word']}_detailed_match_ID.txt"),
 		TE_trans = os.path.join(config['outf_dir'], "3_1_Tumor_vs_normal_DE_test.txt"),
 		TS_trans = os.path.join(config['outf_dir'], "3_2_Tumor_vs_normal_prevalence.txt"),
@@ -339,8 +339,8 @@ rule TCR_prediction:
 
 rule figure:
 	input:
-		trans_CPM = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_ESPRESSO.txt"),
-		trans_proportion = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_ESPRESSO_proportion.txt"),
+		trans_CPM = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM.txt"),
+		trans_proportion = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_proportion.txt"),
 		group_info_inf = config["group_info_inf"],
 		required_trans_inf = config["required_trans_inf"],
 		bed_file = os.path.join(config['outf_dir'], "samples_BedGraph.bed"),
@@ -372,6 +372,6 @@ rule figure:
 		' --figures Isoform Single_isoform Structure'
 		' --genome_version {params.genome_version}'
 		' --ref_gtf {params.ref_gtf}'
-		' --espresso_gtf {params.transcript_gtf}'
+		' --input_gtf {params.transcript_gtf}'
 		' 1> {log.out}'
 		' 2> {log.err}'
