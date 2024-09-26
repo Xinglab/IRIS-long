@@ -20,6 +20,9 @@ for i,line in enumerate(inf):
 	arr = line.strip().split('\t')
 	if arr[2] == 'transcript':
 		if len(key_list)>0:
+			if len(key_list)>1:
+				if int(key_list[0].split("#")[3]) > int(key_list[1].split("#")[3]):
+					key_list = key_list[::-1]
 			transcript_link = ';'.join(key_list)
 			outf.write(transcript_link+'\t'+last_transcript_annotation+'\n')
 		key_list = []
@@ -46,6 +49,9 @@ for i,line in enumerate(inf):
 		key_list.append(key)
 		last_transcript_annotation = arr[1]
 		if i == file_len-1: # the end of entire file
+			if len(key_list)>1:
+				if int(key_list[0].split("#")[3]) > int(key_list[1].split("#")[3]):
+					key_list = key_list[::-1]
 			transcript_link = ';'.join(key_list)
 			outf.write(transcript_link+'\t'+last_transcript_annotation+'\n')
 inf.close()

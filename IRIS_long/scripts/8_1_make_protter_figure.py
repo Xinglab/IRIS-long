@@ -37,7 +37,7 @@ def convert_to_str(pos_list):
 	return ','.join(region_list)
 
 
-with open("%s/Summarized_CAR_T_prioritized_targets_final.txt" % outf_dir,'r') as inf:
+with open("%s/5_5_Summarized_CAR_T_prioritized_targets_final.txt" % outf_dir,'r') as inf:
 	for index,line in enumerate(inf):
 		arr = line.strip().split('\t')
 		if index == 0: continue

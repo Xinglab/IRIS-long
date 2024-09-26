@@ -6,7 +6,6 @@ target_trans = sys.argv[1]
 CPM_inf_name = sys.argv[2]
 tumor_sample_count = int(sys.argv[3])
 out_dir = sys.argv[4]
-#target_trans = "ESPRESSO:chr7:10297:45@Melanoma"
 window_size = int(sys.argv[5])
 step_1_outf_name = out_dir+"/7_1_peptide_matrix_WindowSize_%s_%s.txt" % (str(window_size),target_trans)
 

@@ -284,9 +284,7 @@ if mode == 'long-read':
 			ENSG_ID = arr[2].split('.')[0]+'-PAR-Y'
 		else:
 			ENSG_ID = arr[2].split('.')[0]
-		if ENST_ID.startswith('ESPRESSO'):
-			ENST2ENSG_dict[ENST_ID] = ENSG_ID
-		else:
+		if ENST_ID.startswith('ENST'):
 			if ENST_ID in ENST2ENSG_dict:
 				if ENST2ENSG_dict[ENST_ID] != ENSG_ID:
 					pass
@@ -294,6 +292,8 @@ if mode == 'long-read':
 			else:
 				ENST2ENSG_dict[ENST_ID] = ENSG_ID
 				#print ('not found in gtf',ENST_ID,ENSG_ID)
+		else:
+			ENST2ENSG_dict[ENST_ID] = ENSG_ID
 	inf_exp_data.close()
 
 #### short-read ######
@@ -495,6 +495,7 @@ for line in inf:
 				ee = each_pair.split('#')[1]
 				final_transcript = final_seq[int(ss):int(ee)+3]
 				splicing_site_position = [i.start() for i in re.finditer("[a-z]", final_transcript)]
+				print(ss,ee,transcript_link)
 				absolute_position = genome_position(ss,ee,transcript_link)
 				peptides=str(Seq(final_transcript).translate()).rstrip("/*")
 				peptides_with_ss = lower_ss(peptides,splicing_site_position)

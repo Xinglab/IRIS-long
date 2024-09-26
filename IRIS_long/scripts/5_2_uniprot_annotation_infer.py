@@ -290,15 +290,15 @@ for line in transcript_inf:
 			if Uni_ID not in ENST2Uni[canonical_ENST]:
 				ENST2Uni[canonical_ENST].append(Uni_ID)			
 transcript_inf.close()
-############# load ESPRESSO mapped gene ############
-ESPRESSO2ENSG = defaultdict()
-inf_espresso = open(abundance_inf_name)
-for line in inf_espresso:
+############# load Novel mapped gene ############
+NOVEL2ENSG = defaultdict()
+inf_novel = open(abundance_inf_name)
+for line in inf_novel:
 	arr = line.strip().split('\t')
 	if arr[2] == 'NA': continue
-	if arr[0].startswith('ESPRESSO'):
-		ESPRESSO2ENSG[arr[0]] = get_right_ID(arr[2])
-inf_espresso.close()
+	if not arr[0].startswith('ENST'):
+		NOVEL2ENSG[arr[0]] = get_right_ID(arr[2])
+inf_novel.close()
 
 
 ############### feature uniprot ########

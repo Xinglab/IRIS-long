@@ -28,6 +28,11 @@ fig_data <- read.table(proportion_inf_name, header = T,sep='\t')
 outf_name = paste(object_path,'/Bar_sample_isoform_',target_gene_name,'_',target_trans,'.png',sep='')
 outf_pdf_name = paste(object_path,'/Bar_sample_isoform_',target_gene_name,'_',target_trans,'.pdf',sep='')
 
+## for SCLC 
+#SCLC_sorted_list <- c("DMS79","NCI-H1105","NCI-H2081","NCI-H209","NCI-H2227","NCI-H2171","NCI-H446","NCI-H524","NCI-H82","NCI-H211","Brain","Brain_Caudate_Nucleus","Brain_Cerebellum","Brain_Cerebral_Cortex","Brain_Corpus_Callosum","Brain_Frontal_Lobe","Brain_Hippocampus","Brain_Medulla_Oblongata","Brain_Pons","Brain_Spinal_Cord","Brain_Temporal_Lobe","Brain_Thalamus","Bladder","Blood","Colon","Heart","Kidney","Liver","Lung","Ovary","Pancreas","Prostate","Skeletal_Muscle","Small_Intestine","Spleen","Stomach","Testis","Thyroid")
+
+SCLC_sorted_list <- c("DMS79","NCI-H1105","NCI-H2081","NCI-H209","NCI-H2227","NCI-H2171","NCI-H446","NCI-H524","NCI-H82","NCI-H211","NCI-H2087","Brain","Brain_Caudate_Nucleus","Brain_Cerebellum","Brain_Cerebral_Cortex","Brain_Corpus_Callosum","Brain_Frontal_Lobe","Brain_Hippocampus","Brain_Medulla_Oblongata","Brain_Pons","Brain_Spinal_Cord","Brain_Temporal_Lobe","Brain_Thalamus","Bladder","Blood","Colon","Heart","Kidney","Liver","Lung","Ovary","Pancreas","Prostate","Skeletal_Muscle","Small_Intestine","Spleen","Stomach","Testis","Thyroid")
+
 gene_data <- fig_data[fig_data$Gene_ID == target_gene,]
 ## sort transcript based on proportion ##
 mean_pro_data <- gene_data %>% group_by(Transcript_ID) %>% summarize(mean_Proportion = mean(Proportion, na.rm=TRUE))
@@ -47,7 +52,12 @@ trans_data <- gene_data[gene_data$Transcript_ID == target_trans,]
 if (order_flag == 'yes'){
 	trans_data <- trans_data[order(trans_data$Proportion, decreasing=TRUE),]
 }
-gene_data$Sample <- factor(gene_data$Sample, levels=as.vector(trans_data$Sample))
+
+if ("DMS79" %in% as.vector(trans_data$Sample)){
+	gene_data$Sample <- factor(gene_data$Sample, levels = SCLC_sorted_list)
+}else{
+	gene_data$Sample <- factor(gene_data$Sample, levels = as.vector(trans_data$Sample))
+}
 sub_color <- as.vector(trans_data$Subtype_color)
 
 
@@ -118,18 +128,19 @@ outf_Trans_list_name = paste(object_path,'/Proportion_sample_isoform_',target_ge
 write.table(isoform_reorder_table, file = outf_Trans_list_name, sep = "\t", quote = FALSE, row.names = F, col.names=F)
 #######
 
-
 gene_data$Transcript_ID <- factor(gene_data$Transcript_ID, levels=isoform_order_list)
-
-
 
 #trans_color_original_list <- c('#F31E08','#2171b5','#4292C6','#6baed6','#9ecae1','#97a1a6')
 trans_color_original_list <- c('#FF5F42','#003E7F','#0068AF','#5495E1','#A1C2E8','#D9D9D9')
+if ("Others" %in% isoform_order_list) {
+	trans_color_original_list <- c(trans_color_original_list[1:length(isoform_order_list)-1], "#D9D9D9")
+}
 trans_color_table <- as.data.frame(cbind(trans_color_original_list,c(1:length(trans_color_original_list))))
 trans_reorder_list <- as.integer(as.vector(isoform_reorder_table[,2]))
 trans_reorder_color_table <- trans_color_table[match(trans_reorder_list, trans_color_table[,2]),]
 #trans_color_list <- as.vector(trans_reorder_color_table[,1])
 trans_color_list <- trans_color_original_list 
+
 
 group_color_original_list <- c("#FF0018","#e68e19","#02a620","#0000F9","#86007D")
 group_color_list <- group_color_original_list[0:length(unique(gene_data$Subtype))]
@@ -147,10 +158,10 @@ if (identical(as.character(unique(gene_data$Subtype)), reference_list)) {
 }
 f_fig <- f_fig + geom_bar(stat="identity", position = position_stack(vjust = 1, reverse = FALSE), width=0.9, color="black", linewidth=0.4)
 f_fig <- f_fig + scale_fill_manual(values = trans_color_list)
-f_fig <- f_fig + theme(panel.grid.major = element_line(color = "white",linewidth=0.01),panel.grid.minor = element_line(color = "white",linewidth=0.01), axis.title.y=element_text(size = font_size), axis.text.y=element_text(size = font_size+2), axis.title.x=element_text(size = font_size), axis.text.x=element_text(size = font_size+1, colour = sub_color, angle=90, vjust=0.5, hjust=1), plot.title = element_blank(), legend.position = 'none', legend.title = element_text(size = font_size-1, hjust=0.5), legend.text = element_text(size = font_size-1.5), panel.border = element_rect(fill=NA, linewidth=0.3, colour = "black"), panel.background = element_blank(), legend.box="horizontal", legend.direction="vertical", plot.margin = unit(c(0.5,5,0.5,5), "pt"))
+f_fig <- f_fig + theme(panel.grid.major = element_line(color = "white",linewidth=0.01),panel.grid.minor = element_line(color = "white",linewidth=0.01), axis.title.y=element_text(size = font_size), axis.text.y=element_text(size = font_size+2), axis.title.x=element_text(size = font_size), axis.text.x=element_text(size = font_size+1, colour = sub_color, angle=90, vjust=0.5, hjust=1), plot.title = element_blank(), legend.position = 'bottom', legend.title = element_text(size = font_size-1, hjust=0.5), legend.text = element_text(size = font_size-1.5), panel.border = element_rect(fill=NA, linewidth=0.3, colour = "black"), panel.background = element_blank(), legend.box="horizontal", legend.direction="vertical", plot.margin = unit(c(0.5,5,0.5,5), "pt"))
 f_fig <- f_fig + labs(x="", y="Isoform proportion (%)", title="")
 #f_fig <- f_fig + scale_y_continuous(label = unit_format(unit = "K",sep="",accuracy=0.1))
-#f_fig <- f_fig + guides(fill = guide_legend(reverse = FALSE, ncol=1, label.theme = element_text(size = font_size-1),keywidth=1, keyheight=1, order=1)) + guides(color = guide_legend(reverse = FALSE, ncol=1, label.theme = element_text(size = font_size-1), keywidth=1, keyheight=1, order=2))
+f_fig <- f_fig + guides(fill = guide_legend(reverse = FALSE, nrow=2, title.position='top', label.theme = element_text(size = font_size-1.5), keywidth=1, keyheight=1, order=1)) + guides(color = guide_legend(reverse = FALSE, nrow=2, title.position='top', label.theme = element_text(size = font_size-1.5), keywidth=1, keyheight=1, order=2))
 
 ####### Exp bar plot  ##########
 
@@ -161,7 +172,11 @@ outf_pdf_exp_name = paste(object_path,'/Bar_sample_isoform_',target_gene_name,'_
 gene_data_exp <- fig_data_exp[fig_data_exp$Gene_ID == target_gene,]
 
 ## sort samples based on proportion of given isoform (based on above file) ##
-gene_data_exp$Sample <- factor(gene_data_exp$Sample, levels=as.vector(trans_data$Sample))
+if ("DMS79" %in% as.vector(trans_data$Sample)){
+	gene_data_exp$Sample <- factor(gene_data_exp$Sample, levels = SCLC_sorted_list)
+}else{
+	gene_data_exp$Sample <- factor(gene_data_exp$Sample, levels = as.vector(trans_data$Sample))
+}
 sub_color <- as.vector(trans_data$Subtype_color)
 
 ## sort transcript based on proportion (based on above file) ##
@@ -177,14 +192,14 @@ if (identical(as.character(unique(gene_data$Subtype)), reference_list)) {
 }
 f_fig_exp <- f_fig_exp + geom_bar(stat="identity", position = position_stack(vjust = 1, reverse = TRUE), width=0.9, color="black", linewidth=0.4)
 f_fig_exp <- f_fig_exp + scale_fill_manual(values = trans_color_list)
-f_fig_exp <- f_fig_exp + theme(panel.grid.major = element_line(color = "white",linewidth=0.01),panel.grid.minor = element_line(color = "white",linewidth=0.01), axis.title.y=element_text(size = font_size), axis.text.y=element_text(size = font_size+2), axis.title.x=element_blank(), axis.ticks.x=element_blank(), axis.text.x=element_blank(), plot.title = element_blank(), legend.position ='none', legend.title = element_text(size = font_size-1), legend.text = element_text(size = font_size-2), panel.border = element_rect(fill=NA, linewidth=0.3, colour ="black"), panel.background = element_blank(), legend.box="horizontal", legend.direction="horizontal", plot.margin = unit(c(5,5,0.5,5), "pt"))
+f_fig_exp <- f_fig_exp + theme(panel.grid.major = element_line(color = "white",linewidth=0.01), panel.grid.minor = element_line(color = "white",linewidth=0.01), axis.title.y=element_text(size = font_size), axis.text.y=element_text(size = font_size+2), axis.title.x=element_blank(), axis.ticks.x=element_blank(), axis.text.x=element_blank(), plot.title = element_blank(), panel.border = element_rect(fill=NA, linewidth=0.3, colour ="black"), panel.background = element_blank(), plot.margin = unit(c(5,5,0.5,5), "pt"))
 f_fig_exp <- f_fig_exp + labs(x="", y="Abundance (CPM)", title="")
 #f_fig_exp <- f_fig_exp + guides(fill = guide_legend(reverse = FALSE, nrow=2, label.theme = element_text(size = 5),keywidth=1, keyheight=1, order=1)) + guides(color = guide_legend(reverse = FALSE, nrow=2, label.theme = element_text(size = 5), keywidth=1, keyheight=1, order=2))
 
 
 #### combined plots ####
-legend_a <- get_legend(f_fig + guides(fill = guide_legend(reverse = FALSE, nrow=2, title.position='top', label.theme = element_text(size = font_size-1.5), keywidth=1, keyheight=1, order=1)) + guides(color = guide_legend(reverse = FALSE, nrow=2, title.position='top', label.theme = element_text(size = font_size-1.5), keywidth=1, keyheight=1, order=2)) + theme(legend.position='bottom'))
-box_plot <- plot_grid(f_fig_exp, f_fig, align = "v", ncol=1, rel_heights = c(1,1.8))
+legend_a <- get_plot_component(f_fig, 'guide-box-bottom', return_all = TRUE)
+box_plot <- plot_grid(f_fig_exp + theme(legend.position = 'none'), f_fig + theme(legend.position = 'none'), align = "v", ncol=1, rel_heights = c(1,1.8))
 combined_plot <- plot_grid(box_plot, legend_a, ncol=1, align='v', axis='t', rel_heights=c(1,0.2))
 
 

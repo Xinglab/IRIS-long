@@ -65,7 +65,7 @@ with open(CPM_inf, 'r') as inf:
 		else:
 			gene_ID = arr[2].split('.')[0]
 		## must be tumor-enriched transcript ##
-		#if trans_ID not in DE_transcript_dict: continue
+		if trans_ID not in DE_transcript_dict: continue
 		Tumor_list = np.array(list(map(float,arr[3:3+Tumor_num])))
 		Tumor_with_iso = len(Tumor_list[Tumor_list >= cutoff_tumor_cpm])
 		Tumor_without_iso = len(Tumor_sample_list) - Tumor_with_iso

@@ -44,7 +44,7 @@ with open(required_trans_inf_name, 'r') as required_inf:
 	for index,line in enumerate(required_inf):
 		arr = line.strip().split('\t')
 		if index == 0: continue
-		for each_trans in arr[1].split(';'):
+		for each_trans in re.split(r"[,;]",arr[1]):
 			required_dict[arr[0]].append(each_trans)
 
 with open(canonical_trans_inf_name, "r") as canonical_trans_inf:
@@ -97,7 +97,7 @@ for each_gene in ave_pro_dict:
 				top_exp_trans_dict[each_gene].append(each_value)
 	sorted_key = sorted(ave_pro_dict[each_gene].items(), key=lambda x:float(x[1]), reverse = True)
 	for index,each_item in enumerate(sorted_key):
-		if len(top_exp_trans_dict[each_gene]) >= 5:
+		if (len(top_exp_trans_dict[each_gene]) >= 5) or (ave_pro_dict[each_gene][each_item[0]] < 10):
 			break
 		else:
 			if each_item[0] not in top_exp_trans_dict[each_gene]:
