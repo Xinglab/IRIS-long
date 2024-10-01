@@ -65,7 +65,7 @@ def parse_args():
 	parser_translate.add_argument('-tg', '--trans_gtf', dest='trans_gtf', type=str, help='generated gtf file, e.g. samples_updated_combined.gtf', required=True)
 	parser_translate.add_argument('-ic', '--isoform_cpm_inf', dest='isoform_cpm_inf', type=str, help='Isoform CPM file, e.g. samples_abundance_combined_CPM.txt', required=True)
 	parser_translate.add_argument('-gv', '--genome_version', dest='genome_version', type=str, choices=['GRCh38','GRCh37','hg38','hg19'], help="choose from ['GRCh38','GRCh37','hg38','hg19']", required=True)
-	parser_translate.add_argument('-rg', '--ref_gtf', dest='ref_gtf', type=str, help='reference gencode annotation, e.g. gencode.v39.annotation.gtf', default = './')
+	parser_translate.add_argument('-rg', '--ref_gtf', dest='ref_gtf', type=str, help='reference gencode annotation, e.g. gencode.46.annotation.gtf', default = './')
 	parser_translate.add_argument('-of', '--out_file', dest='out_file', type=str, help='prefix of the name of output file', required=True)
 	parser_translate.add_argument('-od', '--outf_dir', dest='outf_dir', type=str, help='output directory', required=True)
 
@@ -83,8 +83,8 @@ def parse_args():
 	parser_car_t.add_argument('-aic', '--annotated_isoform_contri_inf', dest='annotated_isoform_contri_inf', type=str, help='file generated before, which ends with \"_annotated_isoform_contribution.txt\"', required=True)
 	parser_car_t.add_argument('-tci', '--trans_CDS_inf', dest='trans_CDS_inf', type=str, help='file generated before, format of which is like \"4_4_*_detailed_match_ID.txt\"', required=True)
 	#parser_car_t.add_argument('-oic', '--other_isoform_contri_inf', dest='other_isoform_contri_inf', type=str, help='file generated before, which ends with \"_proportion_only_focus_others.txt\"', required=True)
-	parser_car_t.add_argument('-rg', '--ref_gtf', dest='ref_gtf', type=str, help='reference gencode annotation, e.g. gencode.v39.annotation.gtf', default = './')
-	parser_car_t.add_argument('-gf', '--gencode_fasta', dest='gencode_fasta', type=str, help='reference gencode translation.fasta, e.g. gencode.v39.pc_translations.fa', default = './')
+	parser_car_t.add_argument('-rg', '--ref_gtf', dest='ref_gtf', type=str, help='reference gencode annotation, e.g. gencode.46.annotation.gtf', default = './')
+	parser_car_t.add_argument('-gf', '--gencode_fasta', dest='gencode_fasta', type=str, help='reference gencode translation.fasta, e.g. gencode.v46.pc_translations.fa', default = './')
 	parser_car_t.add_argument('-dt', '--de_trans_inf', dest='de_trans_inf', type=str, help='Tumor-enriched transcripts, e.g. 3_1_Tumor_vs_normal_DE_test.txt', required=True)
 	parser_car_t.add_argument('-st', '--spe_trans_inf', dest='spe_trans_inf', type=str, help='Tumor-specific transcripts, e.g. 3_2_Tumor_vs_normal_prevalence.txt', required=True)
 	parser_car_t.add_argument('-ws', '--window_size', dest='window_size', type=int, help='Window size (default = 9 AAs)', default = 9)
@@ -106,7 +106,7 @@ def parse_args():
 	parser_tcr.add_argument('-ba', '--binding_affi', dest='binding_affi', type=float, help='cutoff of binding affinity between HLA complex and peptide (default = 500)', default = 500)
 	parser_tcr.add_argument('-aic', '--annotated_isoform_contri_inf', dest='annotated_isoform_contri_inf', type=str, help='file generated before, which is like \"_annotated_isoform_contribution.txt\"', required=True)
 	parser_tcr.add_argument('-tci', '--trans_CDS_inf', dest='trans_CDS_inf', type=str, help='file generated before, which is like  \"4_4_*_detailed_match_ID.txt\"', required=True)
-	parser_tcr.add_argument('-rg', '--ref_gtf', dest='ref_gtf', type=str, help='reference gencode annotation, e.g. gencode.v39.annotation.gtf', default = './')
+	parser_tcr.add_argument('-rg', '--ref_gtf', dest='ref_gtf', type=str, help='reference gencode annotation, e.g. gencode.v46.annotation.gtf', default = './')
 	parser_tcr.add_argument('-dt', '--de_trans_inf', dest='de_trans_inf', type=str, help='Tumor-enriched transcripts, e.g. 3_1_Tumor_vs_normal_DE_test.txt', required=True)
 	parser_tcr.add_argument('-st', '--spe_trans_inf', dest='spe_trans_inf', type=str, help='Tumor-specific transcripts, e.g. 3_2_Tumor_vs_normal_prevalence.txt', required=True)
 	parser_tcr.add_argument('-ws', '--window_size', dest='window_size', type=int, help='Window size (default = 9 AAs)', default = 9)
@@ -220,8 +220,15 @@ def Sub_figure(dir_path, args):
 	order = args.order
 	ref_gtf = args.ref_gtf
 	input_gtf = args.input_gtf
+	gencode_version = ref_gtf.split("/")[-1].split(".")[1]
+
+	# 2.0 process gtf file
+	cmd_figure_0 = f"python {dir_path}/scripts/2_0_extract_canonical_basic_trans.py {ref_gtf}"
+	print(cmd_figure_0)
+	os.system(cmd_figure_0)
+
 	# 2.1 only show top 5 isoform's proportion and reshape the file format
-	cmd_figure_1 = f"python {dir_path}/scripts/2_1_merge_isoforms_and_reshape_format.py {isoform_proportion_inf} {isoform_cpm_inf} {group_info_inf} {required_trans_inf} {outf_dir}"
+	cmd_figure_1 = f"python {dir_path}/scripts/2_1_merge_isoforms_and_reshape_format.py {isoform_proportion_inf} {isoform_cpm_inf} {group_info_inf} {required_trans_inf} {outf_dir} {dir_path}/scripts/references/gencode.{gencode_version}.canonical_transcript.txt"
 	print(cmd_figure_1)
 	os.system(cmd_figure_1)
 
@@ -238,9 +245,9 @@ def Sub_figure(dir_path, args):
 	if not os.path.exists(f"{outf_dir}/Example_res"):
 		os.system(f"mkdir {outf_dir}/Example_res")
 	if genome_version in ['hg19','GRCh37']:
-		cmd_figure_2 = f"python {dir_path}/scripts/2_2_Generate_bar_structure_figure_example.py --gene [Ensembl_Gene_ID] --gene_name [Gene_Symbol] --transcript [Interested_Transcript_ID] --abundance_CPM_original {isoform_cpm_inf} --abundance_proportion {prop_reshaped_inf_name} --abundance_CPM {exp_reshaped_inf_name} --bedgraph {bedgraph} --sorted_group {sorted_group_info} --out_dir {outf_dir}/Example_res --figures {' '.join(figures)} --canonical_transcript {dir_path}/scripts/references/Gencode_v39_canonical_isoform.txt --basic_transcript {dir_path}/scripts/references/gencode.v34lift37.annotation_basic_trans.txt --anno_gtf {ref_gtf} --novel_gtf {input_gtf} --CDS_inf {CDS_inf} --genome_version {genome_version} --intron_shrinkage {intron_shrinkage} --order {order}"
+		cmd_figure_2 = f"python {dir_path}/scripts/2_2_Generate_bar_structure_figure_example.py --gene [Ensembl_Gene_ID] --gene_name [Gene_Symbol] --transcript [Interested_Transcript_ID] --abundance_CPM_original {isoform_cpm_inf} --abundance_proportion {prop_reshaped_inf_name} --abundance_CPM {exp_reshaped_inf_name} --bedgraph {bedgraph} --sorted_group {sorted_group_info} --out_dir {outf_dir}/Example_res --figures {' '.join(figures)} --canonical_transcript {dir_path}/scripts/references/gencode.{gencode_version}.canonical_transcript.txt --basic_transcript {dir_path}/scripts/references/gencode.{gencode_version}.basic_transcript.txt --anno_gtf {ref_gtf} --novel_gtf {input_gtf} --CDS_inf {CDS_inf} --genome_version {genome_version} --intron_shrinkage {intron_shrinkage} --order {order}"
 	elif genome_version in ['hg38', 'GRCh38']:
-		cmd_figure_2 = f"python {dir_path}/scripts/2_2_Generate_bar_structure_figure_example.py --gene [Ensembl_Gene_ID] --gene_name [Gene_Symbol] --transcript [Interested_Transcript_ID] --abundance_CPM_original {isoform_cpm_inf} --abundance_proportion {prop_reshaped_inf_name} --abundance_CPM {exp_reshaped_inf_name} --bedgraph {bedgraph} --sorted_group {sorted_group_info} --out_dir {outf_dir}/Example_res --figures {' '.join(figures)} --canonical_transcript {dir_path}/scripts/references/Gencode_v39_canonical_isoform.txt --basic_transcript {dir_path}/scripts/references/gencode.v39.annotation_basic_trans.txt --anno_gtf {ref_gtf} --novel_gtf {input_gtf} --CDS_inf {CDS_inf} --genome_version {genome_version} --intron_shrinkage {intron_shrinkage} --order {order}"
+		cmd_figure_2 = f"python {dir_path}/scripts/2_2_Generate_bar_structure_figure_example.py --gene [Ensembl_Gene_ID] --gene_name [Gene_Symbol] --transcript [Interested_Transcript_ID] --abundance_CPM_original {isoform_cpm_inf} --abundance_proportion {prop_reshaped_inf_name} --abundance_CPM {exp_reshaped_inf_name} --bedgraph {bedgraph} --sorted_group {sorted_group_info} --out_dir {outf_dir}/Example_res --figures {' '.join(figures)} --canonical_transcript {dir_path}/scripts/references/gencode.{gencode_version}.canonical_transcript.txt --basic_transcript {dir_path}/scripts/references/gencode.{gencode_version}.basic_transcript.txt --anno_gtf {ref_gtf} --novel_gtf {input_gtf} --CDS_inf {CDS_inf} --genome_version {genome_version} --intron_shrinkage {intron_shrinkage} --order {order}"
 	with open(f"{outf_dir}/Template_to_generate_figures.sh", "w") as outf_figure_2:
 		outf_figure_2.write(cmd_figure_2+'\n')
 
