@@ -7,12 +7,9 @@ CPM_inf_name = sys.argv[2]
 sample_type_inf_name = sys.argv[3]
 required_trans_inf_name = sys.argv[4]
 outf_dir = sys.argv[5]
+canonical_trans_inf_name = sys.argv[6]
 
 file_dir = os.path.dirname(os.path.realpath(__file__))
-if len(sys.argv) > 6:
-	canonical_trans_inf_name = sys.argv[6]
-else:
-	canonical_trans_inf_name = file_dir+"/references/Gencode_v39_canonical_isoform.txt"
 
 gene_CPM_inf_name = re.sub(".txt$", "_gene.txt", CPM_inf_name)
 ######## get gene expression ######
@@ -213,4 +210,6 @@ for each_gene in Others_exp_dict:
 		this_subtype = cell2subtype_dict[each_sample]
 		this_CPM = Others_exp_dict[each_gene][each_sample]
 		outf_4.write(each_gene+"\tOthers\t"+each_sample+"\t"+str(this_CPM)+"\t"+this_subtype+"\t"+subtype2color_dict[this_subtype]+"\n")
+outf_4.close()
+rs\t"+each_sample+"\t"+str(this_CPM)+"\t"+this_subtype+"\t"+subtype2color_dict[this_subtype]+"\n")
 outf_4.close()
