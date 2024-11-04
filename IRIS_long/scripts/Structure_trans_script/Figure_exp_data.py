@@ -107,7 +107,7 @@ count_novel = 0
 selected_novel_list = []
 for each_item in sorted_list:
 	each_trans_ID = each_item[0]
-	if each_trans_ID.startswith('ESPRESSO'):
+	if not each_trans_ID.startswith('ENST'):
 		flag = 'Novel'
 		count_novel += 1
 		#if count_novel > 5:
@@ -122,7 +122,7 @@ outf_bed = open(sorted_bed_name, 'w')
 
 for each_item in sorted_list_ascend:
 	each_trans_ID = each_item[0]
-	if each_trans_ID.startswith('ESPRESSO'):
+	if not each_trans_ID.startswith('ENST'):
 		flag = 'Novel'
 		if each_trans_ID not in selected_novel_list:
 			continue

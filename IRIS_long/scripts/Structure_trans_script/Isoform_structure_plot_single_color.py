@@ -9,9 +9,6 @@ import numpy as np
 
 
 ##### pre-set parameters ##############
-fig = plt.figure(figsize=(12, 4),dpi=300)
-ax = fig.add_subplot(111)
-
 exon_height = 6
 line_space = 13
 font_size = 12
@@ -97,6 +94,13 @@ with open(bed_list_name,'r') as list_inf:
 			intron_left = int(exon_dict[trans_ID][i].split("#")[2])+1
 			intron_right = int(exon_dict[trans_ID][i+1].split("#")[1])-1+1
 			intron_dict[trans_ID].append([intron_left,intron_right])
+
+##### pre-set parameters ##############
+figure_height = num_trans*0.8 + 1
+fig = plt.figure(figsize=(12, figure_height), dpi=300)
+ax = fig.add_subplot(111)
+#######################################
+
 
 ## obtain the intronic region shared by all transcripts ##
 shared_intron_list = intron_dict[trans_ID_list[0]]

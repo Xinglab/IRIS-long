@@ -33,30 +33,21 @@ key_word = abundance_inf_name.split('/')[-1].split('_')[0]
 CPM_cut_off = float(sys.argv[4])  #default is 1.0
 object_path = sys.argv[5]
 
-
-exp_inf_0 = open(abundance_inf_name,'r')
-for index,line in enumerate(exp_inf_0):
-	arr = line.strip().split('\t')
-	if index==0: continue
-	else:
-		ENST_ID = get_right_ID(arr[0])
-		ENSG_ID = get_right_ID(arr[2])
-		if ENSG_ID == 'NA':
-			continue
-		if (query_gene_name != 'NA') and (query_gene_ID == 'NA') :
-			if re.findall('^'+query_gene_name+'-\d+',arr[1]):
-				query_gene_ID = ENSG_ID
+with open(anno_gtf_inf_name, 'r') as anno_gtf0:
+	for line in anno_gtf0:
+		arr = line.strip().split('\t')
+		if line.startswith("#"): continue
+		if arr[2] != "gene": continue
+		gene_id = get_right_ID(re.findall("gene_id \"(.+?)\"", arr[8])[0])
+		gene_name = re.findall("gene_name \"(.+?)\"", arr[8])[0]
+		if (query_gene_name != 'NA') and (query_gene_ID == 'NA'):
+			if query_gene_name == gene_name:
+				query_gene_ID = gene_id
 				break
 		elif (query_gene_ID != 'NA') and (query_gene_name == 'NA'):
-			if ENSG_ID == query_gene_ID:
-				if re.findall('SIRV',query_gene_ID):
-					query_gene_name = query_gene_ID
-				elif arr[1].startswith('ENS'):
-					query_gene_name = query_gene_ID
-				else:
-					query_gene_name = arr[1].split('-')[0]
+			if query_gene_ID == gene_id:
+				query_gene_name = gene_name
 				break
-exp_inf_0.close()
 print (query_gene_name,query_gene_ID,'Cutoff:',CPM_cut_off)
 
 exp_inf = open(abundance_inf_name,'r')
