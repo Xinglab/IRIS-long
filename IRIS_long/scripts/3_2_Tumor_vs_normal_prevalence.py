@@ -81,11 +81,13 @@ with open(CPM_inf, 'r') as inf:
 		median_fold = np.log2((np.median(Tumor_list)+pseudo)/(np.median(Tissue_list)+pseudo))
 		
 		#if p_value < cutoff_p:
-		if (Tumor_percentage >= cutoff_tumor_percentage) and (Tissue_percentage <= cutoff_tissue_percentage):
+		if (Tumor_percentage > cutoff_tumor_percentage) and (Tissue_percentage < cutoff_tissue_percentage):
 			Tumor_item = str(Tumor_with_iso)+'/'+str(len(Tumor_list))+'/'+str(round(Tumor_percentage,2))
 			Tissue_item = str(Tissue_with_iso)+'/'+str(len(Tissue_list))+'/'+str(round(Tissue_percentage,2))
 			outf.write(line.strip()+'\t'+Tumor_item+'\t'+Tissue_item+'\t'+str(p_value)+'\t'+str(np.mean(Tumor_list))+'\t'+str(np.mean(Tissue_list))+'\t'+str(mean_fold)+'\t'+str(np.median(Tumor_list))+'\t'+str(np.median(Tissue_list))+'\t'+str(median_fold)+'\n')
 outf.close()
 	
+
+
 
 

@@ -62,7 +62,7 @@ if int(window_size) == 9:
 	# Wait for 3 hours (10,800 seconds)
 	time.sleep(10800)
 else:
-	time.sleep(21600)
+	time.sleep(32400)
 
 os.system("cat %s/6_1_TCR_temp_out_*.txt > %s/6_1_TCR_temp_out.txt" % (outf_dir, outf_dir))
 

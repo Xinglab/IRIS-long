@@ -250,6 +250,7 @@ mode = args.mode
 gtf = args.gtf_inf
 inf = open(input_name,'r')
 outf_transcript = open(out_name + '_transcript.txt','w')
+outf_transcript_CDS = open(out_name + '_transcript_CDS.txt','w')
 outf_protein = open(out_name + '_protein.txt','w')
 use_annotation = 'yes'
 
@@ -415,7 +416,17 @@ for line in inf:
 			temp_seq = fetch_seq(genome, chrom, start-1, end, strand)
 			seq = temp_seq[0:-1] + temp_seq[-1].lower()
 			Full_CDS_seq += seq
+
+		## add stop codon
+		if strand == '+':
+			tail_end = int(anno_CDS_list[-1].split('#')[1])+1
+			tail_3_nt = fetch_seq(genome, chrom, tail_end-1, tail_end+2, strand)
+		elif strand == '-':
+			tail_end = int(anno_CDS_list[-1].split('#')[0])
+			tail_3_nt = fetch_seq(genome, chrom, tail_end-4, tail_end-1, strand)
 		Full_CDS_seq = Full_CDS_seq[0:-1] + Full_CDS_seq[-1].upper()
+		Full_CDS_seq_with_stop_codon = Full_CDS_seq + tail_3_nt
+
 		# after obtain full length of CDS sequence
 		splicing_site_position = [i.start() for i in re.finditer("[a-z]", Full_CDS_seq)]
 		peptides=str(Seq(Full_CDS_seq).translate()).rstrip(r"\*")
@@ -431,6 +442,7 @@ for line in inf:
 
 		outf_protein.write(str(final_pep_ID)+'\n'+str(peptides_with_ss)+'\n')
 		outf_transcript.write(str(final_pep_ID)+'\n'+str(final_seq)+'\n')
+		outf_transcript_CDS.write(str(final_pep_ID)+'\n'+str(Full_CDS_seq_with_stop_codon)+'\n')
 
 	else: # either ENST is not annotated or that paramter is not used
 		# Obtain the full length sequence of transcripts
@@ -526,6 +538,7 @@ for line in inf:
 				final_pep_ID = final_pep_ID + ':PC'
 			# After loop, select the longest ORF
 			outf_protein.write(str(final_pep_ID)+'\n'+str(final_peptide_seq)+'\n')
+			outf_transcript_CDS.write(str(final_pep_ID)+'\n'+str(final_transcript)+'\n')
 		else:  # No paired start/stop codon is found
 			final_pep_ID = '>'+str(chrom)+'_'+strand+'_0_1_CDS:none_'+ENST_ID+'_'+ENSG_ID+'_0#1_withoutGTF'
 
@@ -534,4 +547,5 @@ for line in inf:
 
 inf.close()
 outf_transcript.close()
+outf_transcript_CDS.close()
 outf_protein.close()	

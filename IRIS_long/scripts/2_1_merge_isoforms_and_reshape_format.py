@@ -55,6 +55,7 @@ column = 2
 cell2subtype_dict = defaultdict()
 sample_list_2 = []
 ave_pro_dict = defaultdict()
+max_pro_dict = defaultdict()
 outf_2_name = re.sub(".txt", "_reshaped.txt", proportion_inf_name.split('/')[-1])
 outf_2 = open(outf_dir+'/'+outf_2_name, "w")
 outf_2.write("Gene_ID\tTranscript_ID\tSample\tProportion\tSubtype\n")
@@ -77,7 +78,9 @@ with open(proportion_inf_name, "r") as inf_2:
 			trans_ID = arr[0].split(".")[0]
 		if gene_ID not in ave_pro_dict:
 			ave_pro_dict[gene_ID] = defaultdict()
+			max_pro_dict[gene_ID] = defaultdict()
 		ave_pro_dict[gene_ID][trans_ID] = np.nanmean(np.array(list(map(float,arr[column:len(arr)]))))
+		max_pro_dict[gene_ID][trans_ID] = np.nanmax(np.array(list(map(float,arr[column:len(arr)]))))
 		for i in range(column,len(arr)):
 			this_sample = sample_list_2[i-column]
 			this_subtype = cell2subtype_dict[this_sample]
@@ -94,7 +97,7 @@ for each_gene in ave_pro_dict:
 				top_exp_trans_dict[each_gene].append(each_value)
 	sorted_key = sorted(ave_pro_dict[each_gene].items(), key=lambda x:float(x[1]), reverse = True)
 	for index,each_item in enumerate(sorted_key):
-		if (len(top_exp_trans_dict[each_gene]) >= 5) or (ave_pro_dict[each_gene][each_item[0]] < 10):
+		if (len(top_exp_trans_dict[each_gene]) >= 5) or (max_pro_dict[each_gene][each_item[0]] < 10):
 			break
 		else:
 			if each_item[0] not in top_exp_trans_dict[each_gene]:
@@ -210,6 +213,4 @@ for each_gene in Others_exp_dict:
 		this_subtype = cell2subtype_dict[each_sample]
 		this_CPM = Others_exp_dict[each_gene][each_sample]
 		outf_4.write(each_gene+"\tOthers\t"+each_sample+"\t"+str(this_CPM)+"\t"+this_subtype+"\t"+subtype2color_dict[this_subtype]+"\n")
-outf_4.close()
-rs\t"+each_sample+"\t"+str(this_CPM)+"\t"+this_subtype+"\t"+subtype2color_dict[this_subtype]+"\n")
 outf_4.close()
