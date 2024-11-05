@@ -502,14 +502,15 @@ for line in inf:
 			final_peptide_seq = ''
 			peptide_length = 0
 			final_pep_link = ''
+			final_trans_CDS = ''
 			for each_pair in pair_codon:
 				ss = each_pair.split('#')[0]
 				ee = each_pair.split('#')[1]
-				final_transcript = final_seq[int(ss):int(ee)+3]
-				splicing_site_position = [i.start() for i in re.finditer("[a-z]", final_transcript)]
+				this_transcript_CDS = final_seq[int(ss):int(ee)+3]
+				splicing_site_position = [i.start() for i in re.finditer("[a-z]", this_transcript_CDS)]
 				print(ss,ee,transcript_link)
 				absolute_position = genome_position(ss,ee,transcript_link)
-				peptides=str(Seq(final_transcript).translate()).rstrip("/*")
+				peptides=str(Seq(this_transcript_CDS).translate()).rstrip("/*")
 				peptides_with_ss = lower_ss(peptides,splicing_site_position)
 				#remove final stop codon-derived AA
 				if peptides_with_ss[-1]=='*':   
@@ -528,6 +529,7 @@ for line in inf:
 					final_pep_ID = this_pep_ID+'_withoutGTF'
 					final_peptide_seq = peptides_with_ss
 					final_pep_link = this_pep_link
+					final_trans_CDS = this_transcript_CDS
 					peptide_length = this_pep_len
 					continue
 			# Decide NMD
@@ -538,7 +540,7 @@ for line in inf:
 				final_pep_ID = final_pep_ID + ':PC'
 			# After loop, select the longest ORF
 			outf_protein.write(str(final_pep_ID)+'\n'+str(final_peptide_seq)+'\n')
-			outf_transcript_CDS.write(str(final_pep_ID)+'\n'+str(final_transcript)+'\n')
+			outf_transcript_CDS.write(str(final_pep_ID)+'\n'+str(final_trans_CDS)+'\n')
 		else:  # No paired start/stop codon is found
 			final_pep_ID = '>'+str(chrom)+'_'+strand+'_0_1_CDS:none_'+ENST_ID+'_'+ENSG_ID+'_0#1_withoutGTF'
 
