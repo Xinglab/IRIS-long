@@ -196,7 +196,7 @@ def Sub_process(dir_path, args):
 	print (cmd_process_2)
 	os.system(cmd_process_2)
 	# 1.3 merge to gene level, and generate files to filter out bad-quality genes
-	out_file_name = re.sub(".txt|.esp", f"_CPM.txt", input_abundance.split('/')[-1])
+	out_file_name = 'samples_abundance_combined_CPM.txt'
 	cmd_process_3 = f"python {dir_path}/scripts/1_3_merge_to_gene_CPM.py {outf_dir}/{out_file_name}"
 	print (cmd_process_3)
 	os.system(cmd_process_3)
