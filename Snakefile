@@ -59,74 +59,49 @@ def get_gencode_fasta(wildcards):
 	elif config['genome_version'] in ['hg19','GRCh37']:
 		return os.path.join(config['IRIS_long_path'], 'scripts', 'references', 'gencode.v34lift37.pc_translations.fa')
 
-
 rule download_genome_fasta:
 	output:
-		genome_fasta=os.path.join(config['IRIS_long_path'], 'scripts', 'references', 'GRCh38.primary_assembly.genome.fa') if config['genome_version'] in ['hg38','GRCh38'] else os.path.join(config['IRIS_long_path'], 'scripts', 'references', 'hg19.fa'),
+		genome_fasta=get_genome_fasta(None),
 	log:
 		out=os.path.join(config['outf_dir'], 'log_dir', 'download_genome_fasta.out'),
 		err=os.path.join(config['outf_dir'], 'log_dir', 'download_genome_fasta.err'),
 	params:
 		genome_fasta_url=config['genome_fasta_url'],
-	resources:
-		mem_mb=config['general_mem_gb'] * 1024,
-		time_hours=config['general_time_hr'],
 	shell:
-		'curl -L \'{params.genome_fasta_url}\' -o {output.genome_fasta}.gz'
-		' 1> {log.out}'
-		' 2> {log.err}'
-		' && '
-		'gunzip {output.genome_fasta}.gz'
-		' 1>> {log.out}'
-		' 2>> {log.err}'
+		'curl -L {params.genome_fasta_url} -o {output.genome_fasta}.gz && '
+		'gunzip {output.genome_fasta}.gz 1>> {log.out} 2>> {log.err}'
 
 rule download_genome_gtf:
 	output:
-		genome_gtf=os.path.join(config['IRIS_long_path'], 'scripts', 'references', f"genome.v{config['gencode_release_version']}.annotation.gtf") if config['genome_version'] in ['hg38','GRCh38'] else os.path.join(config['IRIS_long_path'], 'scripts', 'references', 'genome.v34lift37.annotation.gtf'),
+		genome_gtf=get_genome_gtf(None),
 	log:
 		out=os.path.join(config['outf_dir'], 'log_dir', 'download_genome_gtf.out'),
 		err=os.path.join(config['outf_dir'], 'log_dir', 'download_genome_gtf.err'),
 	params:
 		genome_gtf_url=config['genome_gtf_url'],
-	resources:
-		mem_mb=config['general_mem_gb'] * 1024,
-		time_hours=config['general_time_hr'],
 	shell:
-		'curl -L \'{params.genome_gtf_url}\' -o {output.genome_gtf}.gz'
-		' 1> {log.out}'
-		' 2> {log.err}'
-		' && '
-		'gunzip {output.genome_gtf}.gz'
-		' 1>> {log.out}'
-		' 2>> {log.err}'
+		'curl -L {params.genome_gtf_url} -o {output.genome_gtf}.gz && '
+		'gunzip {output.genome_gtf}.gz 1>> {log.out} 2>> {log.err}'
 
 rule download_additional_file:
 	output:
-		gencode_fasta=os.path.join(config['IRIS_long_path'],'scripts','references',f"gencode.v{config['gencode_release_version']}.pc_translations.fa") if config['genome_version'] in ['hg38','GRCh38'] else os.path.join(config['IRIS_long_path'], 'scripts', 'references', 'gencode.v34lift37.pc_translations.fa'),
+		gencode_fasta=get_gencode_fasta(None),
 	log:
 		out=os.path.join(config['outf_dir'], 'log_dir', 'download_additional_file.out'),
 		err=os.path.join(config['outf_dir'], 'log_dir', 'download_additional_file.err'),
 	params:
 		gencode_fasta_url=f"https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_{config['gencode_release_version']}/gencode.v{config['gencode_release_version']}.pc_translations.fa.gz",
-	resources:
-		mem_mb=config['general_mem_gb'] * 1024,
-		time_hours=config['general_time_hr'],
 	shell:
-		'curl -L \'{params.gencode_fasta_url}\' -o {output.gencode_fasta}.gz'
-		' 1> {log.out}'
-		' 2> {log.err}'
-		' && '
-		'gunzip {output.gencode_fasta}.gz'
-		' 1>> {log.out}'
-		' 2>> {log.err}'
+		'curl -L {params.gencode_fasta_url} -o {output.gencode_fasta}.gz && '
+		'gunzip {output.gencode_fasta}.gz 1>> {log.out} 2>> {log.err}'
 
 rule pre_processing:
 	input:
 		transcript_gtf = config['input_transcript_gtf'],
 		transcript_abundance = config['input_transcript_abundance_matrix'],
-		download_gencode_fasta = get_gencode_fasta,
-		download_genome_gtf = get_genome_gtf,
-		download_genome_fasta = get_genome_fasta,
+		download_gencode_fasta = get_gencode_fasta(None),
+		download_genome_gtf = get_genome_gtf(None),
+		download_genome_fasta = get_genome_fasta(None),
 	output:
 		trans_CPM = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM.txt"),
 		trans_proportion = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_proportion.txt"),
@@ -145,7 +120,7 @@ rule pre_processing:
 		mem_mb=config['general_mem_gb'] * 1024,
 		time_hours=config['general_time_hr'],
 	shell:
-		'python {params.IRIS_long} Preprocess' 
+		'{params.conda_wrapper} python {params.IRIS_long} Preprocess' 
 		' --input_gtf {input.transcript_gtf}'
 		' --input_abundance {input.transcript_abundance}'
 		' --normalized_mode {params.normalized_mode}'
@@ -180,7 +155,7 @@ rule DE_transcripts:
 		mem_mb=config['general_mem_gb'] * 1024,
 		time_hours=config['general_time_hr'],
 	shell:
-		'python {params.IRIS_long} DiffTest' 
+		'{params.conda_wrapper} python {params.IRIS_long} DiffTest' 
 		' --isoform_cpm_inf {input.trans_CPM}'
 		' --tumor_num {params.num_tumor_sample}'
 		' --enriched_test_p {params.enriched_test_p_value}'
@@ -218,7 +193,7 @@ rule translation:
 		mem_mb=config['general_mem_gb'] * 1024,
 		time_hours=config['general_time_hr'],
 	shell:
-		'python {params.IRIS_long} Translation' 
+		'{params.conda_wrapper} python {params.IRIS_long} Translation' 
 		' --mode {params.mode}'
 		' --trans_gtf {input.transcript_gtf}'
 		' --isoform_cpm_inf {input.trans_CPM}'
@@ -260,7 +235,7 @@ rule CAR_T_prediction:
 		mem_mb=config['general_mem_gb'] * 1024,
 		time_hours=config['general_time_hr'],
 	shell:
-		'python {params.IRIS_long} CAR_T' 
+		'{params.conda_wrapper} python {params.IRIS_long} CAR_T' 
 		' --tmhmm_dir {params.tmhmm_dir}'
 		' --tumor_num {params.num_tumor_sample}'
 		' --protein_inf {input.PC_fasta}'
@@ -314,7 +289,7 @@ rule TCR_prediction:
 		mem_mb=config['general_mem_gb'] * 1024,
 		time_hours=config['general_time_hr'],
 	shell:
-		'python {params.IRIS_long} TCR' 
+		'{params.conda_wrapper} python {params.IRIS_long} TCR' 
 		' --netMHCpan_dir {params.netMHCpan_dir}'
 		' --HLA_str_inf {params.HLA_str_inf}'
 		' --isoform_cpm_inf {input.trans_CPM}'
@@ -361,7 +336,7 @@ rule figure:
 		mem_mb=config['general_mem_gb'] * 1024,
 		time_hours=config['general_time_hr'],
 	shell:
-		'python {params.IRIS_long} Figure' 
+		'{params.conda_wrapper} python {params.IRIS_long} Figure' 
 		' --isoform_proportion_inf {input.trans_proportion}'
 		' --isoform_cpm_inf {input.trans_CPM}'
 		' --group_info_inf {input.group_info_inf}'
