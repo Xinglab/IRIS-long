@@ -50,20 +50,52 @@ outf_sh.write("s=$(sed -n \"${SLURM_ARRAY_TASK_ID}p\" %s/6_1_perform_netMHCpan_c
 outf_sh.close()
 
 outf_sh_array = open("%s/6_1_perform_netMHCpan_cmd" % outf_dir, "w")
+outf_name_list = []
 for each_HLA_str in HLA_list:
 	outf_sh_array.write("%s/netMHCpan -inptype 0 -f %s/6_1_Tumor_vs_normal_DE_prevalence_protein.fasta -BA -t 2 -s -l %s -a %s > %s/6_1_TCR_temp_out_%s.txt\n" % (netMHCpan_dir, outf_dir, window_size, each_HLA_str, outf_dir, each_HLA_str))
+	outf_name_list.append("%s/6_1_TCR_temp_out_%s.txt" % (outf_dir, each_HLA_str))
 outf_sh_array.close()	
 
 command_1 = f"sbatch {outf_dir}/6_1_perform_netMHCpan.sh"
 print(command_1)
 os.system(command_1)
 
-if int(window_size) == 9:
-	# Wait for 3 hours (10,800 seconds)
-	time.sleep(10800)
-else:
-	time.sleep(32400)
 
+##### check if files are completed or not #####
+# Wait for job completion based on file size stability
+job_completed = False
+job_completed_dict = defaultdict(lambda: 0)
+max_wait_time = 12 * 3600  # 12 hours
+check_interval = 300  # 5 minutes
+waited_time = 0
+previous_size_dict = defaultdict(lambda: -1)
+current_size_dict = defaultdict()
+
+while not job_completed and waited_time < max_wait_time:
+	for each_file in outf_name_list:
+		key_name = each_file.split("/")[-1].split(".")[0]
+		if os.path.exists(each_file):
+			current_size_dict[key_name] = os.path.getsize(each_file)
+			if current_size_dict[key_name] == previous_size_dict[key_name]:  # File size hasn't changed
+				job_completed_dict[key_name] = 1
+			else:
+				previous_size_dict[key_name] = current_size_dict[key_name]  # Update previous size
+		else:
+			previous_size_dict[key_name] = -1  # Reset if file doesn't exist
+
+	# Check if all jobs are completed
+	if sum(job_completed_dict.values()) == len(outf_name_list):
+		job_completed = True
+	else:
+		time.sleep(check_interval)
+		waited_time += check_interval
+
+if not job_completed:
+	print("Job did not complete within the expected time or file size stopped updating.")
+	sys.exit(1)
+
+
+###### Once all files are generated #####
 os.system("cat %s/6_1_TCR_temp_out_*.txt > %s/6_1_TCR_temp_out.txt" % (outf_dir, outf_dir))
 
 ############## process netMHCpan result #############

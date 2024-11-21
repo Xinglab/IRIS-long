@@ -27,7 +27,8 @@ with open(inf_name,'r') as inf:
 		CPM_list = np.array(list(map(float, arr[3:len(arr)])))
 		gene_CPM_dict[gene_ID] += CPM_list
 
-outf_name = re.sub(".esp$|.txt$",'_proportion.txt',inf_name)
+dire_path = '/'.join(os.path.abspath(inf_name).split('/')[0:-1])
+outf_name = dire_path+"/samples_abundance_combined_CPM_proportion.txt"
 outf = open(outf_name, 'w')
 with open(inf_name,'r') as inf2:
 	for index,line in enumerate(inf2):

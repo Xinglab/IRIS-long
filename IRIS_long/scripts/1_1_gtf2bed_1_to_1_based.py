@@ -20,7 +20,7 @@ if len(sys.argv) > 2:
 else:
 	inf_abundance_name = 'NA'
 
-outf_name = outf_path+'/'+key_word+'_BedGraph.bed'
+outf_name = outf_path+'/samples_BedGraph.bed'
 outf = open(outf_name, 'w')
 outf.write('track name="%s" visibility=dense\n' % key_word)
 

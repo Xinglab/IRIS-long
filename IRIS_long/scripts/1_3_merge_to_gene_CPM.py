@@ -28,8 +28,8 @@ for index,line in enumerate(inf_2):
 inf_2.close()
 
 dire_path = '/'.join(os.path.abspath(inf_name).split('/')[0:-1])
-outf_name = dire_path+'/'+re.sub(".esp$|.txt$","_gene.txt",inf_name.split('/')[-1])
-outf_name_anno_percentage = dire_path+'/'+re.sub(".esp$|.txt$","_gene_annotated_isoform_contribution.txt",inf_name.split('/')[-1])
+outf_name = dire_path+'/samples_abundance_combined_CPM_gene.txt'
+outf_name_anno_percentage = dire_path+'/samples_abundance_combined_CPM_gene_annotated_isoform_contribution.txt'
 outf_3 = open(outf_name,'w')
 outf_3.write('Gene_ID\t'+'\t'.join(sample_list)+'\n')
 outf_4 = open(outf_name_anno_percentage,'w')

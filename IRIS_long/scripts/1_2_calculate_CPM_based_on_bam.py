@@ -47,7 +47,7 @@ elif mode in ['Sam','sam','SAM']:
 
 
 dire_path = '/'.join(os.path.abspath(inf_name).split('/')[0:-1])
-outf_name = out_folder+'/'+re.sub(".esp$|.txt$", "_CPM.txt", inf_name.split('/')[-1])
+outf_name = out_folder+'/samples_abundance_combined_CPM.txt'
 outf_3 = open(outf_name,'w')
 inf_3 = open(inf_name,'r')
 with open(inf_name) as inf_3:
