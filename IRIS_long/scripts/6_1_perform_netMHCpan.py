@@ -66,7 +66,7 @@ os.system(command_1)
 job_completed = False
 job_completed_dict = defaultdict(lambda: 0)
 max_wait_time = 12 * 3600  # 12 hours
-check_interval = 300  # 5 minutes
+check_interval = 1800  # 30 minutes
 waited_time = 0
 previous_size_dict = defaultdict(lambda: -1)
 current_size_dict = defaultdict()
@@ -84,6 +84,7 @@ while not job_completed and waited_time < max_wait_time:
 			previous_size_dict[key_name] = -1  # Reset if file doesn't exist
 
 	# Check if all jobs are completed
+	print(job_completed_dict)
 	if sum(job_completed_dict.values()) == len(outf_name_list):
 		job_completed = True
 	else:

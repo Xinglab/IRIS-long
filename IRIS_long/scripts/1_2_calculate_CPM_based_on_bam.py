@@ -57,7 +57,7 @@ with open(inf_name) as inf_3:
 			outf_3.write(line)
 			continue
 		else:
-			if str(arr[2]) == "NA": continue
+			if (str(arr[2]) == "NA") or (arr[2] == ""): continue
 			if re.findall("ESPRESSO:GL", arr[0]) or re.findall("ESPRESSO:KI", arr[0]): continue
 			value_list = np.array(list(map(float,arr[value_column:len(arr)])))*1000000/Total_reads_list
 			str1 = get_right_ID(arr[0])+"\t"+arr[1]+"\t"+get_right_ID(arr[2])
