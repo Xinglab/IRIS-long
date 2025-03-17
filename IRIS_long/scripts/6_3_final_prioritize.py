@@ -85,17 +85,20 @@ with open("%s/6_2_peptide_matrix_WindowSize_%s_TCR.txt" % (outf_dir, window_size
 peptide2score_mean_dict = defaultdict()
 peptide2score_median_dict = defaultdict()
 log2_CPM_dict = defaultdict()
+tissue_prevalence_dict = defaultdict()
 with open("%s/6_2_specificity_score_matrix_WindowSize_%s_TCR.txt" % (outf_dir, window_size), 'r') as inf_s2:
 	for index,line in enumerate(inf_s2):
 		arr = line.strip().split('\t')
 		if index == 0: continue
 		##### All the filterings ############
-		if float(arr[-1]) <= score_cutoff: continue
+		#if float(arr[-1]) <= score_cutoff: continue
 		tissue_array = np.array(list(map(float, arr[tumor_count+1:len(arr)-2])))
 		log2_CPM_dict[arr[0]] = ";".join(list(map(str, tissue_array)))
 		n_expressed_tissue = int(np.count_nonzero(tissue_array >= np.log2(tissue_CPM_cutoff+1)))
-		if int(np.count_nonzero(tissue_array >= np.log2(tissue_CPM_cutoff+1))) >= tissue_percentage_cutoff*len(tissue_array): continue
-		#if tissue_median >= np.log2(tissue_CPM_cutoff+1): continue
+		if int(np.count_nonzero(tissue_array >= np.log2(tissue_CPM_cutoff+1))) >= tissue_percentage_cutoff*len(tissue_array): 
+			tissue_prevalence_dict[arr[0]] = "Failed"
+		else:
+			tissue_prevalence_dict[arr[0]] = "Passed"
 
 		##### Only keep peptides pass all filterings ########
 		peptide2score_mean_dict[arr[0]] = float(arr[-2])
@@ -105,6 +108,7 @@ pep_list = []
 trans_list = []
 gene_list = []
 gene_name_list = []
+[n_start, n_out_1, n_out_2, n_out_3, n_end] = [0,0,0,0,0]
 #outf = open("./6_Summarized_TCR_prioritized_targets_score_without_limit.txt", "w")
 outf = open("%s/6_3_Summarized_TCR_prioritized_targets.txt" % outf_dir, "w")
 with open("%s/6_1_Summarized_TCR_netMHCpan_reshaped_out.txt" % outf_dir, "r") as inf:
@@ -114,13 +118,24 @@ with open("%s/6_1_Summarized_TCR_netMHCpan_reshaped_out.txt" % outf_dir, "r") as
 			outf.write('\t'.join(arr)+'\tGRAVY_hydrophobicity\tIsoelectric_point\tlog2FC_mean\tlog2FC_median\tDerived_transcripts\tDerived_genes\tDerived_gene_names\tPeptide_position\tGenomic_position\tlog2_tissue_CPM_list\n')
 			continue
 		peptide = arr[0]
+		n_start += 1
+		## Tissue prevalence assessment ##
+		if tissue_prevalence_dict[peptide] == "Failed": 
+			n_out_1 += 1
+			continue
+		## Peptide specificity assessment ##
+		if float(peptide2score_median_dict[peptide]) <= score_cutoff: 
+			n_out_2 += 1
+			continue
+		## HLA-peptide binding assessment ##
 		bind_aff = np.min(list(map(float, arr[4].split(';'))))
-		if re.findall('SB', arr[-1]):
+		if (re.findall('SB', arr[-1])) and (bind_aff < binding_affi_cutoff):
 			pass
 		else:
+			n_out_3 += 1
 			continue
-		if bind_aff >= binding_affi_cutoff: continue
-		if peptide not in peptide2score_median_dict: continue
+		## filtered TCR targets ##
+		n_end += 1
 		this_pep_match_trans_list = []
 		this_pep_match_gene_list = []
 		this_pep_match_gene_name_list = []
@@ -165,5 +180,10 @@ outf_stats = open("%s/6_3_Summarized_TCR_prioritized_targets_stats.txt" % outf_d
 outf_stats.write("Target peptide (%sAA)\t"%window_size + str(len(pep_list))+'\n')
 outf_stats.write("Target transcripts\t"+str(len(trans_list))+'\n')
 outf_stats.write("Target gene\t"+str(len(gene_list))+'\n')
+outf_stats.write("Number of targets before filtering\t"+str(n_start)+'\n')
+outf_stats.write("Number of targets that have been filtered out in step1: Tissue prevalence assessment\t"+str(n_out_1)+'\n')
+outf_stats.write("Number of targets that have been filtered out in step2: Peptide specificity assessment\t"+str(n_out_2)+'\n')
+outf_stats.write("Number of targets that have been filtered out in step3: HLA-peptide binding assessment\t"+str(n_out_3)+'\n')
+outf_stats.write("Number of targets after filtering\t"+str(n_end)+'\n')
 outf_stats.close()
 

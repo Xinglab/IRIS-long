@@ -142,7 +142,7 @@ trans_reorder_color_table <- trans_color_table[match(trans_reorder_list, trans_c
 #trans_color_list <- as.vector(trans_reorder_color_table[,1])
 trans_color_list <- trans_color_original_list 
 
-group_color_original_list <- c("#FF0018","#e68e19","#02a620","#0000F9","#86007D")
+group_color_original_list <- rep(c("#FF0018","#e68e19","#02a620","#0000F9","#86007D"), 5)
 group_color_list <- group_color_original_list[0:length(unique(gene_data$Subtype))]
 #group_color_list <- c(group_color_list[-length(group_color_list)], "#86007D")
 
@@ -182,7 +182,12 @@ if ("DMS79" %in% as.vector(trans_data$Sample)){
 }
 sub_color <- as.vector(trans_data$Subtype_color)
 
-
+max_CPM <- max(gene_data_exp$CPM)
+if (max_CPM > 150){
+	upper_limit <- ceiling(max_CPM/100) * 100
+}else{
+	upper_limit <- ceiling(max_CPM/10) * 10
+}
 ## plot ##
 f_fig_exp <- ggplot(gene_data_exp, aes(x=Sample, y=CPM, fill=Transcript_ID, group=Transcript_ID))
 f_fig_exp <- f_fig_exp + geom_point(aes(y=NA_integer_, color = Subtype),size=6,shape=15)
@@ -195,6 +200,7 @@ f_fig_exp <- f_fig_exp + geom_bar(stat="identity", position = position_stack(vju
 f_fig_exp <- f_fig_exp + scale_fill_manual(values = trans_color_list)
 f_fig_exp <- f_fig_exp + theme(panel.grid.major = element_line(color = "white", linewidth=0.01),panel.grid.minor = element_line(color = "white", linewidth=0.01), axis.title.y=element_text(size = font_size), axis.text.y=element_text(size = font_size+2), axis.title.x=element_blank(), axis.ticks.x=element_blank(), axis.text.x=element_blank(), plot.title = element_blank(), legend.position ='none', legend.title = element_text(size = font_size-1), legend.text = element_text(size = font_size-1), panel.border = element_rect(fill=NA, linewidth=0.3, colour ="black"), panel.background = element_blank(), legend.box="horizontal", legend.direction="horizontal", plot.margin = unit(c(5,5,0.5,5), "pt"))
 f_fig_exp <- f_fig_exp + labs(x="", y="Abundance (CPM)", title="")
+f_fig_exp <- f_fig_exp + scale_y_continuous(limits = c(0, upper_limit))
 #f_fig_exp <- f_fig_exp + guides(fill = guide_legend(reverse = FALSE, nrow=2, label.theme = element_text(size = 5),keywidth=1, keyheight=1, order=1)) + guides(color = guide_legend(reverse = FALSE, nrow=2, label.theme = element_text(size = 5), keywidth=1, keyheight=1, order=2))
 
 

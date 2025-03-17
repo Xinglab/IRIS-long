@@ -86,6 +86,7 @@ with open(other_isoform_contri_inf_name, 'r') as gene_inf_2:
 print ("number of black list genes:", len(black_list_gene))
 '''
 
+[n_start, n_out_1, n_out_3] = [0,0,0]
 outf = open("%s/5_5_Summarized_CAR_T_prioritized_targets_temp.txt" % outf_dir, "w")
 with open(tumor_vs_normal_inf_name, "r") as inf:
 	for index,line in enumerate(inf):
@@ -93,12 +94,23 @@ with open(tumor_vs_normal_inf_name, "r") as inf:
 		if index == 0: 
 			outf.write(line)
 			continue
+		n_start += 1
 		gene_ID = get_right_ID(arr[1])
 		trans_ID = get_right_ID(arr[0])
-		if arr[-3] not in ['Identified by both: consistent', 'Annotated_cell_surface:TM', 'Annotated_cell_surface:Other', 'Annotated_cell_surface:membrane_protein']: continue
-		if gene_ID in black_list_gene: continue
-		if trans_ID in black_list_trans: continue
 		gene_name = ID2name_dict[gene_ID] if gene_ID in ID2name_dict else gene_ID
+		## Tissue prevalence assessment ##
+		if trans_ID in black_list_trans:
+			n_out_1 += 1
+			continue
+		## Tissue prevalence assessment ##
+		if arr[-3] not in ['Identified by both: consistent', 'Annotated_cell_surface:TM', 'Annotated_cell_surface:Other', 'Annotated_cell_surface:membrane_protein']: 
+			n_out_3 += 1
+			continue
+		#if gene_ID in black_list_gene: continue		
 		outf.write(line)
 outf.close()
+
+print("Number of targets before filtering\t"+str(n_start)+'\n')
+print("Number of targets that have been filtered out in step1: Tissue prevalence assessment\t"+str(n_out_1)+'\n')
+print("Number of targets that have been filtered out in step3: Peptide surface presentation assessment\t"+str(n_out_3)+'\n')
 
