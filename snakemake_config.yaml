@@ -4,10 +4,10 @@ general_threads: 3
 general_time_hr: 40
 
 # Input samples
-input_transcript_abundance_matrix: "/mnt/isilon/xing_lab/aspera/xuy/IRIS-long_SCLC_test/test_abun.txt"
-input_transcript_gtf: "/mnt/isilon/xing_lab/aspera/xuy/IRIS-long_SCLC_test/test.gtf"
+input_transcript_abundance_matrix: "/mnt/isilon/xing_lab/aspera/xuy/espresso/snakemake_SCLC/espresso_out/q_work_dir/samples_abundance_combined.txt"
+input_transcript_gtf: "/mnt/isilon/xing_lab/aspera/xuy/espresso/snakemake_SCLC/espresso_out/q_work_dir/samples_updated_combined.gtf"
 tumor_key_word: "SCLC"
-outf_dir: "/mnt/isilon/xing_lab/aspera/xuy/IRIS-long_SCLC_test/test_out"
+outf_dir: "/mnt/isilon/xing_lab/aspera/xuy/IRIS-long_SCLC/SCLC_ESPRESSO_combined/"
 
 # Genome fasta and gtf will be downloaded automatically if missing
 genome_version: "hg38"
@@ -43,8 +43,8 @@ maximal_peptide_cpm_in_tissue_TCR: 5
 maximal_tissue_percentage_TCR: 0.1
 
 # Parameters in CAR-T prediction:
-minimum_specificity_score_CAR_T: 3
-maximal_peptide_cpm_in_tissue_CAR_T: 10
+minimum_specificity_score_CAR_T: 5
+maximal_peptide_cpm_in_tissue_CAR_T: 5
 maximal_tissue_percentage_CAR_T: 0.1
 
 # Parameters in figure generation:
@@ -52,7 +52,7 @@ group_info_inf: "group_info.txt"
 required_trans_inf: "required_trans.txt"
 
 # Additional configuration
-IRIS_long_path: "/mnt/isilon/xing_lab/aspera/xuy/Test/IRIS_long_2/"
+IRIS_long_path: "/mnt/isilon/xing_lab/aspera/xuy/Test/IRIS_long/"
 tmhmm_dir: "/mnt/isilon/xing_lab/aspera/xuy/tmhmm-2.0c/bin/"
 netMHCpan_dir: "/home/xuy2/xuy2/program/netMHCpan-4.1/"
 conda_wrapper: '/mnt/isilon/xing_lab/aspera/xuy/Test/conda_wrapper'

@@ -31,7 +31,9 @@ rule all:
 def check_all_results():
 	outputs = dict()
 	outputs['CAR_T_result'] = os.path.join(config['outf_dir'], "CAR_T", "5_5_Summarized_CAR_T_prioritized_targets_final.txt")
+	outputs['CAR_T_evaluation']= os.path.join(config['outf_dir'], "CAR_T", "5_6_GTEx_gene_tpm_for_CAR_T_targets.txt"),
 	outputs['TCR_result'] = os.path.join(config['outf_dir'], "TCR", "6_3_Summarized_TCR_prioritized_targets.txt")
+	outputs['TCR_evaluation']= os.path.join(config['outf_dir'], "TCR", "6_4_GTEx_transcript_tpm_for_TCR_targets.txt")
 	outputs['Figure_sh'] = os.path.join(config['outf_dir'], "Template_to_generate_figures.sh")
 	return outputs
 
@@ -256,6 +258,28 @@ rule CAR_T_prediction:
 		' 1> {log.out}'
 		' 2> {log.err}'
 
+rule CAR_T_evaluation:
+	input:
+		CAR_T_output= os.path.join(config['outf_dir'], "CAR_T", "5_5_Summarized_CAR_T_prioritized_targets_final.txt"),
+		TE_trans_category = os.path.join(config['outf_dir'], "3_1_Tumor_vs_normal_DE_test_category.txt"),
+	output:
+		CAR_T_GTEx_gene_output= os.path.join(config['outf_dir'], "CAR_T", "5_6_GTEx_gene_tpm_for_CAR_T_targets.txt"),
+		CAR_T_GTEx_transcript_output= os.path.join(config['outf_dir'], "CAR_T", "5_6_GTEx_transcript_tpm_for_CAR_T_targets.txt"),
+	params:
+		conda_wrapper = config['conda_wrapper'],
+		IRIS_long_path = config['IRIS_long_path'],
+	log:
+		out=os.path.join(config['outf_dir'], 'log_dir', 'CAR_T_evaluation.out'),
+		err=os.path.join(config['outf_dir'], 'log_dir', 'CAR_T_evaluation.err'),
+	resources:
+		mem_mb=config['general_mem_gb'] * 1024,
+		time_hours=config['general_time_hr'],
+	shell:
+		"""
+		{params.conda_wrapper} python {params.IRIS_long_path}/scripts/5_7_short_read_RNA-seq_GTEx.py {input.CAR_T_output} {input.TE_trans_category}
+		{params.conda_wrapper} python {params.IRIS_long_path}/scripts/5_8_immunopeptidomics_peptide_check.py {input.CAR_T_output}
+		"""
+
 rule TCR_prediction:
 	input:
 		PC_NMD_fasta = os.path.join(config['outf_dir'], f"4_4_{config['tumor_key_word']}_PC_and_NMD.fasta"),
@@ -311,6 +335,28 @@ rule TCR_prediction:
 		' --outf_dir {params.outf_dir}'
 		' 1> {log.out}'
 		' 2> {log.err}'
+
+rule TCR_evaluation:
+	input:
+		TCR_output= os.path.join(config['outf_dir'], "TCR", "6_3_Summarized_TCR_prioritized_targets.txt"),
+		TE_trans_category = os.path.join(config['outf_dir'], "3_1_Tumor_vs_normal_DE_test_category.txt"),
+	output:
+		TCR_GTEx_gene_output= os.path.join(config['outf_dir'], "TCR", "6_4_GTEx_gene_tpm_for_TCR_targets.txt"),
+		TCR_GTEx_transcript_output= os.path.join(config['outf_dir'], "TCR", "6_4_GTEx_transcript_tpm_for_TCR_targets.txt"),
+	params:
+		conda_wrapper = config['conda_wrapper'],
+		IRIS_long_path = config['IRIS_long_path'],
+	log:
+		out=os.path.join(config['outf_dir'], 'log_dir', 'TCR_evaluation.out'),
+		err=os.path.join(config['outf_dir'], 'log_dir', 'TCR_evaluation.err'),
+	resources:
+		mem_mb=config['general_mem_gb'] * 1024,
+		time_hours=config['general_time_hr'],
+	shell:
+		"""
+		{params.conda_wrapper} python {params.IRIS_long_path}/scripts/6_4_short_read_RNA-seq_GTEx.py {input.TCR_output} {input.TE_trans_category}
+		{params.conda_wrapper} python {params.IRIS_long_path}/scripts/6_5_immunopeptidomics_peptide_check.py {input.TCR_output}
+		"""
 
 rule figure:
 	input:
