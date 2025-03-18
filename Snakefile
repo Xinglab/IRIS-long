@@ -106,6 +106,7 @@ rule pre_processing:
 		download_genome_fasta = get_genome_fasta(None),
 	output:
 		trans_CPM = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM.txt"),
+		gene_CPM = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_gene.txt"),
 		trans_proportion = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_proportion.txt"),
 		anno_trans_contribution = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_gene_annotated_isoform_contribution.txt"),
 		bed_file = os.path.join(config['outf_dir'], "samples_BedGraph.bed"),
@@ -134,12 +135,16 @@ rule pre_processing:
 rule DE_transcripts:
 	input:
 		trans_CPM = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM.txt"),
+		trans_proportion = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_proportion.txt"),
+		gene_CPM = os.path.join(config['outf_dir'], "samples_abundance_combined_CPM_gene.txt"),
 	output:
 		TE_trans = os.path.join(config['outf_dir'], "3_1_Tumor_vs_normal_DE_test.txt"),
 		TS_trans = os.path.join(config['outf_dir'], "3_2_Tumor_vs_normal_prevalence.txt"),
+		TE_trans_category = os.path.join(config['outf_dir'], "3_1_Tumor_vs_normal_DE_test_category.txt"),
 	params:
 		conda_wrapper = config['conda_wrapper'],
 		IRIS_long = os.path.join(config['IRIS_long_path'], 'IRIS_long_main.py'),
+		IRIS_long_path = config['IRIS_long_path'],
 		outf_dir = config['outf_dir'],
 		num_tumor_sample = config['num_tumor_sample'], 
 		enriched_test_p_value = config['enriched_test_p_value'], 
@@ -157,20 +162,10 @@ rule DE_transcripts:
 		mem_mb=config['general_mem_gb'] * 1024,
 		time_hours=config['general_time_hr'],
 	shell:
-		'{params.conda_wrapper} python {params.IRIS_long} DiffTest' 
-		' --isoform_cpm_inf {input.trans_CPM}'
-		' --tumor_num {params.num_tumor_sample}'
-		' --enriched_test_p {params.enriched_test_p_value}'
-		' --enriched_test_tumor_cpm {params.enriched_test_cpm_in_tumor}'
-		' --enriched_test_fc {params.enriched_test_fc}'
-		' --specificity_test_tumor_cpm {params.specificity_test_cpm_in_tumor}'
-		' --specificity_test_tissue_cpm {params.specificity_test_cpm_in_tissue}'
-		' --specificity_test_tumor_percentage {params.specificity_test_minimum_percentage_in_tumor}'
-		' --specificity_test_tissue_percentage {params.specificity_test_maximal_percentage_in_tissue}'
-		' --specificity_test_exclude_tissue {params.specificity_test_exclude_tissue}'
-		' --outf_dir {params.outf_dir}'
-		' 1> {log.out}'
-		' 2> {log.err}'
+		"""
+		{params.conda_wrapper} python {params.IRIS_long} DiffTest --isoform_cpm_inf {input.trans_CPM} --tumor_num {params.num_tumor_sample} --enriched_test_p {params.enriched_test_p_value} --enriched_test_tumor_cpm {params.enriched_test_cpm_in_tumor} --enriched_test_fc {params.enriched_test_fc} --specificity_test_tumor_cpm {params.specificity_test_cpm_in_tumor} --specificity_test_tissue_cpm {params.specificity_test_cpm_in_tissue} --specificity_test_tumor_percentage {params.specificity_test_minimum_percentage_in_tumor} --specificity_test_tissue_percentage {params.specificity_test_maximal_percentage_in_tissue} --specificity_test_exclude_tissue {params.specificity_test_exclude_tissue} --outf_dir {params.outf_dir} 1> {log.out} 2> {log.err}
+		{params.conda_wrapper} python {params.IRIS_long_path}/scripts/3_3_Classify_tumor_enriched_transcripts.py {output.TE_trans} {output.TS_trans} {params.num_tumor_sample} {input.trans_proportion} {input.gene_CPM}
+		"""
 
 rule translation:
 	input:
