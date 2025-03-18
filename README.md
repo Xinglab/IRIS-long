@@ -26,7 +26,11 @@ chmod +x install
 ./install
 ```
 
-IRIS-long requires annotated genome fasta and gtf files, user-specified files should be downloaded firstly and moved into `~/IRIS_long/IRIS_long/scripts/references/`, otherwise genome fasta (hg38) and corresponding genocode gtf (genome.v39.annotation.gtf) will be downloaded and used automatically. 
+IRIS-long requires annotated genome fasta and gtf files, user-specified files should be downloaded firstly and moved into `~/IRIS_long/IRIS_long/scripts/references/`, otherwise genome fasta (hg38) and corresponding genocode gtf (genome.v39.annotation.gtf) will be downloaded and used automatically. Additionally, the compressed data matrix files should be decompressed before use:
+```
+cd ~/IRIS_long/IRIS_long/scripts/references/
+tar -zxvf Short_read_RNAseq_and_Immunopeptidomics.tar.gz
+```
 
 
 ## Dependencies
