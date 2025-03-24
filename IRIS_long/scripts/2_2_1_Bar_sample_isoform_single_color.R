@@ -181,7 +181,12 @@ sub_color <- as.vector(trans_data$Subtype_color)
 
 ## sort transcript based on proportion (based on above file) ##
 gene_data_exp$Transcript_ID <- factor(gene_data_exp$Transcript_ID, levels=isoform_order_list)
-max_CPM <- max(gene_data_exp$CPM)
+
+gene_data_exp_combinedly <- gene_data_exp %>%
+	group_by(Sample) %>%
+	summarise(Sum_CPM = sum(CPM))
+
+max_CPM <- max(gene_data_exp_combinedly$Sum_CPM)
 if (max_CPM > 150){
 	upper_limit <- ceiling(max_CPM/100) * 100
 }else{
