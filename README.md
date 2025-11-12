@@ -26,7 +26,8 @@ chmod +x install
 ./install
 ```
 
-IRIS-long requires annotated genome fasta and gtf files, user-specified files should be downloaded firstly and moved into `~/IRIS_long/IRIS_long/scripts/references/`, otherwise genome fasta (hg38) and corresponding genocode gtf (genome.v39.annotation.gtf) will be downloaded and used automatically. Additionally, the compressed data matrix files should be decompressed before use:
+IRIS-long requires annotated genome fasta and gtf files, user-specified files should be downloaded firstly and moved into `~/IRIS_long/IRIS_long/scripts/references/`, otherwise genome fasta (hg38) and corresponding genocode gtf (genome.v39.annotation.gtf) will be downloaded and used automatically. 
+Additionally, **the compressed data matrix files should be decompressed before use:**
 ```
 cd ~/IRIS_long/IRIS_long/scripts/references/
 tar -zxvf Short_read_RNAseq_and_Immunopeptidomics.tar.gz
@@ -623,5 +624,6 @@ Predicted potential CAR-T targets could be found in `./example_dataset/CAR_T/5_5
 Predicted potential TCR targets could be found in `./example_dataset/TCR/6_3_Summarized_TCR_prioritized_targets.txt`
 
 After modifying [./example_dataset/Template_to_generate_figures.sh](./example_dataset/Template_to_generate_figures.sh) accordingly, the generated figures of input transcript could be found in [./example_dataset/Example_res/](./example_dataset/Example_res/). 
+
 
 
