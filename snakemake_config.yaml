@@ -4,10 +4,10 @@ general_threads: 3
 general_time_hr: 40
 
 # Input samples
-input_transcript_abundance_matrix: "/mnt/isilon/xing_lab/aspera/xuy/espresso/snakemake_SCLC/espresso_out/q_work_dir/samples_abundance_combined.txt"
-input_transcript_gtf: "/mnt/isilon/xing_lab/aspera/xuy/espresso/snakemake_SCLC/espresso_out/q_work_dir/samples_updated_combined.gtf"
+input_transcript_abundance_matrix: "./samples_abundance_combined.txt"
+input_transcript_gtf: "./samples_updated_combined.gtf"
 tumor_key_word: "SCLC"
-outf_dir: "/mnt/isilon/xing_lab/aspera/xuy/IRIS-long_SCLC/SCLC_ESPRESSO_combined/"
+outf_dir: "./Output"
 
 # Genome fasta and gtf will be downloaded automatically if missing
 genome_version: "hg38"
@@ -36,7 +36,7 @@ mode: "long-read"
 
 # Parameters in TCR prediction:
 HLA_str_inf: "/mnt/isilon/xing_lab/aspera/xuy/IRIS-long_SCLC/SCLC_HLA.txt"
-AA_window_size: 11
+AA_window_size: 9
 binding_affi: 500
 minimum_specificity_score_TCR: 5
 maximal_peptide_cpm_in_tissue_TCR: 5
@@ -52,8 +52,8 @@ group_info_inf: "group_info.txt"
 required_trans_inf: "required_trans.txt"
 
 # Additional configuration
-IRIS_long_path: "/mnt/isilon/xing_lab/aspera/xuy/Test/IRIS_long/"
-tmhmm_dir: "/mnt/isilon/xing_lab/aspera/xuy/tmhmm-2.0c/bin/"
-netMHCpan_dir: "/home/xuy2/xuy2/program/netMHCpan-4.1/"
-conda_wrapper: '/mnt/isilon/xing_lab/aspera/xuy/Test/conda_wrapper'
+IRIS_long_path: "./IRIS_long/"
+tmhmm_dir: "./tmhmm-2.0c/bin/"
+netMHCpan_dir: "./netMHCpan-4.1/"
+conda_wrapper: './conda_wrapper'
 

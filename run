@@ -1,4 +1,5 @@
 #!/bin/bash
 
-#snakemake --profile ./snakemake_profile --dag | dot -Tsvg > dag.svg
-snakemake --profile ./snakemake_profile --keep-incomplete --rerun-incomplete
+#./conda_wrapper snakemake --profile ./snakemake_profile 
+#./conda_wrapper snakemake --profile ./snakemake_profile --dag | dot -Tsvg > dag.svg
+snakemake --profile ./snakemake_profile --keep-incomplete --rerun-incomplete --latency-wait 120

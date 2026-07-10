@@ -8,6 +8,7 @@ sample_type_inf_name = sys.argv[3]
 required_trans_inf_name = sys.argv[4]
 outf_dir = sys.argv[5]
 canonical_trans_inf_name = sys.argv[6]
+number_of_trans_to_show = int(sys.argv[7])
 
 file_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -97,7 +98,7 @@ for each_gene in ave_pro_dict:
 				top_exp_trans_dict[each_gene].append(each_value)
 	sorted_key = sorted(ave_pro_dict[each_gene].items(), key=lambda x:float(x[1]), reverse = True)
 	for index,each_item in enumerate(sorted_key):
-		if (len(top_exp_trans_dict[each_gene]) >= 5) or (max_pro_dict[each_gene][each_item[0]] < 10):
+		if (len(top_exp_trans_dict[each_gene]) >= number_of_trans_to_show) or (max_pro_dict[each_gene][each_item[0]] < 10):
 			break
 		else:
 			if each_item[0] not in top_exp_trans_dict[each_gene]:

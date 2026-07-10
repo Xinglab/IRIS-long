@@ -41,6 +41,7 @@ def parse_args():
 	parser_figure.add_argument('-is', '--intron_shrinkage', dest='intron_shrinkage', type=int, help="Intron shrinkage fold in isoform structure figure", default=10)
 	parser_figure.add_argument('-of', '--order', dest='order', type=str, help='order samples by isoform proportion', default='no')
 	parser_figure.add_argument('-rg', '--ref_gtf', dest='ref_gtf', type=str, help='Reference Gencode gtf', default = './')
+	parser_figure.add_argument('-nt', '--number_of_trans', dest='number_of_trans_to_show', type=int, default=5)
 	parser_figure.add_argument('-ig', '--input_gtf', dest='input_gtf', type=str, help='Input gtf file', required=True)
 	parser_figure.add_argument('-od', '--outf_dir', dest='outf_dir', type=str, help='output directory', required=True)
 
@@ -220,6 +221,7 @@ def Sub_figure(dir_path, args):
 	order = args.order
 	ref_gtf = args.ref_gtf
 	input_gtf = args.input_gtf
+	number_of_trans_to_show = args.number_of_trans_to_show
 	gencode_version = ref_gtf.split("/")[-1].split(".")[1]
 
 	# 2.0 process gtf file
@@ -228,7 +230,7 @@ def Sub_figure(dir_path, args):
 	os.system(cmd_figure_0)
 
 	# 2.1 only show top 5 isoform's proportion and reshape the file format
-	cmd_figure_1 = f"python {dir_path}/scripts/2_1_merge_isoforms_and_reshape_format.py {isoform_proportion_inf} {isoform_cpm_inf} {group_info_inf} {required_trans_inf} {outf_dir} {dir_path}/scripts/references/gencode.{gencode_version}.canonical_transcript.txt"
+	cmd_figure_1 = f"python {dir_path}/scripts/2_1_merge_isoforms_and_reshape_format.py {isoform_proportion_inf} {isoform_cpm_inf} {group_info_inf} {required_trans_inf} {outf_dir} {dir_path}/scripts/references/gencode.{gencode_version}.canonical_transcript.txt {number_of_trans_to_show}"
 	print(cmd_figure_1)
 	os.system(cmd_figure_1)
 
