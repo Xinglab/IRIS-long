@@ -41,7 +41,7 @@ with open(CPM_inf, 'r') as inf:
 		trans_ID = arr[0]
 		tumor_list = np.array(list(map(float, arr[3:3+Tumor_num])))
 		tissue_list = np.array(list(map(float, arr[3+Tumor_num:len(arr)])))
-		if np.median(tumor_list) <= cutoff_tumor_cpm: continue
+		if (np.median(tumor_list) < 1) and (np.median(tissue_list) < 1): continue
 		wilcoxon_test = scipy.stats.ranksums(tumor_list, tissue_list, alternative='two-sided')
 		p_value_dict[trans_ID] = float(wilcoxon_test[1])
 
@@ -70,7 +70,7 @@ with open(CPM_inf, 'r') as inf_2:
 		trans_ID = arr[0]
 		tumor_list = np.array(list(map(float, arr[3:3+Tumor_num])))
 		tissue_list = np.array(list(map(float, arr[3+Tumor_num:len(arr)])))
-		if np.median(tumor_list) < cutoff_tumor_cpm: continue
+		if (np.median(tumor_list) < 1) and (np.median(tissue_list) < 1): continue
 		mean_fold = np.log2((np.mean(tumor_list)+pseudo)/(np.mean(tissue_list)+pseudo))
 		median_fold = np.log2((np.median(tumor_list)+pseudo)/(np.median(tissue_list)+pseudo))
 		#wilcoxon_test = scipy.stats.ranksums(tumor_list, tissue_list, alternative='two-sided')
@@ -80,8 +80,9 @@ with open(CPM_inf, 'r') as inf_2:
 		tag = "Not_significant"
 		if (adjust_p_value < cutoff_p):
 			if (median_fold > np.log2(cutoff_fc)):
-				outf.write(arr[0]+'\t'+arr[2]+'\t'+str(np.mean(tumor_list))+'\t'+str(np.mean(tissue_list))+'\t'+str(mean_fold)+'\t'+str(np.median(tumor_list))+'\t'+str(np.median(tissue_list))+'\t'+str(median_fold)+'\t'+str(adjust_p_value)+'\t'+str(log_p)+'\n')
-				tag = "Significant"
+				if np.median(tumor_list) > cutoff_tumor_cpm:
+					outf.write(arr[0]+'\t'+arr[2]+'\t'+str(np.mean(tumor_list))+'\t'+str(np.mean(tissue_list))+'\t'+str(mean_fold)+'\t'+str(np.median(tumor_list))+'\t'+str(np.median(tissue_list))+'\t'+str(median_fold)+'\t'+str(adjust_p_value)+'\t'+str(log_p)+'\n')
+					tag = "Significant"
 		outf_all.write(arr[0]+'\t'+arr[2]+'\t'+str(np.mean(tumor_list))+'\t'+str(np.mean(tissue_list))+'\t'+str(mean_fold)+'\t'+str(np.median(tumor_list))+'\t'+str(np.median(tissue_list))+'\t'+str(median_fold)+'\t'+str(adjust_p_value)+'\t'+str(log_p)+'\t'+tag+'\n')
 
 outf.close()
